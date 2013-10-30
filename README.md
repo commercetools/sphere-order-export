@@ -4,7 +4,7 @@ sphere-order-xml-export
 This project contains a full functional order export to create separate XMLs from each order. The code supports all possible data points and will be used within an elastic.io workflow. It can be used to connect ERP systems as well as CRM tools to update order data between the different systems.
 
 ## How to develop
-[![Build Status](https://travis-ci.org/hajoeichler/elasticio-helloworld.png?branch=master)](https://travis-ci.org/hajoeichler/elasticio-helloworld)
+[![Build Status](https://travis-ci.org/commercetools/sphere-order-xml-export.png?branch=master)](https://travis-ci.org/commercetools/sphere-order-xml-export)
 
 Install the required dependencies
 
