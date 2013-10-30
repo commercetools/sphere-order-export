@@ -1,0 +1,11 @@
+{
+  "fixtures": {
+    "noOrders": {
+      "msg": {
+        "body": {
+          "results": []
+        }
+      }
+    }
+  }
+}

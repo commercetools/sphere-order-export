@@ -1,0 +1,52 @@
+{
+  "name": "sphere-order-xml-export",
+  "description": "Quick and easy way to export your orders from SPHERE.IO into XML files.",
+  "version": "0.4.1",
+  "author": {
+    "name": "Hajo Eichler",
+    "email": "hajo.eichler@commercetools.de"
+  },
+  "contributors": [
+    {
+      "name": "Nicola Molinari",
+      "email": "nicola.molinari@commercetools.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/commercetools/sphere-order-xml-export.git"
+  },
+  "bugs": {
+    "url": "https://github.com/commercetools/sphere-order-xml-export/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/commercetools/sphere-order-xml-export/blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {
+    "xml2js": "0.2.8",
+    "xmlbuilder": "0.4.2",
+    "libxmljs": "0.8.1",
+    "request": "2.x"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.x",
+    "grunt-cli": "~0.1.9",
+    "grunt-coffeelint": "~0.0.7",
+    "grunt-contrib-clean": "~0.4.1",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-watch": "~0.4.4",
+    "jasmine-node": "~1.11.0",
+    "elasticio-cli": "~0.0.3"
+  },
+  "engines": {
+    "node": ">= 0.8.16"
+  },
+  "main": "./build/app/services.js",
+  "scripts": {
+    "test": "jasmine-node --captureExceptions build/test && elasticio cmp:process -p build/app/services.js -x noOrders"
+  }
+}

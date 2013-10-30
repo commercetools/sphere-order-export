@@ -1,0 +1,10 @@
+{
+  "title": "sphere-elastic-create-file",
+  "description": "Sample implementation for elastic.io data mapper that creates a file for each customer in SPHERE.IO",
+  "actions": {
+    "services": {
+      "main":"./build/app/services.js",
+      "title": "Services"
+    }
+  }
+}
