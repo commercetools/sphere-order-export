@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - 0.8
-  - 0.9
-  - '0.10'
+- 0.8
+- 0.9
+- '0.10'
 before_script:
 - echo '{}' > ${HOME}/elastic.json
 - touch ${HOME}/.env
@@ -10,6 +10,6 @@ before_script:
 - grunt
 env:
   global:
-  - secure: SNe+NExYCusG5i07EjPEx0NAYrV8ezrgbpfcfOt/pZ5FtT8vXRNlNXwgUf9DN4yskbn+VMolvv4wnXwPxjLcOhlZIaZzWClGYwCtmAHP5UHPA0gFQ9HvethnpeEiZq9HAO0JD8aeSYpZ+vKCde1yfxi3kU5/lT5MgNLnGyBY0co=
-  - secure: nAFfCB3Xxt+e5885lPqKcELSA5Aw/xkoGTi4TzX/WDuFw7cHGgSTFmn2xdE6k6tRBIrr4XcDp0jAjgoYfloXHiKeB2vIByVfljF43p6wA00tgyp+nZuuJOMCq/Z96ck6LCn5lJvrPxaeRsXfXd/F3Lk9L35wp1iopydMZeaAK0A=
-  - secure: eRQFFMcuBU/uTq8U5f5yN+OO6lNQVVJzrqtLyccs2tK7pzZVvr2yXFmz1ZE3ttXkAxNFRKmiyyXm+f8bozB98aKSs0LVe0WvYkE1D3EDLmzTiKX7DTFcnqhXW3KWd/vs3CGq6SgEzZpYUQt61tJCMAdLhYrUzWNUqc0A3SgowgQ=
+  - secure: noHgcqki9gddvrROx2pib1TSUt3Xfhj/YFX54QswstEAPGE+2mFA62DXjqvd4t8ZjLoLX5KojNdDMoGikUTOO66YMqaKNtYHJzjXwQdnIQkbVrkY+Lxc57k9YupGG1MvEQ7PtzejzUi9wln5Ujm6CXVynG9htQo4sdiFFGJKDbE=
+  - secure: C1+yjnWRPTq0WKvtwVp724J901VMbYbSNJh5hqtpJt4/8nh+yjP0ldtF6M+3BbMQvRzrD1sz+PBW4arQJpZZV8sRBD/PG7yrSnvcNjofOXAnEBYIhQ7JpDEcvWaQUiz2L79WpS0nDaSOWfjr/KjN5KKRaK94XXx4O1iweUZWz/I=
+  - secure: SKwTkVkihFB2wuKpARuYJkxY7pHFUbuIoXADyshbp8S6SIWjI+R5vPc4qpMhOGBl4tKLqGmiBl7Hli8K7urnXN9tTzgStGfDs6FKHq0xv2myBG0+Qdq5EBRZ7mf83q5ZXYzd8GghFHopG4RPsRQ+3zO9oDlVgqeFkGke7qgUH1k=
