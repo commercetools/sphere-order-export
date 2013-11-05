@@ -1,6 +1,6 @@
 {
-  "title": "sphere-elastic-create-file",
-  "description": "Sample implementation for elastic.io data mapper that creates a file for each customer in SPHERE.IO",
+  "title": "sphere-order-xml-export",
+  "description": "Converts each SPHERE.IO order into XML",
   "actions": {
     "services": {
       "main":"./build/app/services.js",
