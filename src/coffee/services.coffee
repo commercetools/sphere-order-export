@@ -32,12 +32,14 @@ exports.mapOrder = (order)->
   debug("mapOrder: #{order.id}") if order.id
 
   xml = builder.create("order", { "version": "1.0", "encoding": "UTF-8", "standalone": true })
-  xml.e("xsdVersion").t("0.6")
+  xml.e("xsdVersion").t("0.7")
   attribs = [ "id", "version", "createdAt", "lastModifiedAt", "customerId", "customerEmail",
-              "eevoCusomterId", "country", "orderState", "shipmentState", "paymentState" ]
+              "country", "orderState", "shipmentState", "paymentState" ]
 
   for attr in attribs
     exports.add(xml, order, attr)
+
+  xml.e("eevoCusomterId").t("UNKNOWN").up()
 
   if order.taxedPrice
     price = order.taxedPrice
@@ -92,8 +94,21 @@ exports.mapOrder = (order)->
         for attr in variant.attributes
           exports.attributes(xVariant.e("attributes"), attr)
 
+      # Adds sku again directly to the lineItem
+      exports.add(xLi, variant, "sku")
+
       exports.price(xLi, lineItem)
       exports.add(xLi, lineItem, "quantity")
+
+      # Adds lineItem price
+      total = lineItem.price.value.centAmount * lineItem.quantity
+      p =
+        price:
+          value:
+            currencyCode: lineItem.price.value.currencyCode
+            centAmount: total
+      exports.price(xLi, p, "lineItemPrice")
+
       exports.taxRate(xLi, lineItem)
 
   if order.customLineItems
@@ -108,11 +123,7 @@ exports.customLineItem = (xml, elem)->
   exports.money(xml, elem, "money")
   exports.add(xml, elem, "slug")
   exports.add(xml, elem, "quantity")
-
-  #    "taxCategory" : {
-  #      "id" : "2246b2fb-0531-47dd-84ec-c004d7fef3ce",
-  #     "typeId" : "tax-category"
-  #    }
+  exports.taxRate(xml, elem)
 
 exports.attributes = (xml, elem)->
   xml.e("name").t(elem.name).up()
@@ -123,8 +134,8 @@ exports.money = (xml, elem, name)->
     .e("currencyCode").t(elem[name].currencyCode).up()
     .e("centAmount").t(elem[name].centAmount)
 
-exports.price = (xml, elem)->
-  exports.priceElem(xml.e("price"), elem.price)
+exports.price = (xml, elem, name="price")->
+  exports.priceElem(xml.e(name), elem.price)
 
 exports.priceElem = (xP, p)->
   exports.money(xP, p, "value")
@@ -143,8 +154,9 @@ exports.customerGroup = (xml, elem)->
   if cg
     xCg = xml.e("customerGroup")
     exports.add(xCg, cg, "id")
-    exports.add(xCg, cg, "version")
-    exports.add(xCg, cg, "name")
+    if cg.obj
+      exports.add(xCg, cg.obj, "version")
+      exports.add(xCg, cg.obj, "name")
 
 exports.mapAddress = (xml, address)->
   attribs = [ "id", "title", "salutation", "firstName", "lastName", "streetName", "streetNumber", "additionalStreetInfo", "postalCode",

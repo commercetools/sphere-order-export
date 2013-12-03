@@ -88,8 +88,10 @@
       <xs:element name="productId" type="xs:string"/>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="variant" type="productVariant"/>
+      <xs:element name="sku" type="xs:string"/>
       <xs:element name="price" type="price"/>
       <xs:element name="quantity" type="xs:int"/>
+      <xs:element name="lineItemPrice" type="price"/>
       <xs:element name="taxRate" type="taxRate"/>
     </xs:sequence>
   </xs:complexType>
@@ -100,7 +102,7 @@
       <xs:element name="money" type="money"/>
       <xs:element name="slug" type="xs:string"/>
       <xs:element name="quantity" type="xs:int"/>
-<!--      <xs:element name="taxCategory" type="taxCategory"/> -->
+      <xs:element name="taxRate" type="taxRate"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="order">
@@ -109,7 +111,7 @@
         <xs:element name="xsdVersion">
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:enumeration value="0.6"/>
+              <xs:enumeration value="0.7"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>

@@ -34,7 +34,7 @@ exports.login = (projectKey, clientId, clientSecret, callback, finish)->
 exports.getOrders = (projectKey, accessToken, callback, finish)->
   debug("getOrders of project #{projectKey}")
   request_options =
-    uri: "https://api.sphere.io/#{projectKey}/orders"
+    uri: "https://api.sphere.io/#{projectKey}/orders?expand=" + encodeURIComponent("lineItems[*].variant.prices[*].customerGroup")
     method: "GET"
     headers:
       "User-Agent": "elastic.io <-> sphere.io: order export"

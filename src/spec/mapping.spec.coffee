@@ -23,10 +23,58 @@ describe "#mapOrder", ->
     doc = services.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
-      expect(result.order.xsdVersion[0]).toBe "0.6"
+      expect(result.order.xsdVersion[0]).toBe "0.7"
       expect(result.order.id[0]).toBe "abc"
       expect(result.order.version[0]).toBe "1"
       expect(result.order.orderState).toBeUndefined()
+      expect(result.order.eevoCusomterId[0]).toBe "UNKNOWN"
+
+  it "lineItem", ->
+    o = {
+      lineItems: [
+        id: "l1"
+        name:
+          de: "mein Produkt"
+        price:
+          value:
+            currencyCode: 'EUR'
+            centAmount: 999
+        quantity: 2
+        taxRate:
+          name: 'Mehrwertsteuer'
+          amount: 0.19
+          oncludedInPrice: true
+          country: 'DE'
+          id: 'ABC'
+        variant:
+          id: 1
+          sku: '345'
+      ]
+    }
+    doc = services.mapOrder(o)
+    console.log(doc)
+    parseString doc, (err, result) ->
+      expect(result.order.lineItems.length).toBe 1
+      li = result.order.lineItems[0]
+      expect(li.id[0]).toBe 'l1'
+      expect(li.name[0]).toBe 'mein Produkt'
+      expect(li.sku[0]).toBe '345'
+
+      expect(li.variant[0].id[0]).toBe '1'
+      expect(li.variant[0].sku[0]).toBe '345'
+
+      expect(li.price[0].value[0].currencyCode[0]).toBe 'EUR'
+      expect(li.price[0].value[0].centAmount[0]).toBe '999'
+
+      expect(li.quantity[0]).toBe '2'
+
+      expect(li.lineItemPrice[0].value[0].currencyCode[0]).toBe 'EUR'
+      expect(li.lineItemPrice[0].value[0].centAmount[0]).toBe '1998'
+
+      expect(li.taxRate[0].id[0]).toBe 'ABC'
+      expect(li.taxRate[0].name[0]).toBe 'Mehrwertsteuer'
+      expect(li.taxRate[0].amount[0]).toBe '0.19'
+      expect(li.taxRate[0].country[0]).toBe 'DE'
 
   it "taxedPrice", ->
     o = {
@@ -85,16 +133,21 @@ describe "#mapOrder", ->
       expect(result.order.billingAddress[0].pOBox[0]).toBe "123456789"
 
   it "customerGroup", ->
-    o = {
-      "customerGroup": {
-        "name": "B2B"
-      }
-    }
+    o =
+      customerGroup:
+        typeId: "customer-group"
+        id: "213"
+        obj:
+          id: "213"
+          version: 3
+          name: "B2B"
     doc = services.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
-      expect(result.order.customerGroup).not.toBeUndefined()
-      expect(result.order.customerGroup[0].name[0]).toBe "B2B"
+      cg = result.order.customerGroup[0]
+      expect(cg.id[0]).toBe "213"
+      expect(cg.version[0]).toBe "3"
+      expect(cg.name[0]).toBe "B2B"
 
   it "paymentInfo", ->
     o = {
@@ -126,5 +179,6 @@ describe "#mapOrder", ->
     console.log(doc)
     parseString doc, (err, result) ->
       expect(result.order.shippingInfo).not.toBeUndefined()
+      expect(result.order.shippingInfo[0].price[0].currencyCode[0]).toBe "USD"
       expect(result.order.shippingInfo[0].price[0].centAmount[0]).toBe "999"
       expect(result.order.shippingInfo[0].taxRate[0].includedInPrice[0]).toBe "true"
