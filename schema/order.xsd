@@ -59,7 +59,7 @@
   </xs:complexType>
   <xs:complexType name="address">
     <xs:sequence>
-      <xs:element name="id" type="xs:string"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
       <xs:element name="title" type="xs:string" minOccurs="0"/>
       <xs:element name="salutation" type="xs:string" minOccurs="0"/>
       <xs:element name="firstName" type="xs:string" minOccurs="0"/>
@@ -102,6 +102,7 @@
       <xs:element name="money" type="money"/>
       <xs:element name="slug" type="xs:string"/>
       <xs:element name="quantity" type="xs:int"/>
+      <xs:element name="lineItemPrice" type="price"/>
       <xs:element name="taxRate" type="taxRate"/>
     </xs:sequence>
   </xs:complexType>
@@ -115,13 +116,13 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
+        <xs:element name="eevoCusomterId" type="xs:string"/>
         <xs:element name="id" type="xs:string"/>
         <xs:element name="version" type="xs:int"/>
         <xs:element name="createdAt" type="xs:string"/>
         <xs:element name="lastModifiedAt" type="xs:string"/>
         <xs:element name="customerId" type="xs:string" minOccurs="0"/>
         <xs:element name="customerEmail" type="xs:string" minOccurs="0"/>
-        <xs:element name="eevoCusomterId" type="xs:string" minOccurs="0"/>
         <xs:element name="country" type="xs:string" minOccurs="0"/>
         <xs:element name="orderState">
           <xs:simpleType>

@@ -76,6 +76,47 @@ describe "#mapOrder", ->
       expect(li.taxRate[0].amount[0]).toBe '0.19'
       expect(li.taxRate[0].country[0]).toBe 'DE'
 
+  it "customLineItem", ->
+    o = {
+      customLineItems: [
+        id: "cl1"
+        name:
+          de: "Rabatt"
+        slug: "discount"
+        money:
+            currencyCode: 'EUR'
+            centAmount: -700
+        quantity: 3
+        taxRate:
+          name: 'Mehrwertsteuer'
+          amount: 0.19
+          oncludedInPrice: true
+          country: 'DE'
+          id: 'ABC'
+      ]
+    }
+    doc = services.mapOrder(o)
+    console.log(doc)
+    parseString doc, (err, result) ->
+      expect(result.order.customLineItems.length).toBe 1
+      cli = result.order.customLineItems[0]
+      expect(cli.id[0]).toBe 'cl1'
+      expect(cli.name[0]).toBe 'Rabatt'
+      expect(cli.slug[0]).toBe 'discount'
+
+      expect(cli.money[0].currencyCode[0]).toBe 'EUR'
+      expect(cli.money[0].centAmount[0]).toBe '-700'
+
+      expect(cli.quantity[0]).toBe '3'
+
+      expect(cli.lineItemPrice[0].value[0].currencyCode[0]).toBe 'EUR'
+      expect(cli.lineItemPrice[0].value[0].centAmount[0]).toBe '-2100'
+
+      expect(cli.taxRate[0].id[0]).toBe 'ABC'
+      expect(cli.taxRate[0].name[0]).toBe 'Mehrwertsteuer'
+      expect(cli.taxRate[0].amount[0]).toBe '0.19'
+      expect(cli.taxRate[0].country[0]).toBe 'DE'
+
   it "taxedPrice", ->
     o = {
       "taxedPrice": {

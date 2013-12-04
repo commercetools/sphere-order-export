@@ -33,13 +33,14 @@ exports.mapOrder = (order)->
 
   xml = builder.create("order", { "version": "1.0", "encoding": "UTF-8", "standalone": true })
   xml.e("xsdVersion").t("0.7")
+
+  xml.e("eevoCusomterId").t("UNKNOWN").up()
+
   attribs = [ "id", "version", "createdAt", "lastModifiedAt", "customerId", "customerEmail",
               "country", "orderState", "shipmentState", "paymentState" ]
 
   for attr in attribs
     exports.add(xml, order, attr)
-
-  xml.e("eevoCusomterId").t("UNKNOWN").up()
 
   if order.taxedPrice
     price = order.taxedPrice
@@ -101,13 +102,7 @@ exports.mapOrder = (order)->
       exports.add(xLi, lineItem, "quantity")
 
       # Adds lineItem price
-      total = lineItem.price.value.centAmount * lineItem.quantity
-      p =
-        price:
-          value:
-            currencyCode: lineItem.price.value.currencyCode
-            centAmount: total
-      exports.price(xLi, p, "lineItemPrice")
+      exports.lineItemPrice xLi, lineItem.price.value.centAmount, lineItem.quantity, lineItem.price.value.currencyCode
 
       exports.taxRate(xLi, lineItem)
 
@@ -123,6 +118,7 @@ exports.customLineItem = (xml, elem)->
   exports.money(xml, elem, "money")
   exports.add(xml, elem, "slug")
   exports.add(xml, elem, "quantity")
+  exports.lineItemPrice xml, elem.money.centAmount, elem.quantity, elem.money.currencyCode
   exports.taxRate(xml, elem)
 
 exports.attributes = (xml, elem)->
@@ -141,6 +137,15 @@ exports.priceElem = (xP, p)->
   exports.money(xP, p, "value")
   exports.add(xP, p, "country")
   exports.customerGroup(xP, p)
+
+exports.lineItemPrice = (xml, centAmount, quantity, currencyCode) ->
+  total = centAmount * quantity
+  p =
+    price:
+      value:
+        currencyCode: currencyCode
+        centAmount: total
+  exports.price(xml, p, "lineItemPrice")
 
 exports.taxRate = (xml, elem)->
   tr = elem.taxRate
