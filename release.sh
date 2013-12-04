@@ -2,6 +2,8 @@
 
 set -e
 
+rm -rf build
+
 npm version minor
 git checkout production
 git merge master
