@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = (grunt)->
   # project configuration
   grunt.initConfig
@@ -39,7 +41,8 @@ module.exports = (grunt)->
       default: ["Gruntfile.coffee", "src/**/*.coffee"]
 
     clean:
-      default: "build"
+      default: "lib"
+      test: "test"
 
     coffee:
       options:
@@ -49,14 +52,14 @@ module.exports = (grunt)->
         flatten: true
         cwd: "src/coffee"
         src: ["*.coffee"]
-        dest: "build/app"
+        dest: "lib"
         ext: ".js"
       test:
         expand: true
         flatten: true
         cwd: "src/spec"
         src: ["*.spec.coffee"]
-        dest: "build/test"
+        dest: "test"
         ext: ".spec.js"
 
     concat:
@@ -65,31 +68,40 @@ module.exports = (grunt)->
       default:
         expand: true
         flatten: true
-        cwd: "build/app"
+        cwd: "lib"
         src: ["*.js"]
-        dest: "build/app"
+        dest: "lib"
         ext: ".js"
-      test:
-        expand: true
-        flatten: true
-        cwd: "build/test"
-        src: ["*.spec.js"]
-        dest: "build/test"
-        ext: ".spec.js"
 
     # watching for changes
     watch:
       default:
         files: ["src/coffee/*.coffee"]
         tasks: ["build"]
+      test:
+        files: ["src/**/*.coffee"]
+        tasks: ["test"]
+
+    shell:
+      options:
+        stdout: true
+        stderr: true
+        failOnError: true
+      coverage:
+        command: "istanbul cover jasmine-node --captureExceptions test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+      jasmine:
+        command: "jasmine-node --captureExceptions test"
 
   # load plugins that provide the tasks defined in the config
   grunt.loadNpmTasks "grunt-coffeelint"
   grunt.loadNpmTasks "grunt-contrib-clean"
-  grunt.loadNpmTasks "grunt-contrib-coffee"
   grunt.loadNpmTasks "grunt-contrib-concat"
+  grunt.loadNpmTasks "grunt-contrib-coffee"
   grunt.loadNpmTasks "grunt-contrib-watch"
+  grunt.loadNpmTasks "grunt-shell"
+  grunt.loadNpmTasks "grunt-bump"
 
   # register tasks
   grunt.registerTask "build", ["clean", "coffeelint", "coffee", "concat"]
-  grunt.registerTask "default", ["build"]
+  grunt.registerTask "test", ["build", "shell:jasmine"]
+  grunt.registerTask "coverage", ["build", "shell:coverage"]

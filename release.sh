@@ -2,13 +2,13 @@
 
 set -e
 
-rm -rf build
+rm -rf lib
 
 npm version minor
 git checkout production
 git merge master
-grunt
-git add -f build/app/services.js
+grunt test
+git add -f lib/services.js
 git commit -m "Add generated code for production environment."
 git push origin production
 

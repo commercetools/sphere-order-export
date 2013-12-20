@@ -1,6 +1,4 @@
-basedir = "../../build/app/"
-
-services = require basedir + "services.js"
+services = require '../lib/services.js'
 {parseString} = require "xml2js"
 libxmljs = require "libxmljs"
 

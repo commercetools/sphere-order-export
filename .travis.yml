@@ -5,7 +5,9 @@ before_script:
 - echo '{}' > ${HOME}/elastic.json
 - touch ${HOME}/.env
 - ./create_config.sh
-- grunt
+script:
+- npm test
+- elasticio cmp:process -p lib/services.js -x noOrders
 env:
   global:
   - secure: noHgcqki9gddvrROx2pib1TSUt3Xfhj/YFX54QswstEAPGE+2mFA62DXjqvd4t8ZjLoLX5KojNdDMoGikUTOO66YMqaKNtYHJzjXwQdnIQkbVrkY+Lxc57k9YupGG1MvEQ7PtzejzUi9wln5Ujm6CXVynG9htQo4sdiFFGJKDbE=

@@ -3,7 +3,7 @@
   "description": "Converts each SPHERE.IO order into XML",
   "actions": {
     "services": {
-      "main":"./build/app/services.js",
+      "main":"./lib/services.js",
       "title": "Services"
     }
   }
