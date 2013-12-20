@@ -2,5 +2,5 @@
 node_modules
 build
 lib
-test
+spec
 config.js
