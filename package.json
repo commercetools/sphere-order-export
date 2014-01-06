@@ -1,9 +1,15 @@
 {
   "name": "sphere-order-xml-export",
   "description": "Quick and easy way to export your orders from SPHERE.IO into XML files.",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "homepage": "https://github.com/commercetools/sphere-order-xml-export",
-  "keywords": [ "sphere", "api", "order", "export", "xml" ],
+  "keywords": [
+    "sphere",
+    "api",
+    "order",
+    "export",
+    "xml"
+  ],
   "author": {
     "name": "Hajo Eichler",
     "email": "hajo.eichler@commercetools.de"
