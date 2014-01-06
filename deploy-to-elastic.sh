@@ -4,12 +4,13 @@ set -e
 
 rm -rf lib
 
-npm version minor
+npm version patch
 git checkout production
 git merge master
-grunt test
-git add -f lib/services.js
-git commit -m "Add generated code for production environment."
+
+grunt build
+git add -f lib/
+git commit -m "Add generated code for elastic.io environment."
 git push origin production
 
 git checkout master
