@@ -3,7 +3,8 @@
   "description": "Converts each SPHERE.IO order into XML",
   "actions": {
     "services": {
-      "main":"./lib/services.js",
+      "title": "Sphere Order XML Export",
+      "main": "./lib/services.js",
       "title": "Services"
     }
   }
