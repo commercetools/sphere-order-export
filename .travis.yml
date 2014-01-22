@@ -7,7 +7,7 @@ before_script:
 - ./create_config.sh
 script:
 - npm test
-- elasticio cmp:process -p lib/services.js -x noOrders
+- node lib/run.js --projectKey ${SPHERE_PROJECT_KEY} --clientId ${SPHERE_CLIENT_ID} --clientSecret ${SPHERE_CLIENT_SECRET} --output out.xml
 env:
   global:
   - secure: noHgcqki9gddvrROx2pib1TSUt3Xfhj/YFX54QswstEAPGE+2mFA62DXjqvd4t8ZjLoLX5KojNdDMoGikUTOO66YMqaKNtYHJzjXwQdnIQkbVrkY+Lxc57k9YupGG1MvEQ7PtzejzUi9wln5Ujm6CXVynG9htQo4sdiFFGJKDbE=
