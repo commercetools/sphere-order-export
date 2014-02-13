@@ -1,4 +1,4 @@
-builder     = require "xmlbuilder"
+builder = require "xmlbuilder"
 
 debug = (msg)-> console.log "DEBUG: #{msg}"
 
@@ -31,9 +31,9 @@ exports.mapOrder = (order)->
   debug("mapOrder: #{order.id}") if order.id
 
   xml = builder.create("order", { "version": "1.0", "encoding": "UTF-8", "standalone": true })
-  xml.e("xsdVersion").t("0.7")
+  xml.e("xsdVersion").t("0.8")
 
-  xml.e("eevoCusomterId").t("UNKNOWN").up()
+  xml.e("externalCustomerId").t("UNKNOWN").up()
 
   attribs = [ "id", "version", "createdAt", "lastModifiedAt", "customerId", "customerEmail",
               "country", "orderState", "shipmentState", "paymentState" ]

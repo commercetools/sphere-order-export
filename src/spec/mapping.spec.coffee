@@ -21,11 +21,11 @@ describe "#mapOrder", ->
     doc = services.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
-      expect(result.order.xsdVersion[0]).toBe "0.7"
+      expect(result.order.xsdVersion[0]).toBe "0.8"
       expect(result.order.id[0]).toBe "abc"
       expect(result.order.version[0]).toBe "1"
       expect(result.order.orderState).toBeUndefined()
-      expect(result.order.eevoCusomterId[0]).toBe "UNKNOWN"
+      expect(result.order.externalCustomerId[0]).toBe "UNKNOWN"
 
   it "lineItem", ->
     o = {
