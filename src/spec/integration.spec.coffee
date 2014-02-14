@@ -1,21 +1,17 @@
 Mapping = require '../lib/mapping.js'
-sphere = require '../lib/sphere.js'
-config = require('../config').config
+SphereClient = require 'sphere-node-client'
+config = require '../config'
 
-describe "elastic.io integration", ->
-  it "login", (done) ->
-    sphere.login config.project_key, config.client_id, config.client_secret, (p, t) ->
-      expect(t).not.toBeUndefined()
+describe 'elastic.io integration', ->
+  beforeEach ->
+    @sphere = new SphereClient config
+  
+  it "getOrders", (done) ->
+    @sphere.orders.fetch().then (result) ->
+      expect(result).not.toBeUndefined()
       done()
 
-  it "getOrders", (done) ->
-    sphere.login config.project_key, config.client_id, config.client_secret, (p, t) ->
-      sphere.getOrders p, t, (r) ->
-        expect(r).not.toBeUndefined()
-        done()
-
   it "full turn around", (done) ->
-    sphere.login config.project_key, config.client_id, config.client_secret, (p, t) ->
-      sphere.getOrders p, t, (r) ->
-        new Mapping().mapOrders r, (finish) ->
-          done()
+    @sphere.orders.fetch().then (result) ->
+      new Mapping().mapOrders result, ->
+        done()

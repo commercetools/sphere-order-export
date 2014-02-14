@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "request": "2.x",
+    "sphere-node-client": "0.3.0",
     "xmlbuilder": "2.1.0"
   },
   "devDependencies": {
