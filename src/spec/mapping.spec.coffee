@@ -1,15 +1,5 @@
 Mapping = require '../lib/mapping'
 {parseString} = require 'xml2js'
-libxmljs = require 'libxmljs'
-
-describe 'validateXML', ->
-  xit 'validate', ->
-    xsd = ''
-    xsdDoc = libxmljs.parseXmlString xsd
-
-    xml = ''
-    xmlDoc = libxmljs.parseXmlString xml
-    expect(xmlDoc.validate xsdDoc).toBe true
 
 describe '#mapOrder', ->
   beforeEach ->
