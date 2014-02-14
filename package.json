@@ -47,18 +47,18 @@
     "xmlbuilder": "0.4.2"
   },
   "devDependencies": {
-    "coveralls": "~2.1.0",
+    "coveralls": "~2.8.0",
     "elasticio-cli": "~0.0.3",
     "grunt": "~0.4.1",
     "grunt-bump": "~0.0.11",
     "grunt-cli": "~0.1.9",
     "grunt-coffeelint": "~0.0.7",
     "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-coffee": "~0.10.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-shell": "~0.5.0",
-    "istanbul": "~0.1.46",
-    "jasmine-node": "~1.11.0"
+    "grunt-shell": "~0.6.4",
+    "istanbul": "~0.2.4",
+    "jasmine-node": "~1.13.0"
   }
 }
