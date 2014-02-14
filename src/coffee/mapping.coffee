@@ -8,12 +8,12 @@ class Mapping
     console.log "DEBUG: #{msg}"
 
   elasticio: (msg, cfg, next, snapshot) ->
-    @_debug 'process'
+    @_debug 'elasticio called'
     @mapOrders(msg.body, next)
 
   mapOrders: (json, finish) ->
     orders = json.results
-    @_debug "mapOrders: #{orders.length}"
+    @_debug "mapOrders: number of orders #{orders.length}"
 
     now = new Buffer(new Date().toISOString()).toString(@BASE64)
     data =
@@ -24,7 +24,6 @@ class Mapping
 
     for order in orders
       xmlOrder = @mapOrder(order)
-      @_debug(xmlOrder)
       fileName = "#{order.id}.xml"
       base64 = new Buffer(xmlOrder).toString(@BASE64)
       data.attachments[fileName] =
@@ -33,7 +32,7 @@ class Mapping
     finish(null, data)
 
   mapOrder: (order) ->
-    @_debug("mapOrder: #{order.id}") if order.id
+    @_debug("mapOrder for #{order.id}") if order.id
 
     xml = builder.create('order', { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.8')
