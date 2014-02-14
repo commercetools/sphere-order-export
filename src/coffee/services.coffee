@@ -1,175 +1,182 @@
-builder = require "xmlbuilder"
+builder = require 'xmlbuilder'
 
-debug = (msg)-> console.log "DEBUG: #{msg}"
+class Mapping
 
-exports.process = (msg, cfg, next)->
-  debug "process"
-  exports.mapOrders(msg.body, next)
+  BASE64 = 'base64'
 
-exports.mapOrders = (json, finish)->
-  orders = json.results
-  debug "mapOrders: #{orders.length}"
+  debug: (msg) ->
+    console.log "DEBUG: #{msg}"
 
-  now = new Buffer(new Date().toISOString()).toString("base64")
-  data =
-    body: {}
-    attachments:
-      "touch-timestamp.txt":
-        content: now
+  process: (msg, cfg, next) ->
+    @debug 'process'
+    @mapOrders(msg.body, next)
 
-  for order in orders
-    xmlOrder = exports.mapOrder(order)
-    debug(xmlOrder)
-    fileName = "#{order.id}.xml"
-    base64 = new Buffer(xmlOrder).toString("base64")
-    data.attachments[fileName] =
-      content: base64
+  mapOrders: (json, finish) ->
+    orders = json.results
+    @debug "mapOrders: #{orders.length}"
 
-  finish(null, data)
+    now = new Buffer(new Date().toISOString()).toString(@BASE64)
+    data =
+      body: {}
+      attachments:
+        'touch-timestamp.txt':
+          content: now
 
-exports.mapOrder = (order)->
-  debug("mapOrder: #{order.id}") if order.id
+    for order in orders
+      xmlOrder = @mapOrder(order)
+      @debug(xmlOrder)
+      fileName = "#{order.id}.xml"
+      base64 = new Buffer(xmlOrder).toString(@BASE64)
+      data.attachments[fileName] =
+        content: base64
 
-  xml = builder.create("order", { "version": "1.0", "encoding": "UTF-8", "standalone": true })
-  xml.e("xsdVersion").t("0.8")
+    finish(null, data)
 
-  xml.e("externalCustomerId").t("UNKNOWN").up()
+  mapOrder: (order) ->
+    @debug("mapOrder: #{order.id}") if order.id
 
-  attribs = [ "id", "version", "createdAt", "lastModifiedAt", "customerId", "customerEmail",
-              "country", "orderState", "shipmentState", "paymentState" ]
+    xml = builder.create("order", { "version": "1.0", "encoding": "UTF-8", "standalone": true })
+    xml.e("xsdVersion").t("0.8")
 
-  for attr in attribs
-    exports.add(xml, order, attr)
+    xml.e("externalCustomerId").t("UNKNOWN").up()
 
-  if order.taxedPrice
-    price = order.taxedPrice
-    xPrice = xml.e("taxedPrice")
-    exports.money(xPrice, price, "totalNet")
-    exports.money(xPrice, price, "totalGross")
+    attribs = [ "id", "version", "createdAt", "lastModifiedAt", "customerId", "customerEmail",
+                "country", "orderState", "shipmentState", "paymentState" ]
 
-    for tax in price.taxPortions
-      xT = xPrice.e("taxPortions")
-      xT.e("rate").t(tax.rate)
-      exports.money(xT, tax, "amount")
+    for attr in attribs
+      @add(xml, order, attr)
 
-  if order.shippingAddress
-    exports.mapAddress(xml.e("shippingAddress"), order.shippingAddress)
+    if order.taxedPrice
+      price = order.taxedPrice
+      xPrice = xml.e("taxedPrice")
+      @money(xPrice, price, "totalNet")
+      @money(xPrice, price, "totalGross")
 
-  if order.billingAddress
-    exports.mapAddress(xml.e("billingAddress"), order.billingAddress)
+      for tax in price.taxPortions
+        xT = xPrice.e("taxPortions")
+        xT.e("rate").t(tax.rate)
+        @money(xT, tax, "amount")
 
-  exports.customerGroup(xml, order)
+    if order.shippingAddress
+      @mapAddress(xml.e("shippingAddress"), order.shippingAddress)
 
-  if order.paymentInfo
-    pi = order.paymentInfo
-    xPi = xml.e("paymentInfo")
-    exports.add(xPi, pi, "paymentMethod")
-    exports.add(xPi, pi, "paymentID")
+    if order.billingAddress
+      @mapAddress(xml.e("billingAddress"), order.billingAddress)
 
-  if order.shippingInfo
-    si = order.shippingInfo
-    xSi = xml.e("shippingInfo")
-    exports.add(xSi, si, "shippingMethodName")
-    exports.add(xSi, si, "trackingData")
+    @customerGroup(xml, order)
 
-    exports.money(xSi, si, "price")
-    exports.taxRate(xSi, si)
+    if order.paymentInfo
+      pi = order.paymentInfo
+      xPi = xml.e("paymentInfo")
+      @add(xPi, pi, "paymentMethod")
+      @add(xPi, pi, "paymentID")
 
-  if order.lineItems
-    for lineItem in order.lineItems
-      xLi = xml.e("lineItems")
-      exports.add(xLi, lineItem, "id")
-      exports.add(xLi, lineItem, "productId")
-      exports.add(xLi, lineItem.name, "de", "name")
+    if order.shippingInfo
+      si = order.shippingInfo
+      xSi = xml.e("shippingInfo")
+      @add(xSi, si, "shippingMethodName")
+      @add(xSi, si, "trackingData")
 
-      variant = lineItem.variant
-      xVariant = xLi.e("variant")
-      exports.add(xVariant, variant, "id")
-      exports.add(xVariant, variant, "sku")
-      if variant.prices
-        for price in variant.prices
-          exports.priceElem(xVariant.e("prices"), price)
+      @money(xSi, si, "price")
+      @taxRate(xSi, si)
 
-      if variant.attributes
-        for attr in variant.attributes
-          exports.attributes(xVariant.e("attributes"), attr)
+    if order.lineItems
+      for lineItem in order.lineItems
+        xLi = xml.e("lineItems")
+        @add(xLi, lineItem, "id")
+        @add(xLi, lineItem, "productId")
+        @add(xLi, lineItem.name, "de", "name")
 
-      # Adds sku again directly to the lineItem
-      exports.add(xLi, variant, "sku")
+        variant = lineItem.variant
+        xVariant = xLi.e("variant")
+        @add(xVariant, variant, "id")
+        @add(xVariant, variant, "sku")
+        if variant.prices
+          for price in variant.prices
+            @priceElem(xVariant.e("prices"), price)
 
-      exports.price(xLi, lineItem)
-      exports.add(xLi, lineItem, "quantity")
+        if variant.attributes
+          for attr in variant.attributes
+            @attributes(xVariant.e("attributes"), attr)
 
-      # Adds lineItem price
-      exports.lineItemPrice xLi, lineItem.price.value.centAmount, lineItem.quantity, lineItem.price.value.currencyCode
+        # Adds sku again directly to the lineItem
+        @add(xLi, variant, "sku")
 
-      exports.taxRate(xLi, lineItem)
+        @price(xLi, lineItem)
+        @add(xLi, lineItem, "quantity")
 
-  if order.customLineItems
-    for customLineItem in order.customLineItems
-      exports.customLineItem(xml.e("customLineItems"), customLineItem)
+        # Adds lineItem price
+        @lineItemPrice xLi, lineItem.price.value.centAmount, lineItem.quantity, lineItem.price.value.currencyCode
 
-  xml.end(pretty: true, indent: "  ", newline: "\n")
+        @taxRate(xLi, lineItem)
 
-exports.customLineItem = (xml, elem)->
-  exports.add(xml, elem, "id")
-  exports.add(xml, elem.name, "de", "name")
-  exports.money(xml, elem, "money")
-  exports.add(xml, elem, "slug")
-  exports.add(xml, elem, "quantity")
-  exports.lineItemPrice xml, elem.money.centAmount, elem.quantity, elem.money.currencyCode
-  exports.taxRate(xml, elem)
+    if order.customLineItems
+      for customLineItem in order.customLineItems
+        @customLineItem(xml.e("customLineItems"), customLineItem)
 
-exports.attributes = (xml, elem)->
-  xml.e("name").t(elem.name).up()
-    .e("value").t(elem.value)
+    xml.end(pretty: true, indent: "  ", newline: "\n")
 
-exports.money = (xml, elem, name)->
-  xml.e(name)
-    .e("currencyCode").t(elem[name].currencyCode).up()
-    .e("centAmount").t(elem[name].centAmount)
+  customLineItem: (xml, elem) ->
+    @add(xml, elem, "id")
+    @add(xml, elem.name, "de", "name")
+    @money(xml, elem, "money")
+    @add(xml, elem, "slug")
+    @add(xml, elem, "quantity")
+    @lineItemPrice xml, elem.money.centAmount, elem.quantity, elem.money.currencyCode
+    @taxRate(xml, elem)
 
-exports.price = (xml, elem, name="price")->
-  exports.priceElem(xml.e(name), elem.price)
+  attributes: (xml, elem) ->
+    xml.e("name").t(elem.name).up()
+      .e("value").t(elem.value)
 
-exports.priceElem = (xP, p)->
-  exports.money(xP, p, "value")
-  exports.add(xP, p, "country")
-  exports.customerGroup(xP, p)
+  money: (xml, elem, name) ->
+    xml.e(name)
+      .e("currencyCode").t(elem[name].currencyCode).up()
+      .e("centAmount").t(elem[name].centAmount)
 
-exports.lineItemPrice = (xml, centAmount, quantity, currencyCode) ->
-  total = centAmount * quantity
-  p =
-    price:
-      value:
-        currencyCode: currencyCode
-        centAmount: total
-  exports.price(xml, p, "lineItemPrice")
+  price: (xml, elem, name="price") ->
+    @priceElem(xml.e(name), elem.price)
 
-exports.taxRate = (xml, elem)->
-  tr = elem.taxRate
-  xTr = xml.e("taxRate")
-  attribs = [ "id", "name", "amount", "includedInPrice", "country", "state" ]
-  for attr in attribs
-    exports.add(xTr, tr, attr)
+  priceElem: (xP, p) ->
+    @money(xP, p, "value")
+    @add(xP, p, "country")
+    @customerGroup(xP, p)
 
-exports.customerGroup = (xml, elem)->
-  cg = elem.customerGroup
-  if cg
-    xCg = xml.e("customerGroup")
-    exports.add(xCg, cg, "id")
-    if cg.obj
-      exports.add(xCg, cg.obj, "version")
-      exports.add(xCg, cg.obj, "name")
+  lineItemPrice: (xml, centAmount, quantity, currencyCode) ->
+    total = centAmount * quantity
+    p =
+      price:
+        value:
+          currencyCode: currencyCode
+          centAmount: total
+    @price(xml, p, "lineItemPrice")
 
-exports.mapAddress = (xml, address)->
-  attribs = [ "id", "title", "salutation", "firstName", "lastName", "streetName", "streetNumber", "additionalStreetInfo", "postalCode",
-              "city", "region", "state", "country", "company", "department", "building", "apartment", "pOBox", "phone", "mobile", "email" ]
-  for attr in attribs
-    exports.add(xml, address, attr)
+  taxRate: (xml, elem) ->
+    tr = elem.taxRate
+    xTr = xml.e("taxRate")
+    attribs = [ "id", "name", "amount", "includedInPrice", "country", "state" ]
+    for attr in attribs
+      @add(xTr, tr, attr)
 
-exports.add = (xml, elem, attr, xAttr)->
-  xAttr = attr unless xAttr
+  customerGroup: (xml, elem) ->
+    cg = elem.customerGroup
+    if cg
+      xCg = xml.e("customerGroup")
+      @add(xCg, cg, "id")
+      if cg.obj
+        @add(xCg, cg.obj, "version")
+        @add(xCg, cg.obj, "name")
 
-  value = elem[attr]
-  xml.e(xAttr).t(value).up() if value
+  mapAddress: (xml, address) ->
+    attribs = [ "id", "title", "salutation", "firstName", "lastName", "streetName", "streetNumber", "additionalStreetInfo", "postalCode",
+                "city", "region", "state", "country", "company", "department", "building", "apartment", "pOBox", "phone", "mobile", "email" ]
+    for attr in attribs
+      @add(xml, address, attr)
+
+  add: (xml, elem, attr, xAttr) ->
+    xAttr = attr unless xAttr
+
+    value = elem[attr]
+    xml.e(xAttr).t(value).up() if value
+
+module.exports = Mapping

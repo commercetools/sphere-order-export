@@ -1,4 +1,4 @@
-services = require '../lib/services.js'
+Mapping = require '../lib/services'
 {parseString} = require "xml2js"
 libxmljs = require "libxmljs"
 
@@ -13,12 +13,14 @@ describe "validateXML", ->
 
 
 describe "#mapOrder", ->
+  beforeEach ->
+    @mapping = new Mapping()
   it "simple", ->
     o = {
       "id":"abc",
       "version":1
     }
-    doc = services.mapOrder(o)
+    doc = @mapping.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
       expect(result.order.xsdVersion[0]).toBe "0.8"
@@ -49,7 +51,7 @@ describe "#mapOrder", ->
           sku: '345'
       ]
     }
-    doc = services.mapOrder(o)
+    doc = @mapping.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
       expect(result.order.lineItems.length).toBe 1
@@ -93,7 +95,7 @@ describe "#mapOrder", ->
           id: 'ABC'
       ]
     }
-    doc = services.mapOrder(o)
+    doc = @mapping.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
       expect(result.order.customLineItems.length).toBe 1
@@ -135,7 +137,7 @@ describe "#mapOrder", ->
         }]
       }
     }
-    doc = services.mapOrder(o)
+    doc = @mapping.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
       expect(result.order.taxedPrice).not.toBeUndefined()
@@ -153,7 +155,7 @@ describe "#mapOrder", ->
         "title": "Prof. Dr."
       }
     }
-    doc = services.mapOrder(o)
+    doc = @mapping.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
       expect(result.order.shippingAddress).not.toBeUndefined()
@@ -165,7 +167,7 @@ describe "#mapOrder", ->
         "pOBox": "123456789"
       }
     }
-    doc = services.mapOrder(o)
+    doc = @mapping.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
       expect(result.order.billingAddress).not.toBeUndefined()
@@ -180,7 +182,7 @@ describe "#mapOrder", ->
           id: "213"
           version: 3
           name: "B2B"
-    doc = services.mapOrder(o)
+    doc = @mapping.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
       cg = result.order.customerGroup[0]
@@ -195,7 +197,7 @@ describe "#mapOrder", ->
         "paymentMethod": "Cash"
       }
     }
-    doc = services.mapOrder(o)
+    doc = @mapping.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
       expect(result.order.paymentInfo).not.toBeUndefined()
@@ -214,7 +216,7 @@ describe "#mapOrder", ->
         }
       }
     }
-    doc = services.mapOrder(o)
+    doc = @mapping.mapOrder(o)
     console.log(doc)
     parseString doc, (err, result) ->
       expect(result.order.shippingInfo).not.toBeUndefined()
