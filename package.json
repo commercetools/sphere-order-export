@@ -33,7 +33,7 @@
       "url": "https://github.com/commercetools/sphere-order-xml-export/blob/master/LICENSE-MIT"
     }
   ],
-  "main": "lib/services.js",
+  "main": "elasticio.js",
   "engines": {
     "node": ">= 0.8.0"
   },
@@ -41,23 +41,23 @@
     "test": "grunt coverage"
   },
   "dependencies": {
-    "xml2js": "0.2.8",
-    "xmlbuilder": "0.4.2",
     "libxmljs": "0.8.1",
-    "request": "2.x"
+    "request": "2.x",
+    "xml2js": "0.2.8",
+    "xmlbuilder": "0.4.2"
   },
   "devDependencies": {
     "coveralls": "~2.1.0",
     "elasticio-cli": "~0.0.3",
     "grunt": "~0.4.1",
-    "grunt-shell": "~0.5.0",
+    "grunt-bump": "~0.0.11",
     "grunt-cli": "~0.1.9",
     "grunt-coffeelint": "~0.0.7",
     "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-bump": "~0.0.11",
+    "grunt-shell": "~0.5.0",
     "istanbul": "~0.1.46",
     "jasmine-node": "~1.11.0"
   }
