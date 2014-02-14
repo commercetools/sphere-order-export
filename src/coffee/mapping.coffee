@@ -133,7 +133,7 @@ class Mapping
       .e('currencyCode').t(elem[name].currencyCode).up()
       .e('centAmount').t(elem[name].centAmount)
 
-  _price: (xml, elem, name='price') ->
+  _price: (xml, elem, name = 'price') ->
     @_priceElem(xml.e(name), elem.price)
 
   _priceElem: (xP, p) ->
