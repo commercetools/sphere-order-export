@@ -7,9 +7,17 @@ before_script:
 - ./create_config.sh
 script:
 - npm test
-#- node lib/run.js --projectKey ${SPHERE_PROJECT_KEY} --clientId ${SPHERE_CLIENT_ID} --clientSecret ${SPHERE_CLIENT_SECRET} --output out.xml
 env:
   global:
   - secure: noHgcqki9gddvrROx2pib1TSUt3Xfhj/YFX54QswstEAPGE+2mFA62DXjqvd4t8ZjLoLX5KojNdDMoGikUTOO66YMqaKNtYHJzjXwQdnIQkbVrkY+Lxc57k9YupGG1MvEQ7PtzejzUi9wln5Ujm6CXVynG9htQo4sdiFFGJKDbE=
   - secure: C1+yjnWRPTq0WKvtwVp724J901VMbYbSNJh5hqtpJt4/8nh+yjP0ldtF6M+3BbMQvRzrD1sz+PBW4arQJpZZV8sRBD/PG7yrSnvcNjofOXAnEBYIhQ7JpDEcvWaQUiz2L79WpS0nDaSOWfjr/KjN5KKRaK94XXx4O1iweUZWz/I=
   - secure: SKwTkVkihFB2wuKpARuYJkxY7pHFUbuIoXADyshbp8S6SIWjI+R5vPc4qpMhOGBl4tKLqGmiBl7Hli8K7urnXN9tTzgStGfDs6FKHq0xv2myBG0+Qdq5EBRZ7mf83q5ZXYzd8GghFHopG4RPsRQ+3zO9oDlVgqeFkGke7qgUH1k=
+notifications:
+  hipchat:
+    rooms:
+      secure: nJhb0+Vle68bKhgE/2BeIjOslESECiOiYpRwzCe/bufVbyORoo+tooGGUV4lkKN1uLsMNik1vQelRY/MM96qPt/TgyUgwGCagQPmh3zZ41sZuzOfYasBjLuh+cyneZi8rTD/V5PwQFrn5HVPnPx33e83SWDOl8Qbjnq+uFnXjS8=
+    template:
+    - '%{repository}#%{build_number} (%{author}): %{message} (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Compare</a>)'
+    format: html
+    on_success: change
+    on_failure: change
