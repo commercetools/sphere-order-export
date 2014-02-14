@@ -1,4 +1,4 @@
-Mapping = require '../lib/services'
+Mapping = require '../lib/mapping'
 {parseString} = require "xml2js"
 libxmljs = require "libxmljs"
 

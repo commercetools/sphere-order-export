@@ -4,8 +4,8 @@
   "actions": {
     "services": {
       "title": "Sphere Order XML Export",
-      "main": "./lib/services.js",
-      "title": "Order XML Export"
+      "main": "elasticio.js",
+      "title": "XML Export"
     }
   }
 }

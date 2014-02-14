@@ -1,4 +1,4 @@
-services = require '../lib/services.js'
+Mapping = require '../lib/mapping.js'
 sphere = require '../lib/sphere.js'
 config = require('../config').config
 
@@ -17,5 +17,5 @@ describe "elastic.io integration", ->
   it "full turn around", (done) ->
     sphere.login config.project_key, config.client_id, config.client_secret, (p, t) ->
       sphere.getOrders p, t, (r) ->
-        services.mapOrders r, (finish) ->
+        new Mapping().mapOrders r, (finish) ->
           done()
