@@ -41,6 +41,7 @@
     "test": "grunt coverage"
   },
   "dependencies": {
+    "q": "1.0.0",
     "request": "2.x",
     "sphere-node-client": "0.3.0",
     "xmlbuilder": "2.1.0"
