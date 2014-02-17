@@ -1,17 +1,22 @@
 builder = require 'xmlbuilder'
+CustomerNumber = require '../lib/customernumber'
+Q = require 'q'
 
 class Mapping
 
   BASE64 = 'base64'
+
+  constructor: (options = {}) ->
+    @numberService = new CustomerNumber options
 
   _debug: (msg) ->
     console.log "DEBUG: #{msg}"
 
   elasticio: (msg, cfg, next, snapshot) ->
     @_debug 'elasticio called'
-    @mapOrders(msg.body, next)
+    @mapOrders msg.body, next
 
-  mapOrders: (json, finish) ->
+  mapOrders: (json, callback) ->
     orders = json.results
     @_debug "mapOrders: number of orders #{orders.length}"
 
@@ -22,22 +27,29 @@ class Mapping
         'touch-timestamp.txt':
           content: now
 
+    promises = []
     for order in orders
-      xmlOrder = @mapOrder(order)
-      fileName = "#{order.id}.xml"
-      base64 = new Buffer(xmlOrder).toString(@BASE64)
-      data.attachments[fileName] =
-        content: base64
+      promises.push @numberService.getCustomerNumberById(order.customerId)
 
-    finish(null, data)
-
-  mapOrder: (order) ->
+    Q.all(promises)
+    .then (customerNumbers) =>
+      for order, index in orders
+        xml = @mapOrder order, customerNumbers[index]
+        fileName = "#{orders.id}.xml"
+        base64 = new Buffer(xml).toString(@BASE64)
+        data.attachments[fileName] =
+          content: base64
+      callback(true, data)
+    .fail (res) ->
+      callback(false, res)
+    
+  mapOrder: (order, externalCustomerId = 'UNKNOWN') ->
     @_debug("mapOrder for #{order.id}") if order.id
 
     xml = builder.create('order', { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.8')
 
-    xml.e('externalCustomerId').t('UNKNOWN').up()
+    xml.e('externalCustomerId').t(externalCustomerId).up()
 
     attribs = [ 'id', 'version', 'createdAt', 'lastModifiedAt', 'customerId', 'customerEmail',
                 'country', 'orderState', 'shipmentState', 'paymentState' ]

@@ -2,6 +2,8 @@ CustomerNumber = require '../lib/customernumber'
 SphereClient = require 'sphere-node-client'
 config = require '../config'
 
+jasmine.getEnv().defaultTimeoutInterval = 9000
+
 describe 'CustomerNumber', ->
   beforeEach ->
     @cn = new CustomerNumber config
@@ -24,4 +26,3 @@ describe 'CustomerNumber', ->
       @cn.getCustomerNumberById(res.customer.id).then (customerNumber) ->
         expect(customerNumber).toBe 'ext123'
         done()
-

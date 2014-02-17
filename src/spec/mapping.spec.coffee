@@ -1,9 +1,10 @@
 Mapping = require '../lib/mapping'
+config = require '../config'
 {parseString} = require 'xml2js'
 
 describe '#mapOrder', ->
   beforeEach ->
-    @mapping = new Mapping()
+    @mapping = new Mapping config
   it 'simple', ->
     order =
       id: 'abc'
