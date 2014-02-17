@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="returnInfo">
+    <xs:sequence>
+      <xs:element name="items" type="returnItem" minOccurs="1" maxOccurs="unbounded"/>
+      <xs:element name="returnTrackingId" type="xs:string" minOccurs="0"/>
+      <xs:element name="returnDate" type="xs:datetime"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="returnItem">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="quantity" type="xs:int"/>
+      <xs:element name="lineItemId" type="xs:string"/>
+      <xs:element name="comment" type="xs:string"/>
+      <xs:element name="returnShipmentState" type="returnShipmentState"/>      
+      <xs:element name="returnPaymentState" type="returnPaymentState"/>         
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="returnShipmentState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Advised"/>
+      <xs:enumeration value="Returned"/>
+      <xs:enumeration value="BackInStock"/>
+      <xs:enumeration value="Unusable"/> 
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="returnPaymentState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Initial"/>
+      <xs:enumeration value="NonRefundable"/>
+      <xs:enumeration value="Refunded"/>
+      <xs:enumeration value="NotRefunded"/> 
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="delivery">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="items" type="deliveryItem" minOccurs="1" maxOccurs="unbounded"/>
+      <xs:element name="parcels" type="parcel" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="deliveryItem">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="quantity" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="parcel">
+    <xs:sequence>
+      <xs:element name="measurements" type="parcelMeasurements" minOccurs="0"/>
+      <xs:element name="trackingData" type="trackingData" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="parcelMeasurements">
+    <xs:sequence>
+      <xs:element name="heightInMillimeter" type="xs:int"/>
+      <xs:element name="lengthInMillimeter" type="xs:int"/>
+      <xs:element name="widthInMillimeter" type="xs:int"/>
+      <xs:element name="weightInGram" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="trackingData">
+    <xs:sequence>
+      <xs:element name="trackingId" type="xs:string" minOccurs="0"/>
+      <xs:element name="carrier" type="xs:string" minOccurs="0"/>
+      <xs:element name="shippingProvider" type="xs:string" minOccurs="0"/>
+      <xs:element name="shippingProviderTransaction" type="xs:string" minOccurs="0"/>
+      <xs:element name="isReturn" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="xsdVersion">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="0.1"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="id" type="xs:string"/>
+        <xs:element name="version" type="xs:int"/>
+        <xs:element name="orderState">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Open"/>
+              <xs:enumeration value="Complete"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="shipmentState" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Shipped"/>
+              <xs:enumeration value="Ready"/>
+              <xs:enumeration value="Pending"/>
+              <xs:enumeration value="Partial"/>
+              <xs:enumeration value="Backorder"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="paymentState">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="BalanceDue"/>
+              <xs:enumeration value="Failed"/>
+              <xs:enumeration value="Pending"/>
+              <xs:enumeration value="CreditOwed"/>
+              <xs:enumeration value="Paid"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="shippingInfo" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="deliveries" type="delivery" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="returnInfo" type="returnInfo" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
