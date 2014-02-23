@@ -1,11 +1,12 @@
 Mapping = require '../lib/mapping'
-config = require '../config'
+Config = require '../config'
 {parseString} = require 'xml2js'
 
 describe '#mapOrder', ->
   beforeEach ->
-    @mapping = new Mapping config
-  it 'simple', ->
+    @mapping = new Mapping Config
+    
+  it 'simple', (done) ->
     order =
       id: 'abc'
       version: 1
@@ -16,8 +17,9 @@ describe '#mapOrder', ->
       expect(result.order.version[0]).toBe '1'
       expect(result.order.orderState).toBeUndefined()
       expect(result.order.externalCustomerId[0]).toBe 'UNKNOWN'
+      done()
 
-  it 'lineItem', ->
+  it 'lineItem', (done) ->
     order =
       lineItems: [
         id: 'l1'
@@ -61,8 +63,9 @@ describe '#mapOrder', ->
       expect(li.taxRate[0].name[0]).toBe 'Mehrwertsteuer'
       expect(li.taxRate[0].amount[0]).toBe '0.19'
       expect(li.taxRate[0].country[0]).toBe 'DE'
+      done()
 
-  it 'customLineItem', ->
+  it 'customLineItem', (done) ->
     order =
       customLineItems: [
         id: 'cl1'
@@ -100,8 +103,9 @@ describe '#mapOrder', ->
       expect(cli.taxRate[0].name[0]).toBe 'Mehrwertsteuer'
       expect(cli.taxRate[0].amount[0]).toBe '0.19'
       expect(cli.taxRate[0].country[0]).toBe 'DE'
+      done()
 
-  it 'taxedPrice', ->
+  it 'taxedPrice', (done) ->
     order =
       taxedPrice:
         totalNet:
@@ -126,8 +130,9 @@ describe '#mapOrder', ->
       expect(result.order.taxedPrice[0].taxPortions[0].rate[0]).toBe 'MwSt'
       expect(result.order.taxedPrice[0].taxPortions[0].amount[0].currencyCode[0]).toBe 'EUR'
       expect(result.order.taxedPrice[0].taxPortions[0].amount[0].centAmount[0]).toBe '190'
+      done()
 
-  it 'shippingAddress', ->
+  it 'shippingAddress', (done) ->
     order =
       shippingAddress:
         title: 'Prof. Dr.'
@@ -135,8 +140,9 @@ describe '#mapOrder', ->
     parseString doc, (err, result) ->
       expect(result.order.shippingAddress).not.toBeUndefined()
       expect(result.order.shippingAddress[0].title[0]).toBe 'Prof. Dr.'
+      done()
 
-  it 'billingAddress', ->
+  it 'billingAddress', (done) ->
     order =
       billingAddress:
         pOBox: '123456789'
@@ -144,8 +150,9 @@ describe '#mapOrder', ->
     parseString doc, (err, result) ->
       expect(result.order.billingAddress).not.toBeUndefined()
       expect(result.order.billingAddress[0].pOBox[0]).toBe '123456789'
+      done()
 
-  it 'customerGroup', ->
+  it 'customerGroup', (done) ->
     order =
       customerGroup:
         typeId: 'customer-group'
@@ -160,8 +167,9 @@ describe '#mapOrder', ->
       expect(cg.id[0]).toBe '213'
       expect(cg.version[0]).toBe '3'
       expect(cg.name[0]).toBe 'B2B'
+      done()
 
-  it 'paymentInfo', ->
+  it 'paymentInfo', (done) ->
     order =
       paymentInfo:
         paymentID: '7'
@@ -171,8 +179,9 @@ describe '#mapOrder', ->
       expect(result.order.paymentInfo).not.toBeUndefined()
       expect(result.order.paymentInfo[0].paymentID[0]).toBe '7'
       expect(result.order.paymentInfo[0].paymentMethod[0]).toBe 'Cash'
+      done()
 
-  it 'shippingInfo', ->
+  it 'shippingInfo', (done) ->
     order =
       shippingInfo:
         price:
@@ -186,3 +195,4 @@ describe '#mapOrder', ->
       expect(result.order.shippingInfo[0].price[0].currencyCode[0]).toBe 'USD'
       expect(result.order.shippingInfo[0].price[0].centAmount[0]).toBe '999'
       expect(result.order.shippingInfo[0].taxRate[0].includedInPrice[0]).toBe 'true'
+      done()
