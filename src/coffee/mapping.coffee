@@ -51,7 +51,7 @@ class Mapping
         unless @isValidXML xml, @xsdDoc
           out =
             """
-            WARNING: XML is valid according to XSD
+            WARNING: XML is NOT valid according to XSD
             #####
             #{content}
             #####
