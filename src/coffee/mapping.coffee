@@ -1,4 +1,5 @@
 builder = require 'xmlbuilder'
+libxmljs = require 'libxmljs'
 CustomerNumber = require '../lib/customernumber'
 Q = require 'q'
 
@@ -8,9 +9,16 @@ class Mapping
 
   constructor: (options = {}) ->
     @numberService = new CustomerNumber options
+    if options.xsd
+      xsd = options.xsd
+      @xsdDoc = libxmljs.parseXmlString xsd
 
   _debug: (msg) ->
     console.log "DEBUG: #{msg}"
+
+  isValidXML: (xml, xsdDoc) ->
+    xmlDoc = libxmljs.parseXmlString xml
+    xmlDoc.validate xsdDoc
 
   elasticio: (msg, cfg, next, snapshot) ->
     @_debug 'elasticio called'
@@ -35,10 +43,20 @@ class Mapping
     .then (customerNumbers) =>
       for order, index in orders
         xml = @mapOrder order, customerNumbers[index]
+        content = xml.end(pretty: true, indent: '  ', newline: "\n")
         fileName = "#{orders.id}.xml"
-        base64 = new Buffer(xml).toString(@BASE64)
+        base64 = new Buffer(content).toString(@BASE64)
         data.attachments[fileName] =
           content: base64
+        unless @isValidXML xml, @xsdDoc
+          out =
+            """
+            WARNING: XML is valid according to XSD
+            #####
+            #{content}
+            #####
+            """
+          console.log out
       callback(true, data)
     .fail (res) ->
       callback(false, res)
@@ -52,10 +70,14 @@ class Mapping
     xml.e('externalCustomerId').t(externalCustomerId).up()
 
     attribs = [ 'id', 'version', 'createdAt', 'lastModifiedAt', 'customerId', 'customerEmail',
-                'country', 'orderState', 'shipmentState', 'paymentState' ]
+                'country', 'orderState' ]
 
     for attr in attribs
       @_add(xml, order, attr)
+
+    states = [ 'shipmentState', 'paymentState' ]
+    for attr in states
+      @_add(xml, order, attr, attr, 'Pending')
 
     if order.taxedPrice
       price = order.taxedPrice
@@ -125,7 +147,7 @@ class Mapping
       for customLineItem in order.customLineItems
         @_customLineItem(xml.e('customLineItems'), customLineItem)
 
-    xml.end(pretty: true, indent: '  ', newline: "\n")
+    xml
 
   _customLineItem: (xml, elem) ->
     @_add(xml, elem, 'id')
@@ -184,10 +206,11 @@ class Mapping
     for attr in attribs
       @_add(xml, address, attr)
 
-  _add: (xml, elem, attr, xAttr) ->
+  _add: (xml, elem, attr, xAttr, fallback) ->
     xAttr = attr unless xAttr
 
     value = elem[attr]
+    value = fallback unless value
     xml.e(xAttr).t(value).up() if value
 
 module.exports = Mapping

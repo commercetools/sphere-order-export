@@ -5,7 +5,7 @@ Config = require '../config'
 describe '#mapOrder', ->
   beforeEach ->
     @mapping = new Mapping Config
-    
+
   it 'simple', (done) ->
     order =
       id: 'abc'
@@ -15,7 +15,8 @@ describe '#mapOrder', ->
       expect(result.order.xsdVersion[0]).toBe '0.8'
       expect(result.order.id[0]).toBe 'abc'
       expect(result.order.version[0]).toBe '1'
-      expect(result.order.orderState).toBeUndefined()
+      expect(result.order.paymentState[0]).toBe 'Pending'
+      expect(result.order.shipmentState[0]).toBe 'Pending'
       expect(result.order.externalCustomerId[0]).toBe 'UNKNOWN'
       done()
 
