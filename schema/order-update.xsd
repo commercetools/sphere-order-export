@@ -9,10 +9,10 @@
   </xs:complexType>
   <xs:complexType name="returnItem">
     <xs:sequence>
-      <xs:element name="id" type="xs:string"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
       <xs:element name="quantity" type="xs:int"/>
       <xs:element name="lineItemId" type="xs:string"/>
-      <xs:element name="comment" type="xs:string"/>
+      <xs:element name="comment" type="xs:string" minOccurs="0"/>
       <xs:element name="returnShipmentState" type="returnShipmentState"/>      
       <xs:element name="returnPaymentState" type="returnPaymentState"/>         
     </xs:sequence>
@@ -35,13 +35,14 @@
   </xs:simpleType>
   <xs:complexType name="delivery">
     <xs:sequence>
-      <xs:element name="id" type="xs:string"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
       <xs:element name="items" type="deliveryItem" minOccurs="1" maxOccurs="unbounded"/>
       <xs:element name="parcels" type="parcel" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="deliveryItem">
     <xs:sequence>
+      <!-- The id references either a lineItem or a customLineItem -->
       <xs:element name="id" type="xs:string"/>
       <xs:element name="quantity" type="xs:int"/>
     </xs:sequence>
@@ -75,17 +76,22 @@
         <xs:element name="xsdVersion">
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:enumeration value="0.1"/>
+              <xs:enumeration value="0.2"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="id" type="xs:string"/>
-        <xs:element name="version" type="xs:int"/>
+        <!-- One of the following two identifers must be provided to be able to identify the order -->
+        <xs:element name="id" type="xs:string" minOccurs="0"/>
+        <xs:element name="number" type="xs:string" minOccurs="0"/>
+        <xs:element name="version" type="xs:int" minOccurs="0"/>
+        <xs:element name="createdAt" type="xs:string" minOccurs="0"/>
+        <xs:element name="lastModifiedAt" type="xs:string" minOccurs="0"/>
         <xs:element name="orderState">
           <xs:simpleType>
             <xs:restriction base="xs:string">
               <xs:enumeration value="Open"/>
               <xs:enumeration value="Complete"/>
+              <xs:enumeration value="Cancelled"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
@@ -100,7 +106,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="paymentState">
+        <xs:element name="paymentState" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
               <xs:enumeration value="BalanceDue"/>
