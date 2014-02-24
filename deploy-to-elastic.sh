@@ -2,21 +2,31 @@
 
 set -e
 
+BRANCH_NAME='production'
+
+set +e
+git branch -D ${BRANCH_NAME}
+set -e
+
 rm -rf lib
+rm -rf node_modules
 
 npm version patch
-git checkout production
-git merge master
+git branch ${BRANCH_NAME}
+git checkout ${BRANCH_NAME}
 
+npm install
 grunt build
+rm -rf node_modules
+npm install --production
 git add -f lib/
-libs=$(cat package.json | jq -r '.dependencies' | grep ':' | cut -d: -f1 | tr -d " " | tr -d '"')
-for lib in $libs; do
-    git add -f node_modules/$lib
-done
+git add -f node_modules/
 git commit -m "Add generated code and runtime dependencies for elastic.io environment."
-git push origin production
+git push --force origin ${BRANCH_NAME}
 
 git checkout master
+
+VERSION=$(cat package.json | jq --raw-output .version)
+git push origin "v${VERSION}"
 npm version patch
-git push origin master
+npm install
