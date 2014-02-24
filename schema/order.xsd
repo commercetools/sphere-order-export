@@ -116,13 +116,16 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element name="externalCustomerId" type="xs:string"/>
         <xs:element name="id" type="xs:string"/>
         <xs:element name="version" type="xs:int"/>
         <xs:element name="createdAt" type="xs:string"/>
         <xs:element name="lastModifiedAt" type="xs:string"/>
+        <!-- at least one of the following 4 entries will be provided -->
         <xs:element name="customerId" type="xs:string" minOccurs="0"/>
         <xs:element name="customerEmail" type="xs:string" minOccurs="0"/>
+        <xs:element name="externalCustomerId" type="xs:string" minOccurs="0"/>
+        <xs:element name="customerNumber" type="xs:string" minOccurs="0"/>
+        
         <xs:element name="country" type="xs:string" minOccurs="0"/>
         <xs:element name="orderState">
           <xs:simpleType>
