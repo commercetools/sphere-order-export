@@ -1,6 +1,29 @@
 {
   "title": "sphere-order-xml-export",
   "description": "Converts each SPHERE.IO order into XML",
+  "url" : "http://dev.sphere.io",
+  "credentials": {
+    "fields": {
+      "sphereProjectKey": {
+        "viewClass": "TextFieldView",
+        "label": "Project Key",
+        "required": true,
+        "placeholder": "Paste your SPHERE.IO project key here"
+      },
+      "sphereClientId": {
+        "viewClass": "TextFieldView",
+        "label": "Client Id",
+        "required": true,
+        "placeholder": "Paste your SPHERE.IO client id here"
+      },
+      "sphereClientSecret": {
+        "viewClass": "TextFieldView",
+        "label": "Client Secret",
+        "required": true,
+        "placeholder": "Paste your your SPHERE.IO client secret here"
+      }
+    }
+  },  
   "actions": {
     "services": {
       "title": "Sphere Order XML Export",
