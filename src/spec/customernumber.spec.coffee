@@ -21,8 +21,8 @@ describe 'CustomerNumber', ->
       lastName: 'Doe'
       email: "john.doe+#{unique}@example.com"
       password: 'foobar'
-      externalId: 'ext123'
+      customerNumber: "myNumber123-#{unique}"
     customerService.save(customer).then (res) =>
       @cn.getCustomerNumberById(res.customer.id).then (customerNumber) ->
-        expect(customerNumber).toBe 'ext123'
+        expect(customerNumber).toBe "myNumber123-#{unique}"
         done()

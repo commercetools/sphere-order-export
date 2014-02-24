@@ -61,21 +61,22 @@ class Mapping
     .fail (res) ->
       callback(false, res)
     
-  mapOrder: (order, externalCustomerId = 'UNKNOWN') ->
+  mapOrder: (order, customerNumber = 'UNKNOWN') ->
     @_debug("mapOrder for #{order.id}") if order.id
 
     xml = builder.create('order', { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.8')
 
-    xml.e('externalCustomerId').t(externalCustomerId).up()
-
-    attribs = [ 'id', 'version', 'createdAt', 'lastModifiedAt', 'customerId', 'customerEmail',
-                'country', 'orderState' ]
+    attribs = [ 'id', 'version', 'createdAt', 'lastModifiedAt',
+                'country',
+                'customerId', 'customerEmail' ]
 
     for attr in attribs
       @_add(xml, order, attr)
 
-    states = [ 'shipmentState', 'paymentState' ]
+    xml.e('customerNumber').t(customerNumber).up()
+
+    states = [ 'orderState', 'shipmentState', 'paymentState' ]
     for attr in states
       @_add(xml, order, attr, attr, 'Pending')
 

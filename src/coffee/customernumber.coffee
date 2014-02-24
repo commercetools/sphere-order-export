@@ -12,13 +12,12 @@ class CustomerNumber
   getCustomerNumberById: (customerId) ->
     deferred = Q.defer()
     @customerService.byId(customerId).fetch().then (customer) ->
-      if customer.externalId
-        deferred.resolve customer.externalId
+      if customer.customerNumber
+        deferred.resolve customer.customerNumber
       else
         deferred.resolve UNKOWN_CUSTOMER_NUMBER
     .fail (res) ->
       deferred.resolve UNKOWN_CUSTOMER_NUMBER
     deferred.promise
-
 
 module.exports = CustomerNumber
