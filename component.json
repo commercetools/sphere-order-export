@@ -25,10 +25,9 @@
     }
   },  
   "actions": {
-    "services": {
-      "title": "Sphere Order XML Export",
-      "main": "elasticio.js",
-      "title": "XML Export"
+    "orderExport": {
+      "title": "Order XML Export",
+      "main": "elasticio.js"
     }
   }
 }
