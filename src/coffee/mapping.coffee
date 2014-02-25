@@ -69,9 +69,9 @@ class Mapping extends CommonUpdater
     @_debug("mapOrder for #{order.id}") if order.id
 
     xml = builder.create('order', { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
-    xml.e('xsdVersion').t('0.8')
+    xml.e('xsdVersion').t('0.9')
 
-    attribs = [ 'id', 'version', 'createdAt', 'lastModifiedAt',
+    attribs = [ 'id', 'orderNumber', 'version', 'createdAt', 'lastModifiedAt',
                 'country',
                 'customerId', 'customerEmail' ]
 

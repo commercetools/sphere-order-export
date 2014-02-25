@@ -9,11 +9,13 @@ describe '#mapOrder', ->
   it 'simple', (done) ->
     order =
       id: 'abc'
+      orderNumber: '10001'
       version: 1
     doc = @mapping.mapOrder order
     parseString doc, (err, result) ->
-      expect(result.order.xsdVersion[0]).toBe '0.8'
+      expect(result.order.xsdVersion[0]).toBe '0.9'
       expect(result.order.id[0]).toBe 'abc'
+      expect(result.order.orderNumber[0]).toBe '10001'
       expect(result.order.version[0]).toBe '1'
       expect(result.order.paymentState[0]).toBe 'Pending'
       expect(result.order.shipmentState[0]).toBe 'Pending'
