@@ -35,7 +35,7 @@ class Mapping extends CommonUpdater
         data.attachments[fileName] =
           content: base64
 
-      next data
+      next null, data
     .fail (res) ->
       @returnResult false, res, next
 

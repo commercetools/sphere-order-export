@@ -30,7 +30,8 @@ describe 'integration tests', ->
     @sphere.orders.perPage(7).fetch().then (result) =>
       msg =
         body: result
-      @mapping.elasticio msg, Config, (result) ->
-        expect(result).toBeDefined()
-        expect(result.attachments).toBeDefined()
+      @mapping.elasticio msg, Config, (msg, data) ->
+        expect(data).toBeDefined()
+        expect(data.attachments).toBeDefined()
+        expect(data.attachments['touch-timestamp.txt']).toBeDefined()
         done()
