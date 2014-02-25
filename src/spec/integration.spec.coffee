@@ -34,4 +34,5 @@ describe 'integration tests', ->
         expect(data).toBeDefined()
         expect(data.attachments).toBeDefined()
         expect(data.attachments['touch-timestamp.txt']).toBeDefined()
+        console.log data.attachments['touch-timestamp.txt'].content
         done()

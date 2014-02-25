@@ -21,7 +21,7 @@ class Mapping extends CommonUpdater
       return
 
     @mapOrders(msg.body.results).then (xmlOrders) =>
-      now = new Buffer(new Date().toISOString()).toString(@BASE64)
+      now = new Buffer(new Date().toISOString()).toString(BASE64)
       data =
         body: {}
         attachments:
@@ -31,7 +31,7 @@ class Mapping extends CommonUpdater
       for entry in xmlOrders
         content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
         fileName = "#{entry.id}.xml"
-        base64 = new Buffer(content).toString(@BASE64)
+        base64 = new Buffer(content).toString(BASE64)
         data.attachments[fileName] =
           content: base64
 
