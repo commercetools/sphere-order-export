@@ -112,11 +112,12 @@
         <xs:element name="xsdVersion">
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:enumeration value="0.8"/>
+              <xs:enumeration value="0.9"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
         <xs:element name="id" type="xs:string"/>
+        <xs:element name="orderNumber" type="xs:string"/>
         <xs:element name="version" type="xs:int"/>
         <xs:element name="createdAt" type="xs:string"/>
         <xs:element name="lastModifiedAt" type="xs:string"/>
