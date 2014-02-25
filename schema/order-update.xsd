@@ -76,13 +76,13 @@
         <xs:element name="xsdVersion">
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:enumeration value="0.2"/>
+              <xs:enumeration value="0.3"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
         <!-- One of the following two identifers must be provided to be able to identify the order -->
         <xs:element name="id" type="xs:string" minOccurs="0"/>
-        <xs:element name="number" type="xs:string" minOccurs="0"/>
+        <xs:element name="orderNumber" type="xs:string" minOccurs="0"/>
         <xs:element name="version" type="xs:int" minOccurs="0"/>
         <xs:element name="createdAt" type="xs:string" minOccurs="0"/>
         <xs:element name="lastModifiedAt" type="xs:string" minOccurs="0"/>
