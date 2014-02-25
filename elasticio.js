@@ -1,4 +1,4 @@
-Mapping = require '../lib/mapping'
+Mapping = require './lib/mapping'
 
 exports.process = function(msg, cfg, next, snapshot) {
   config = {
