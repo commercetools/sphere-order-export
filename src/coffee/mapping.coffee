@@ -10,30 +10,38 @@ class Mapping
   constructor: (options = {}) ->
     @numberService = new CustomerNumber options
     if options.xsd
-      xsd = options.xsd
-      @xsdDoc = libxmljs.parseXmlString xsd
+      @xsdDoc = libxmljs.parseXmlString options.xsd
 
   _debug: (msg) ->
     console.log "DEBUG: #{msg}"
 
   isValidXML: (xml, xsdDoc) ->
+    return true unless xsdDoc
     xmlDoc = libxmljs.parseXmlString xml
     xmlDoc.validate xsdDoc
 
   elasticio: (msg, cfg, next, snapshot) ->
     @_debug 'elasticio called'
-    @mapOrders msg.body, next
+    @mapOrders msg.body, (xmlOrders) ->
+      now = new Buffer(new Date().toISOString()).toString(@BASE64)
+      data =
+        body: {}
+        attachments:
+          'touch-timestamp.txt':
+            content: now
+
+      for entry in xmlOrders
+        content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
+        fileName = "#{entry.id}.xml"
+        base64 = new Buffer(content).toString(@BASE64)
+        data.attachments[fileName] =
+          content: base64
+
+      next true, data
 
   mapOrders: (json, callback) ->
     orders = json.results
     @_debug "mapOrders: number of orders #{orders.length}"
-
-    now = new Buffer(new Date().toISOString()).toString(@BASE64)
-    data =
-      body: {}
-      attachments:
-        'touch-timestamp.txt':
-          content: now
 
     promises = []
     for order in orders
@@ -41,25 +49,22 @@ class Mapping
 
     Q.all(promises)
     .then (customerNumbers) =>
+      xmlOrders = []
       for order, index in orders
         xml = @mapOrder order, customerNumbers[index]
-        content = xml.end(pretty: true, indent: '  ', newline: "\n")
-        fileName = "#{orders.id}.xml"
-        base64 = new Buffer(content).toString(@BASE64)
-        data.attachments[fileName] =
-          content: base64
         unless @isValidXML xml, @xsdDoc
-          out =
-            """
-            WARNING: XML is NOT valid according to XSD
-            #####
-            #{content}
-            #####
-            """
+          """
+          WARNING: XML is NOT valid according to XSD
+          #####
+          #{content}
+          #####
+          """
           console.log out
-      callback(true, data)
-    .fail (res) ->
-      callback(false, res)
+        entry =
+          id: order.id
+          xml: xml
+        xmlOrders.push entry
+      callback (xmlOrders)
     
   mapOrder: (order, customerNumber = 'UNKNOWN') ->
     @_debug("mapOrder for #{order.id}") if order.id
