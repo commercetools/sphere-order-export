@@ -1,9 +1,11 @@
+_ = require 'underscore'
 builder = require 'xmlbuilder'
 libxmljs = require 'libxmljs'
 CustomerNumber = require '../lib/customernumber'
+CommonUpdater = require('sphere-node-sync').CommonUpdater
 Q = require 'q'
 
-class Mapping
+class Mapping extends CommonUpdater
 
   BASE64 = 'base64'
 
@@ -22,7 +24,11 @@ class Mapping
 
   elasticio: (msg, cfg, next, snapshot) ->
     @_debug 'elasticio called'
-    @mapOrders msg.body, (xmlOrders) ->
+    if _.isEmpty msg or _.isEmpty msg.body
+      @returnResult true, "No data from elastic.io!", next
+      return
+
+    @mapOrders(msg.body.results).then (xmlOrders) =>
       now = new Buffer(new Date().toISOString()).toString(@BASE64)
       data =
         body: {}
@@ -37,11 +43,17 @@ class Mapping
         data.attachments[fileName] =
           content: base64
 
-      next true, data
+      next data
+    .fail (res) ->
+      @returnResult false, res, next
 
-  mapOrders: (json, callback) ->
-    orders = json.results
+  mapOrders: (orders) ->
     @_debug "mapOrders: number of orders #{orders.length}"
+    deferred = Q.defer()
+
+    if _.isEmpty orders
+      deferred.resolve []
+      return deferred.promise
 
     promises = []
     for order in orders
@@ -64,7 +76,9 @@ class Mapping
           id: order.id
           xml: xml
         xmlOrders.push entry
-      callback (xmlOrders)
+      deferred.resolve xmlOrders
+
+    deferred.promise
     
   mapOrder: (order, customerNumber = 'UNKNOWN') ->
     @_debug("mapOrder for #{order.id}") if order.id
