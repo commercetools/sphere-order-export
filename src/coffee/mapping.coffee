@@ -1,6 +1,5 @@
 _ = require 'underscore'
 builder = require 'xmlbuilder'
-libxmljs = require 'libxmljs'
 CustomerNumber = require '../lib/customernumber'
 CommonUpdater = require('sphere-node-sync').CommonUpdater
 Q = require 'q'
@@ -11,16 +10,9 @@ class Mapping extends CommonUpdater
 
   constructor: (options = {}) ->
     @numberService = new CustomerNumber options
-    if options.xsd
-      @xsdDoc = libxmljs.parseXmlString options.xsd
 
   _debug: (msg) ->
     console.log "DEBUG: #{msg}"
-
-  isValidXML: (xml, xsdDoc) ->
-    return true unless xsdDoc
-    xmlDoc = libxmljs.parseXmlString xml
-    xmlDoc.validate xsdDoc
 
   elasticio: (msg, cfg, next, snapshot) ->
     @_debug 'elasticio called'
@@ -64,14 +56,7 @@ class Mapping extends CommonUpdater
       xmlOrders = []
       for order, index in orders
         xml = @mapOrder order, customerNumbers[index]
-        unless @isValidXML xml, @xsdDoc
-          """
-          WARNING: XML is NOT valid according to XSD
-          #####
-          #{content}
-          #####
-          """
-          console.log out
+        # TODO validate
         entry =
           id: order.id
           xml: xml

@@ -41,7 +41,6 @@
     "test": "grunt coverage"
   },
   "dependencies": {
-    "libxmljs": "0.8.1",
     "optimist": "0.6.1",
     "q": "1.0.0",
     "request": "2.x",

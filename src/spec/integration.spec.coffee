@@ -5,14 +5,9 @@ Config = require '../config'
 fs = require 'fs'
 
 describe 'integration tests', ->
-  beforeEach (done) ->
+  beforeEach ->
     @sphere = new SphereClient Config
-    fs.readFile './schema/order.xsd', 'utf8', (err, content) =>
-      options =
-        config: Config.config
-        xsd: content
-      @mapping = new Mapping options
-      done()
+    @mapping = new Mapping Config
 
   it 'nothing to do', (done) ->
     @mapping.mapOrders([]).then (xmlOrders) ->

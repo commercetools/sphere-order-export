@@ -19,7 +19,6 @@ options =
     client_secret: argv.clientSecret
   timeout: argv.timeout
   user_agent: "#{package_json.name} - #{package_json.version}"
-#  xsd: './schema/order.xsd'
 
 sphere = new SphereClient options
 mapping = new Mapping options
