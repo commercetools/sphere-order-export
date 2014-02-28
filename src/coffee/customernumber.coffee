@@ -6,8 +6,9 @@ class CustomerNumber
   UNKOWN_CUSTOMER_NUMBER = 'UNKOWN'
 
   constructor: (options = {}) ->
-    client = new SphereClient(options)
-    @customerService = client.customers
+    unless options.sphere_client
+      options.sphere_client = new SphereClient options
+    @customerService = options.sphere_client.customers
 
   getCustomerNumberById: (customerId) ->
     deferred = Q.defer()

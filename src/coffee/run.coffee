@@ -21,6 +21,7 @@ options =
   user_agent: "#{package_json.name} - #{package_json.version}"
 
 sphere = new SphereClient options
+options.sphere_client = sphere
 mapping = new Mapping options
 
 sphere.orders.perPage(0).fetch().then (result) ->
@@ -30,9 +31,9 @@ sphere.orders.perPage(0).fetch().then (result) ->
       fileName = "#{entry.id}.xml"
       fs.writeFile fileName, content, (err) ->
         if err
-          console.log err
+          console.error err
           process.exit 2
 
 .fail (res) ->
-  console.log res
+  console.error res
   process.exit 1

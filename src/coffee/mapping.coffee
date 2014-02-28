@@ -1,6 +1,7 @@
 _ = require 'underscore'
 builder = require 'xmlbuilder'
 CustomerNumber = require '../lib/customernumber'
+OrderService = require '../lib/orderservice'
 CommonUpdater = require('sphere-node-sync').CommonUpdater
 Q = require 'q'
 
@@ -10,6 +11,7 @@ class Mapping extends CommonUpdater
 
   constructor: (options = {}) ->
     @numberService = new CustomerNumber options
+    @orderService = new OrderService options
 
   _debug: (msg) ->
     console.log "DEBUG: #{msg}"
