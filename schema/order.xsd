@@ -57,6 +57,18 @@
       <xs:element name="value" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="state">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="key" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="itemState">
+    <xs:sequence>
+      <xs:element name="quantity" type="xs:int"/>
+      <xs:element name="state" type="state"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="address">
     <xs:sequence>
       <xs:element name="id" type="xs:string" minOccurs="0"/>
@@ -92,6 +104,7 @@
       <xs:element name="price" type="price"/>
       <xs:element name="quantity" type="xs:int"/>
       <xs:element name="lineItemPrice" type="price"/>
+      <xs:element name="states" type="itemState"/>
       <xs:element name="taxRate" type="taxRate"/>
     </xs:sequence>
   </xs:complexType>
@@ -103,6 +116,7 @@
       <xs:element name="slug" type="xs:string"/>
       <xs:element name="quantity" type="xs:int"/>
       <xs:element name="lineItemPrice" type="price"/>
+      <xs:element name="states" type="itemState"/>      
       <xs:element name="taxRate" type="taxRate"/>
     </xs:sequence>
   </xs:complexType>
@@ -112,7 +126,7 @@
         <xs:element name="xsdVersion">
           <xs:simpleType>
             <xs:restriction base="xs:string">
-              <xs:enumeration value="0.9"/>
+              <xs:enumeration value="0.9.1"/>
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
