@@ -1,17 +1,15 @@
 _ = require 'underscore'
 builder = require 'xmlbuilder'
-CustomerNumber = require '../lib/customernumber'
-OrderService = require '../lib/orderservice'
 CommonUpdater = require('sphere-node-sync').CommonUpdater
 Q = require 'q'
+SphereClient = require 'sphere-node-client'
 
 class Mapping extends CommonUpdater
 
   BASE64 = 'base64'
 
   constructor: (options = {}) ->
-    @numberService = new CustomerNumber options
-    @orderService = new OrderService options
+    @client = new SphereClient(options)
 
   _debug: (msg) ->
     console.log "DEBUG: #{msg}"
@@ -51,23 +49,31 @@ class Mapping extends CommonUpdater
 
     promises = []
     for order in orders
-      promises.push @numberService.getCustomerNumberById(order.customerId)
+      promises.push @client.customers.byId(order.customerId).fetch()
 
-    Q.all(promises)
-    .then (customerNumbers) =>
+    Q.allSettled(promises)
+    .then (results) =>
+      customers = []
+      _.each results, (result) ->
+        if result.state is "fulfilled"
+          customers.push result.value
+        else
+          customers.push null
+
       xmlOrders = []
       for order, index in orders
-        xml = @mapOrder order, customerNumbers[index]
+        xml = @mapOrder order, customers[index]
         # TODO validate
         entry =
           id: order.id
           xml: xml
         xmlOrders.push entry
       deferred.resolve xmlOrders
-
+    .fail (result) ->
+      console.log result
     deferred.promise
 
-  mapOrder: (order, customerNumber = 'UNKNOWN') ->
+  mapOrder: (order, customer) ->
     @_debug("mapOrder for #{order.id}") if order.id
 
     xml = builder.create('order', { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
@@ -75,12 +81,13 @@ class Mapping extends CommonUpdater
 
     attribs = [ 'id', 'orderNumber', 'version', 'createdAt', 'lastModifiedAt',
                 'country',
-                'customerId', 'customerEmail', 'externalCustomerId' ]
+                'customerId', 'customerEmail']
 
     for attr in attribs
       @_add(xml, order, attr)
 
-    xml.e('customerNumber').t(customerNumber).up()
+    xml.e('customerNumber').t(if customer and customer.customerNumber then customer.customerNumber else 'UNKNOWN').up()
+    xml.e('externalCustomerId').t(if customer and customer.externalId then customer.externalId else 'UNKNOWN').up()
 
     states = [ 'orderState', 'shipmentState', 'paymentState' ]
     for attr in states

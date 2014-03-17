@@ -12,6 +12,7 @@ describe '#mapOrder', ->
       orderNumber: '10001'
       version: 1
       externalCustomerId: '111-2222-33333'
+
     doc = @mapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.xsdVersion[0]).toBe '0.9'
@@ -21,7 +22,7 @@ describe '#mapOrder', ->
       expect(result.order.paymentState[0]).toBe 'Pending'
       expect(result.order.shipmentState[0]).toBe 'Pending'
       expect(result.order.customerNumber[0]).toBe 'UNKNOWN'
-      expect(result.order.externalCustomerId[0]).toBe order.externalCustomerId
+      expect(result.order.externalCustomerId[0]).toBe 'UNKNOWN'
       done()
 
   it 'lineItem', (done) ->
@@ -200,4 +201,15 @@ describe '#mapOrder', ->
       expect(result.order.shippingInfo[0].price[0].currencyCode[0]).toBe 'USD'
       expect(result.order.shippingInfo[0].price[0].centAmount[0]).toBe '999'
       expect(result.order.shippingInfo[0].taxRate[0].includedInPrice[0]).toBe 'true'
+      done()
+
+  it 'customer', (done) ->
+    order = {}
+    customer =
+      customerNumber: '111-222'
+      externalId: '111-222-333'
+    doc = @mapping.mapOrder order, customer
+    parseString doc, (err, result) ->
+      expect(result.order.customerNumber[0]).toBe customer.customerNumber
+      expect(result.order.externalCustomerId[0]).toBe customer.externalId
       done()
