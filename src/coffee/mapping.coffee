@@ -86,8 +86,8 @@ class Mapping extends CommonUpdater
     for attr in attribs
       @_add(xml, order, attr)
 
-    xml.e('customerNumber').t(if customer and customer.customerNumber then customer.customerNumber else 'UNKNOWN').up()
-    xml.e('externalCustomerId').t(if customer and customer.externalId then customer.externalId else 'UNKNOWN').up()
+    xml.e('customerNumber').t(if customer?.customerNumber then customer.customerNumber else 'UNKNOWN').up()
+    xml.e('externalCustomerId').t(if customer?.externalId then customer.externalId else 'UNKNOWN').up()
 
     states = [ 'orderState', 'shipmentState', 'paymentState' ]
     for attr in states
