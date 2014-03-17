@@ -64,7 +64,7 @@ class Mapping extends CommonUpdater
       deferred.resolve xmlOrders
 
     deferred.promise
-    
+
   mapOrder: (order, customerNumber = 'UNKNOWN') ->
     @_debug("mapOrder for #{order.id}") if order.id
 
@@ -73,7 +73,7 @@ class Mapping extends CommonUpdater
 
     attribs = [ 'id', 'orderNumber', 'version', 'createdAt', 'lastModifiedAt',
                 'country',
-                'customerId', 'customerEmail' ]
+                'customerId', 'customerEmail', 'externalCustomerId' ]
 
     for attr in attribs
       @_add(xml, order, attr)

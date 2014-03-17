@@ -11,6 +11,7 @@ describe '#mapOrder', ->
       id: 'abc'
       orderNumber: '10001'
       version: 1
+      externalCustomerId: '111-2222-33333'
     doc = @mapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.xsdVersion[0]).toBe '0.9'
@@ -20,6 +21,7 @@ describe '#mapOrder', ->
       expect(result.order.paymentState[0]).toBe 'Pending'
       expect(result.order.shipmentState[0]).toBe 'Pending'
       expect(result.order.customerNumber[0]).toBe 'UNKNOWN'
+      expect(result.order.externalCustomerId[0]).toBe order.externalCustomerId
       done()
 
   it 'lineItem', (done) ->
