@@ -21,8 +21,8 @@ describe '#mapOrder', ->
       expect(result.order.version[0]).toBe '1'
       expect(result.order.paymentState[0]).toBe 'Pending'
       expect(result.order.shipmentState[0]).toBe 'Pending'
-      expect(result.order.customerNumber[0]).toBe 'UNKNOWN'
-      expect(result.order.externalCustomerId[0]).toBe 'UNKNOWN'
+      expect(result.order.customerNumber).toBe undefined
+      expect(result.order.externalCustomerId).toBe undefined
       done()
 
   it 'lineItem', (done) ->
