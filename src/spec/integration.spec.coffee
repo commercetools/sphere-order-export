@@ -4,6 +4,8 @@ SphereClient = require 'sphere-node-client'
 Config = require '../config'
 fs = require 'fs'
 
+jasmine.getEnv().defaultTimeoutInterval = 10000
+
 describe 'integration tests', ->
   beforeEach ->
     @sphere = new SphereClient Config
@@ -13,7 +15,7 @@ describe 'integration tests', ->
     @mapping.mapOrders([]).then (xmlOrders) ->
       expect(xmlOrders).toEqual []
       done()
-  
+
   it 'full turn around', (done) ->
     @sphere.orders.perPage(3).fetch().then (result) =>
       @mapping.mapOrders(result.results).then (xmlOrders) ->

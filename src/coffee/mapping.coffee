@@ -1,26 +1,34 @@
 _ = require 'underscore'
 builder = require 'xmlbuilder'
 CommonUpdater = require('sphere-node-sync').CommonUpdater
+OrderService = require '../lib/orderservice'
+ChannelService = require '../lib/channelservice'
 Q = require 'q'
 SphereClient = require 'sphere-node-client'
 
 class Mapping extends CommonUpdater
 
   BASE64 = 'base64'
+  CHANNEL_KEY = 'OrderXmlFileExport'
 
   constructor: (options = {}) ->
-    @client = new SphereClient(options)
+    @client = new SphereClient options
+    @orderService = new OrderService options
+    @channelService = new ChannelService options
 
   _debug: (msg) ->
     console.log "DEBUG: #{msg}"
 
   elasticio: (msg, cfg, next, snapshot) ->
-    @_debug 'elasticio called'
     if _.isEmpty msg or _.isEmpty msg.body
-      @returnResult true, "No data from elastic.io!", next
+      @returnResult true, 'No data from elastic.io!', next
       return
 
-    @mapOrders(msg.body.results).then (xmlOrders) =>
+    @channelService.byKeyOrCreate(CHANNEL_KEY)
+    .then (channel) =>
+      @channel = channel
+      @mapOrders(msg.body.results, channel.id)
+    .then (xmlOrders) =>
       now = new Buffer(new Date().toISOString()).toString(BASE64)
       data =
         body: {}
@@ -28,28 +36,36 @@ class Mapping extends CommonUpdater
           'touch-timestamp.txt':
             content: now
 
-      for entry in xmlOrders
-        content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
-        fileName = "#{entry.id}.xml"
+      syncInfos = []
+
+      for xmlOrder in xmlOrders
+        content = xmlOrder.xml.end(pretty: true, indent: '  ', newline: "\n")
+        fileName = "#{xmlOrder.id}.xml"
         base64 = new Buffer(content).toString(BASE64)
         data.attachments[fileName] =
           content: base64
 
-      next null, data
+        syncInfos.push @orderService.addSyncInfo xmlOrder.id, xmlOrder.version, @channel, fileName
+
+      Q.all(syncInfos)
+    .then =>
+      @returnResult true, data, next
     .fail (res) ->
       @returnResult false, res, next
 
-  mapOrders: (orders) ->
-    @_debug "mapOrders: number of orders #{orders.length}"
+  mapOrders: (orders, channelId) ->
+    @_debug "mapOrders: number of orders #{orders.length},
+      channelId: #{channelId}"
     deferred = Q.defer()
 
-    if _.isEmpty orders
-      deferred.resolve []
-      return deferred.promise
+    unsyncedOrders = @orderService.filterOrders orders, channelId
 
     promises = []
-    for order in orders
-      promises.push @client.customers.byId(order.customerId).fetch()
+    if _.isEmpty unsyncedOrders
+      promises = Q([])
+    else
+      promises = _.map unsyncedOrders, (order) =>
+        @client.customers.byId(order.customerId).fetch()
 
     Q.allSettled(promises)
     .then (results) =>
@@ -60,23 +76,23 @@ class Mapping extends CommonUpdater
         else
           customers.push null
 
-      xmlOrders = []
-      for order, index in orders
-        xml = @mapOrder order, customers[index]
-        # TODO validate
+      xmlOrders = _.map unsyncedOrders, (order, index) =>
         entry =
           id: order.id
-          xml: xml
-        xmlOrders.push entry
+          xml: @mapOrder order, customers[index]
+          version: order.version
+
       deferred.resolve xmlOrders
     .fail (result) ->
-      console.log result
+      deferred.reject result
+
     deferred.promise
 
   mapOrder: (order, customer) ->
     @_debug("mapOrder for #{order.id}") if order.id
 
-    xml = builder.create('order', { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
+    xml = builder.create('order',
+      { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.9')
 
     attribs = [ 'id', 'orderNumber', 'version', 'createdAt', 'lastModifiedAt',
@@ -86,9 +102,11 @@ class Mapping extends CommonUpdater
     for attr in attribs
       @_add(xml, order, attr)
 
-    xml.e('customerNumber').t(customer.customerNumber) if customer?.customerNumber
-    xml.e('externalCustomerId').t(customer.externalId) if customer?.externalId
-    
+    xml.e('customerNumber')
+      .t(customer.customerNumber) if customer?.customerNumber
+    xml.e('externalCustomerId')
+      .t(customer.externalId) if customer?.externalId
+
     states = [ 'orderState', 'shipmentState', 'paymentState' ]
     for attr in states
       @_add(xml, order, attr, attr, 'Pending')
@@ -153,7 +171,8 @@ class Mapping extends CommonUpdater
         @_add(xLi, lineItem, 'quantity')
 
         # Adds lineItem price
-        @_lineItemPrice xLi, lineItem.price.value.centAmount, lineItem.quantity, lineItem.price.value.currencyCode
+        @_lineItemPrice xLi, lineItem.price.value.centAmount, lineItem.quantity,
+          lineItem.price.value.currencyCode
 
         @_taxRate(xLi, lineItem)
 
@@ -169,7 +188,8 @@ class Mapping extends CommonUpdater
     @_money(xml, elem, 'money')
     @_add(xml, elem, 'slug')
     @_add(xml, elem, 'quantity')
-    @_lineItemPrice xml, elem.money.centAmount, elem.quantity, elem.money.currencyCode
+    @_lineItemPrice xml, elem.money.centAmount, elem.quantity,
+      elem.money.currencyCode
     @_taxRate(xml, elem)
 
   _attributes: (xml, elem) ->
@@ -215,8 +235,11 @@ class Mapping extends CommonUpdater
         @_add(xCg, cg.obj, 'name')
 
   _address: (xml, address) ->
-    attribs = [ 'id', 'title', 'salutation', 'firstName', 'lastName', 'streetName', 'streetNumber', 'additionalStreetInfo', 'postalCode',
-                'city', 'region', 'state', 'country', 'company', 'department', 'building', 'apartment', 'pOBox', 'phone', 'mobile', 'email' ]
+    attribs = [ 'id', 'title', 'salutation', 'firstName', 'lastName',
+                'streetName', 'streetNumber', 'additionalStreetInfo',
+                'postalCode', 'city', 'region', 'state', 'country', 'company',
+                'department','building', 'apartment', 'pOBox', 'phone',
+                'mobile', 'email' ]
     for attr in attribs
       @_add(xml, address, attr)
 
