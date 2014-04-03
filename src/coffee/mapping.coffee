@@ -1,12 +1,13 @@
 _ = require 'underscore'
 builder = require 'xmlbuilder'
-CommonUpdater = require('sphere-node-sync').CommonUpdater
+SphereUtils = require 'sphere-node-utils'
+ElasticIo = SphereUtils.ElasticIo
 OrderService = require '../lib/orderservice'
 ChannelService = require '../lib/channelservice'
 Q = require 'q'
 SphereClient = require 'sphere-node-client'
 
-class Mapping extends CommonUpdater
+class Mapping
 
   BASE64 = 'base64'
   CHANNEL_KEY = 'OrderXmlFileExport'
@@ -21,7 +22,7 @@ class Mapping extends CommonUpdater
 
   elasticio: (msg, cfg, next, snapshot) ->
     if _.isEmpty msg or _.isEmpty msg.body
-      @returnResult true, 'No data from elastic.io!', next
+      ElasticIo.returnSuccess 'No data from elastic.io!', next
       return
 
     @channelService.byKeyOrCreate(CHANNEL_KEY)
@@ -49,9 +50,9 @@ class Mapping extends CommonUpdater
 
       Q.all(syncInfos)
     .then =>
-      @returnResult true, data, next
+      ElasticIo.returnSuccess data, next
     .fail (res) ->
-      @returnResult false, res, next
+      ElasticIo.returnFailure res, res, next
 
   mapOrders: (orders, channelId) ->
     @_debug "mapOrders: number of orders #{orders.length},

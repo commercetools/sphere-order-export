@@ -44,9 +44,9 @@
     "optimist": "0.6.1",
     "q": "1.0.0",
     "request": "2.x",
-    "sphere-node-client": "0.5.2",
-    "sphere-node-sync": "0.4.20",
-    "sphere-node-utils": "~0.3.3",
+    "sphere-node-client": "0.6.1",
+    "sphere-node-sync": "0.5.0",
+    "sphere-node-utils": "0.3.6",
     "underscore": "1.6.0",
     "xmlbuilder": "2.1.0"
   },
