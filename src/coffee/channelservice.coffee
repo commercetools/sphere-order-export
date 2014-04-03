@@ -13,20 +13,18 @@ class ChannelService
     deferred = Q.defer()
 
     @client.channels.where("key=\"#{key}\"").page(1).fetch()
-    .then (channel) ->
-      deferred.resolve channel
-    .fail (result) =>
-      if result.statusCode is 404
-        channel =
-          key: channelId
-
-        @client.channels.save(channel)
-        .then (channel) ->
-          deferred.resolve channel
-        .fail (result) ->
-          deferred.reject result
+    .then (result) =>
+      if result.body.total is 1
+        deferred.resolve result.body.results[0]
       else
-        deferred.reject result
+
+        channel =
+          key: key
+          roles: ['OrderExport']
+        @client.channels.save(channel)
+
+    .fail (result) ->
+      deferred.reject result
 
     deferred.promise
 

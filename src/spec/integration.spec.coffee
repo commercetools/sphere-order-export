@@ -1,5 +1,5 @@
 _ = require 'underscore'
-Mapping = require '../lib/mapping.js'
+Mapping = require '../lib/mapping'
 SphereClient = require 'sphere-node-client'
 Config = require '../config'
 fs = require 'fs'
@@ -18,23 +18,25 @@ describe 'integration tests', ->
 
   it 'full turn around', (done) ->
     @sphere.orders.perPage(3).fetch().then (result) =>
-      @mapping.mapOrders(result.results).then (xmlOrders) ->
+      @mapping.mapOrders(result.body.results).then (xmlOrders) ->
         expect(_.size xmlOrders).toBe 3
         done()
 
-  it 'elastic.io integration', (done) ->
-    @mapping.elasticio {}, Config, (result) ->
-      expect(result.status).toBe true
-      expect(result.message).toBe 'No data from elastic.io!'
-      done()
-
-  it 'elastic.io integration', (done) ->
-    @sphere.orders.perPage(7).fetch().then (result) =>
-      msg =
-        body: result
-      @mapping.elasticio msg, Config, (msg, data) ->
-        expect(data).toBeDefined()
-        expect(data.attachments).toBeDefined()
-        expect(data.attachments['touch-timestamp.txt']).toBeDefined()
-        console.log data.attachments['touch-timestamp.txt'].content
+  describe 'elastic.io', ->
+    it 'nothing to do', (done) ->
+      @mapping.elasticio {}, Config, (error, message) ->
+        expect(error).toBe null
+        expect(message).toBe 'No data from elastic.io!'
         done()
+
+    it 'full turn around', (done) ->
+      @sphere.orders.perPage(5).fetch().then (result) =>
+        msg =
+          body: result.body
+        @mapping.elasticio msg, Config, (error, message) ->
+          console.log error
+          expect(error).toBe null
+          expect(message.attachments).toBeDefined()
+          expect(message.attachments['touch-timestamp.txt']).toBeDefined()
+          console.log message.attachments['touch-timestamp.txt'].content
+          done()

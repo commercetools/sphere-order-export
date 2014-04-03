@@ -1,7 +1,6 @@
 _ = require 'underscore'
 builder = require 'xmlbuilder'
-SphereUtils = require 'sphere-node-utils'
-ElasticIo = SphereUtils.ElasticIo
+{ElasticIo} = require('sphere-node-utils').ElasticIo
 OrderService = require '../lib/orderservice'
 ChannelService = require '../lib/channelservice'
 Q = require 'q'
@@ -28,7 +27,7 @@ class Mapping
     @channelService.byKeyOrCreate(CHANNEL_KEY)
     .then (channel) =>
       @channel = channel
-      @mapOrders(msg.body.results, channel.id)
+      @mapOrders(msg.body.results, @channel.id)
     .then (xmlOrders) =>
       now = new Buffer(new Date().toISOString()).toString(BASE64)
       data =
@@ -49,8 +48,8 @@ class Mapping
         syncInfos.push @orderService.addSyncInfo xmlOrder.id, xmlOrder.version, @channel, fileName
 
       Q.all(syncInfos)
-    .then =>
-      ElasticIo.returnSuccess data, next
+      .then =>
+        ElasticIo.returnSuccess data, next
     .fail (res) ->
       ElasticIo.returnFailure res, res, next
 
