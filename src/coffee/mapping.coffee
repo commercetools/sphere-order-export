@@ -25,8 +25,10 @@ class Mapping
     @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
     .then (channel) =>
       @channel = channel
+
       @processOrders(msg.body.results, @channel)
     .then (xmlOrders) =>
+
       now = new Buffer(new Date().toISOString()).toString(BASE64)
       data =
         body: {}
@@ -42,7 +44,6 @@ class Mapping
         base64 = new Buffer(content).toString(BASE64)
         data.attachments[fileName] =
           content: base64
-
         syncInfos.push @orderService.addSyncInfo xmlOrder.id, xmlOrder.version,
           @channel, fileName
 
@@ -54,13 +55,9 @@ class Mapping
 
   processOrders: (orders, channel) ->
     unsyncedOrders = @orderService.unsyncedOrders orders, channel
-    if _.isEmpty unsyncedOrders
-      Q 'Nothing to do'
-    else
-      promises = _.map unsyncedOrders, (order) =>
-        @processOrder order
-
-      Q.all(promises)
+    promises = _.map unsyncedOrders, (order) =>
+      @processOrder order
+    Q.all(promises)
 
   processOrder: (order) ->
     deferred = Q.defer()

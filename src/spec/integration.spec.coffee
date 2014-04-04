@@ -12,9 +12,13 @@ describe 'integration tests', ->
     @mapping = new Mapping Config
 
   it 'nothing to do', (done) ->
-    @mapping.processOrders([]).then (xmlOrders) ->
-      expect(xmlOrders).toEqual 'Nothing to do'
+    @mapping.processOrders([])
+    .then (xmlOrders) ->
+      expect(xmlOrders).toBeDefined()
+      expect(_.size(xmlOrders)).toEqual 0
       done()
+    .fail (err) ->
+      done(err)
 
   xit 'full turn around', (done) ->
     @sphere.orders.perPage(3).fetch().then (result) =>
