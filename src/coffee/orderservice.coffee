@@ -20,7 +20,7 @@ class OrderService
     _.select orders, (order) ->
       order.syncInfo or= []
       not _.find order.syncInfo, (syncInfo) ->
-        syncInfo.channel.id is channel
+        syncInfo.channel.id is channel.id
 
   # TODO:
   # retry if version of order is updated
