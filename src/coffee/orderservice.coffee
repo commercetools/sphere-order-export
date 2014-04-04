@@ -11,7 +11,7 @@ class OrderService
     @client = options.sphere_client
 
   ###
-  Returns only orders without given syncInfo channel.
+  Returns only orders which haven't been synced using the given channel.
   @param {Collection} orders List of order resources.
   @param {Channel} channel SyncInfo channel to which an order mustn't have.
   @return {Collection}
