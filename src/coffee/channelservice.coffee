@@ -12,8 +12,8 @@ class ChannelService
   ###
   Returns a channel with a given key and role. If not existing, the channel will
   be created or the channel role will be added if absent.
-  @param {string} key Channel needs to have this key.
-  @param {string} role Channel needs to have this role.
+  @param {String} key Channel needs to have this key.
+  @param {String} role Channel needs to have this role.
   @return {Promise Channel}
   ###
   byKeyOrCreate: (key, role) ->

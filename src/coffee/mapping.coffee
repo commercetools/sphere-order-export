@@ -25,7 +25,7 @@ class Mapping
     @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
     .then (channel) =>
       @channel = channel
-      @mapOrders(msg.body.results, @channel.id)
+      @mapOrders(msg.body.results, @channel)
     .then (xmlOrders) =>
       now = new Buffer(new Date().toISOString()).toString(BASE64)
       data =
@@ -52,10 +52,10 @@ class Mapping
     .fail (result) ->
       ElasticIo.returnFailure res, res, next
 
-  mapOrders: (orders, channelId) ->
+  mapOrders: (orders, channel) ->
     deferred = Q.defer()
 
-    unsyncedOrders = @orderService.filterOrders orders, channelId
+    unsyncedOrders = @orderService.unsyncedOrders orders, channel
 
     promises = []
     if _.isEmpty unsyncedOrders
