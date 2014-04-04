@@ -10,6 +10,7 @@ class Mapping
 
   BASE64 = 'base64'
   CHANNEL_KEY = 'OrderXmlFileExport'
+  CHANNEL_ROLE = 'OrderExport'
 
   constructor: (options = {}) ->
     @client = new SphereClient options
@@ -21,7 +22,7 @@ class Mapping
       ElasticIo.returnSuccess 'No data from elastic.io!', next
       return
 
-    @channelService.byKeyOrCreate(CHANNEL_KEY)
+    @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
     .then (channel) =>
       @channel = channel
       @mapOrders(msg.body.results, @channel.id)
@@ -46,9 +47,9 @@ class Mapping
           @channel, fileName
 
       Q.all(syncInfos)
-      .then ->
-        ElasticIo.returnSuccess data, next
-    .fail (res) ->
+    .then ->
+      ElasticIo.returnSuccess data, next
+    .fail (result) ->
       ElasticIo.returnFailure res, res, next
 
   mapOrders: (orders, channelId) ->

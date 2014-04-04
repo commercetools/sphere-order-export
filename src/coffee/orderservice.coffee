@@ -28,6 +28,9 @@ class OrderService
           id: channel.id
         externalId: externalId
       ]
+
+    console.log "data: #{JSON.stringify data, null, 4}"
+    console.log "channel: #{JSON.stringify channel, null, 4}"
     @client.orders.byId(orderId).save(data)
 
 module.exports = OrderService
