@@ -4,3 +4,5 @@ build
 lib
 spec
 config.js
+sphere-node-client-debug.log
+coverage
