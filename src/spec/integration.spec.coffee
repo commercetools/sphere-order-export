@@ -25,7 +25,7 @@ describe 'integration tests', ->
   describe 'elastic.io', ->
     it 'nothing to do', (done) ->
       @mapping.elasticio {}, Config, (error, message) ->
-        expect(error).toBe null
+        done(JSON.stringify error, null, 4) if error
         expect(message).toBe 'No data from elastic.io!'
         done()
 
@@ -34,9 +34,7 @@ describe 'integration tests', ->
         msg =
           body: result.body
         @mapping.elasticio msg, Config, (error, message) ->
-          console.log error
-          expect(error).toBe null
+          done(JSON.stringify error, null, 4) if error
           expect(message.attachments).toBeDefined()
           expect(message.attachments['touch-timestamp.txt']).toBeDefined()
-          console.log message.attachments['touch-timestamp.txt'].content
           done()
