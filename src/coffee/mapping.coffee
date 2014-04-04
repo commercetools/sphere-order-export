@@ -16,9 +16,6 @@ class Mapping
     @orderService = new OrderService options
     @channelService = new ChannelService options
 
-  _debug: (msg) ->
-    console.log "DEBUG: #{msg}"
-
   elasticio: (msg, cfg, next, snapshot) ->
     if _.isEmpty msg or _.isEmpty msg.body
       ElasticIo.returnSuccess 'No data from elastic.io!', next
@@ -45,17 +42,16 @@ class Mapping
         data.attachments[fileName] =
           content: base64
 
-        syncInfos.push @orderService.addSyncInfo xmlOrder.id, xmlOrder.version, @channel, fileName
+        syncInfos.push @orderService.addSyncInfo xmlOrder.id, xmlOrder.version,
+          @channel, fileName
 
       Q.all(syncInfos)
-      .then =>
+      .then ->
         ElasticIo.returnSuccess data, next
     .fail (res) ->
       ElasticIo.returnFailure res, res, next
 
   mapOrders: (orders, channelId) ->
-    @_debug "mapOrders: number of orders #{orders.length},
-      channelId: #{channelId}"
     deferred = Q.defer()
 
     unsyncedOrders = @orderService.filterOrders orders, channelId
@@ -89,8 +85,6 @@ class Mapping
     deferred.promise
 
   mapOrder: (order, customer) ->
-    @_debug("mapOrder for #{order.id}") if order.id
-
     xml = builder.create('order',
       { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.9')
