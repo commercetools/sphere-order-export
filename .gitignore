@@ -1,8 +1,8 @@
 .DS_Store
 node_modules
-build
+*.log
 lib
-spec
-config.js
-sphere-node-client-debug.log
+test
+.coveralls.yml
 coverage
+config.js
