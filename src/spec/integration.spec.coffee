@@ -12,15 +12,17 @@ describe 'integration tests', ->
     @mapping = new Mapping Config
 
   it 'nothing to do', (done) ->
-    @mapping.mapOrders([]).then (xmlOrders) ->
-      expect(xmlOrders).toEqual []
+    @mapping.processOrders([]).then (xmlOrders) ->
+      expect(xmlOrders).toEqual 'Nothing to do'
       done()
 
-  it 'full turn around', (done) ->
+  xit 'full turn around', (done) ->
     @sphere.orders.perPage(3).fetch().then (result) =>
-      @mapping.mapOrders(result.body.results).then (xmlOrders) ->
+      @mapping.processOrders(result.body.results).then (xmlOrders) ->
         expect(_.size xmlOrders).toBe 3
         done()
+    .fail (err) ->
+      done err
 
   describe 'elastic.io', ->
     it 'nothing to do', (done) ->

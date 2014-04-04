@@ -25,7 +25,7 @@ class Mapping
     @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
     .then (channel) =>
       @channel = channel
-      @mapOrders(msg.body.results, @channel)
+      @processOrders(msg.body.results, @channel)
     .then (xmlOrders) =>
       now = new Buffer(new Date().toISOString()).toString(BASE64)
       data =
@@ -47,41 +47,39 @@ class Mapping
           @channel, fileName
 
       Q.all(syncInfos)
-    .then ->
-      ElasticIo.returnSuccess data, next
+      .then ->
+        ElasticIo.returnSuccess data, next
     .fail (result) ->
       ElasticIo.returnFailure res, res, next
 
-  mapOrders: (orders, channel) ->
-    deferred = Q.defer()
-
+  processOrders: (orders, channel) ->
     unsyncedOrders = @orderService.unsyncedOrders orders, channel
-
-    promises = []
     if _.isEmpty unsyncedOrders
-      promises = Q([])
+      Q 'Nothing to do'
     else
       promises = _.map unsyncedOrders, (order) =>
-        @client.customers.byId(order.customerId).fetch()
+        @processOrder order
 
-    Q.allSettled(promises)
-    .then (results) =>
-      customers = []
-      _.each results, (result) ->
-        if result.state is "fulfilled"
-          customers.push result.value
-        else
-          customers.push null
+      Q.all(promises)
 
-      xmlOrders = _.map unsyncedOrders, (order, index) =>
+  processOrder: (order) ->
+    deferred = Q.defer()
+    if order.customerId?
+      @client.customers.byId(order.customerId).fetch()
+      .then (result) =>
         entry =
           id: order.id
-          xml: @mapOrder order, customers[index]
+          xml: @mapOrder order, result
           version: order.version
-
-      deferred.resolve xmlOrders
-    .fail (result) ->
-      deferred.reject result
+        deferred.resolve entry
+      .fail (err) ->
+        deferred.reject err
+    else
+      entry =
+        id: order.id
+        xml: @mapOrder order
+        version: order.version
+      deferred.resolve entry
 
     deferred.promise
 

@@ -25,7 +25,7 @@ options.sphere_client = sphere
 mapping = new Mapping options
 
 sphere.orders.perPage(0).fetch().then (result) ->
-  mapping.mapOrders result.results, (xmlOrders) ->
+  mapping.processOrders result.results, (xmlOrders) ->
     for entry in xmlOrders
       content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
       fileName = "#{entry.id}.xml"
