@@ -71,14 +71,13 @@ describe 'integration tests', ->
         done()
 
     it 'full turn around', (done) ->
-      @sphere.orders.perPage(5).fetch().then (result) =>
-        msg =
-          body: result.body
-        @mapping.elasticio msg, Config, (error, message) ->
-          done(JSON.stringify error, null, 4) if error
-          expect(message.attachments).toBeDefined()
-          expect(message.attachments['touch-timestamp.txt']).toBeDefined()
-          done()
+      msg =
+        body: [@order]
+      @mapping.elasticio msg, Config, (error, message) ->
+        done(JSON.stringify error, null, 4) if error
+        expect(message.attachments).toBeDefined()
+        expect(message.attachments['touch-timestamp.txt']).toBeDefined()
+        done()
 
 
 ###
