@@ -1,6 +1,7 @@
 _ = require 'underscore'
 Mapping = require '../lib/mapping'
 SphereClient = require 'sphere-node-client'
+{ElasticIo, _u} = require('sphere-node-utils')
 Config = require '../config'
 fs = require 'fs'
 ChannelService = require '../lib/channelservice'
@@ -42,7 +43,7 @@ describe 'channelservice tests', ->
       @order = result.body
       done()
     .fail (err) ->
-      done(JSON.stringify err, null, 4)
+      done _u.prettify(err)
 
   afterEach (done) ->
     done()
@@ -56,7 +57,7 @@ describe 'channelservice tests', ->
       expect(result.body.roles).toEqual [CHANNEL_ROLE]
       done()
     .fail (err) ->
-      done(JSON.stringify err, null, 4)
+      done _u.prettify(err)
 
   it 'should fetch an existing channel and return it', (done) ->
     @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
@@ -66,7 +67,7 @@ describe 'channelservice tests', ->
       expect(result.body.roles).toEqual @channel.roles
       done()
     .fail (err) ->
-      done(JSON.stringify err, null, 4)
+      done _u.prettify(err)
 
 ###
 helper methods

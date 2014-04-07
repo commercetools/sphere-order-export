@@ -1,6 +1,6 @@
 _ = require 'underscore'
 builder = require 'xmlbuilder'
-{ElasticIo} = require('sphere-node-utils')
+{ElasticIo, _u} = require('sphere-node-utils')
 OrderService = require '../lib/orderservice'
 ChannelService = require '../lib/channelservice'
 Q = require 'q'

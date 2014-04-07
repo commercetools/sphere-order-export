@@ -10,11 +10,11 @@ class ChannelService
     @client = options.sphere_client
 
   ###
-  Returns a channel with a given key and role. If not existing, the channel will
+  Returns a Channel result for a given key and role. If not existing, the channel will
   be created or the channel role will be added if absent.
   @param {String} key Channel needs to have this key.
   @param {String} role Channel needs to have this role.
-  @return {Promise Channel}
+  @return {Promise Result}
   ###
   byKeyOrCreate: (key, role) ->
     deferred = Q.defer()
