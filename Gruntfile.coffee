@@ -20,25 +20,35 @@ module.exports = (grunt) ->
 
     clean:
       default: "lib"
-      test: "spec"
+      test: "test"
 
     coffee:
       options:
         bare: true
       default:
-        expand: true
-        flatten: true
-        cwd: "src/coffee"
-        src: ["*.coffee"]
-        dest: "lib"
-        ext: ".js"
+        files: grunt.file.expandMapping(['**/*.coffee'], 'lib/',
+          flatten: false
+          cwd: 'src/coffee'
+          ext: '.js'
+          rename: (dest, matchedSrcPath) ->
+            dest + matchedSrcPath
+          )
       test:
-        expand: true
-        flatten: true
-        cwd: "src/spec"
-        src: ["*.spec.coffee"]
-        dest: "spec"
-        ext: ".spec.js"
+        files: grunt.file.expandMapping(['**/*.spec.coffee'], 'test/',
+          flatten: false
+          cwd: 'src/spec'
+          ext: '.spec.js'
+          rename: (dest, matchedSrcPath) ->
+            dest + matchedSrcPath
+          )
+      testHelpers:
+        files: grunt.file.expandMapping(['**/helper.coffee'], 'test/',
+          flatten: false
+          cwd: 'src/spec'
+          ext: '.js'
+          rename: (dest, matchedSrcPath) ->
+            dest + matchedSrcPath
+          )
 
     concat:
       options:
@@ -66,9 +76,9 @@ module.exports = (grunt) ->
         stderr: true
         failOnError: true
       coverage:
-        command: "istanbul cover jasmine-node --captureExceptions spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+        command: 'istanbul cover jasmine-node --captureExceptions test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage'
       jasmine:
-        command: "jasmine-node --captureExceptions spec"
+        command: 'jasmine-node --verbose --captureExceptions test'
 
   # load plugins that provide the tasks defined in the config
   grunt.loadNpmTasks "grunt-coffeelint"

@@ -1,26 +1,33 @@
 _ = require 'underscore'
 builder = require 'xmlbuilder'
-CommonUpdater = require('sphere-node-sync').CommonUpdater
+{ElasticIo, _u} = require('sphere-node-utils')
+OrderService = require '../lib/orderservice'
+ChannelService = require '../lib/channelservice'
 Q = require 'q'
 SphereClient = require 'sphere-node-client'
 
-class Mapping extends CommonUpdater
+class Mapping
 
   BASE64 = 'base64'
+  CHANNEL_KEY = 'OrderXmlFileExport'
+  CHANNEL_ROLE = 'OrderExport'
 
   constructor: (options = {}) ->
-    @client = new SphereClient(options)
-
-  _debug: (msg) ->
-    console.log "DEBUG: #{msg}"
+    @client = new SphereClient options
+    @orderService = new OrderService options
+    @channelService = new ChannelService options
 
   elasticio: (msg, cfg, next, snapshot) ->
-    @_debug 'elasticio called'
     if _.isEmpty msg or _.isEmpty msg.body
-      @returnResult true, "No data from elastic.io!", next
+      ElasticIo.returnSuccess 'No data from elastic.io!', next
       return
 
-    @mapOrders(msg.body.results).then (xmlOrders) =>
+    @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
+    .then (result) =>
+      @channel = result.body
+      @processOrders(msg.body.results, @channel)
+    .then (xmlOrders) =>
+
       now = new Buffer(new Date().toISOString()).toString(BASE64)
       data =
         body: {}
@@ -28,55 +35,53 @@ class Mapping extends CommonUpdater
           'touch-timestamp.txt':
             content: now
 
-      for entry in xmlOrders
-        content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
-        fileName = "#{entry.id}.xml"
+      syncInfos = []
+
+      for xmlOrder in xmlOrders
+        content = xmlOrder.xml.end(pretty: true, indent: '  ', newline: "\n")
+        fileName = "#{xmlOrder.id}.xml"
         base64 = new Buffer(content).toString(BASE64)
         data.attachments[fileName] =
           content: base64
+        syncInfos.push @orderService.addSyncInfo xmlOrder.id, xmlOrder.version,
+          @channel, fileName
 
-      next null, data
-    .fail (res) ->
-      @returnResult false, res, next
+      Q.all(syncInfos)
+      .then ->
+        ElasticIo.returnSuccess data, next
+    .fail (result) ->
+      ElasticIo.returnFailure res, res, next
 
-  mapOrders: (orders) ->
-    @_debug "mapOrders: number of orders #{orders.length}"
+  processOrders: (orders, channel) ->
+    unsyncedOrders = @orderService.unsyncedOrders orders, channel
+    promises = _.map unsyncedOrders, (order) =>
+      @processOrder order
+    Q.all(promises)
+
+  processOrder: (order) ->
     deferred = Q.defer()
-
-    if _.isEmpty orders
-      deferred.resolve []
-      return deferred.promise
-
-    promises = []
-    for order in orders
-      promises.push @client.customers.byId(order.customerId).fetch()
-
-    Q.allSettled(promises)
-    .then (results) =>
-      customers = []
-      _.each results, (result) ->
-        if result.state is "fulfilled"
-          customers.push result.value
-        else
-          customers.push null
-
-      xmlOrders = []
-      for order, index in orders
-        xml = @mapOrder order, customers[index]
-        # TODO validate
+    if order.customerId?
+      @client.customers.byId(order.customerId).fetch()
+      .then (result) =>
         entry =
           id: order.id
-          xml: xml
-        xmlOrders.push entry
-      deferred.resolve xmlOrders
-    .fail (result) ->
-      console.log result
+          xml: @mapOrder order, result
+          version: order.version
+        deferred.resolve entry
+      .fail (err) ->
+        deferred.reject err
+    else
+      entry =
+        id: order.id
+        xml: @mapOrder order
+        version: order.version
+      deferred.resolve entry
+
     deferred.promise
 
   mapOrder: (order, customer) ->
-    @_debug("mapOrder for #{order.id}") if order.id
-
-    xml = builder.create('order', { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
+    xml = builder.create('order',
+      { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.9')
 
     attribs = [ 'id', 'orderNumber', 'version', 'createdAt', 'lastModifiedAt',
@@ -86,9 +91,11 @@ class Mapping extends CommonUpdater
     for attr in attribs
       @_add(xml, order, attr)
 
-    xml.e('customerNumber').t(customer.customerNumber) if customer?.customerNumber
-    xml.e('externalCustomerId').t(customer.externalId) if customer?.externalId
-    
+    xml.e('customerNumber')
+      .t(customer.customerNumber) if customer?.customerNumber
+    xml.e('externalCustomerId')
+      .t(customer.externalId) if customer?.externalId
+
     states = [ 'orderState', 'shipmentState', 'paymentState' ]
     for attr in states
       @_add(xml, order, attr, attr, 'Pending')
@@ -153,7 +160,8 @@ class Mapping extends CommonUpdater
         @_add(xLi, lineItem, 'quantity')
 
         # Adds lineItem price
-        @_lineItemPrice xLi, lineItem.price.value.centAmount, lineItem.quantity, lineItem.price.value.currencyCode
+        @_lineItemPrice xLi, lineItem.price.value.centAmount, lineItem.quantity,
+          lineItem.price.value.currencyCode
 
         @_taxRate(xLi, lineItem)
 
@@ -169,7 +177,8 @@ class Mapping extends CommonUpdater
     @_money(xml, elem, 'money')
     @_add(xml, elem, 'slug')
     @_add(xml, elem, 'quantity')
-    @_lineItemPrice xml, elem.money.centAmount, elem.quantity, elem.money.currencyCode
+    @_lineItemPrice xml, elem.money.centAmount, elem.quantity,
+      elem.money.currencyCode
     @_taxRate(xml, elem)
 
   _attributes: (xml, elem) ->
@@ -215,8 +224,11 @@ class Mapping extends CommonUpdater
         @_add(xCg, cg.obj, 'name')
 
   _address: (xml, address) ->
-    attribs = [ 'id', 'title', 'salutation', 'firstName', 'lastName', 'streetName', 'streetNumber', 'additionalStreetInfo', 'postalCode',
-                'city', 'region', 'state', 'country', 'company', 'department', 'building', 'apartment', 'pOBox', 'phone', 'mobile', 'email' ]
+    attribs = [ 'id', 'title', 'salutation', 'firstName', 'lastName',
+                'streetName', 'streetNumber', 'additionalStreetInfo',
+                'postalCode', 'city', 'region', 'state', 'country', 'company',
+                'department','building', 'apartment', 'pOBox', 'phone',
+                'mobile', 'email' ]
     for attr in attribs
       @_add(xml, address, attr)
 

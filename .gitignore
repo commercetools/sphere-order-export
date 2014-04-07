@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
-build
+*.log
 lib
-spec
+test
+.coveralls.yml
+coverage
 config.js

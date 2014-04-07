@@ -6,10 +6,11 @@ Config = require '../config'
 fs = require 'fs'
 ChannelService = require '../lib/channelservice'
 SpecHelper = require './helper'
+OrderService = require '../lib/orderservice'
 
 jasmine.getEnv().defaultTimeoutInterval = 10000
 
-describe 'integration tests', ->
+describe 'orderservice', ->
 
   CHANNEL_KEY = 'OrderXmlFileExport'
   CHANNEL_ROLE = 'OrderExport'
@@ -18,16 +19,17 @@ describe 'integration tests', ->
     @sphere = new SphereClient Config
     @mapping = new Mapping Config
     @channelService = new ChannelService Config
+    @orderService = new OrderService Config
 
     @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
     .then (result) =>
-      @channel = result.channel
+      @channel = result.body
       # get a tax category required for setting up shippingInfo
       #   (simply returning first found)
       @sphere.taxCategories.save SpecHelper.taxCategoryMock()
     .then (result) =>
       @taxCategory = result.body
-      @sphere.zones.save SpecHelper.zoneMock()
+      @sphere.zones.save zoneMock()
     .then (result) =>
       zone = result.body
       @sphere.shippingMethods
@@ -48,37 +50,30 @@ describe 'integration tests', ->
     .fail (err) ->
       done _u.prettify err
 
-  afterEach (done) ->
-    done()
+  it 'should return unsynced orders', ->
+    unsyncedOrders = @orderService.unsyncedOrders([@order], @channel)
+    expect(_.size(unsyncedOrders)).toEqual 1
 
-  it 'nothing to do', (done) ->
-    @mapping.processOrders([])
-    .then (xmlOrders) ->
-      expect(xmlOrders).toBeDefined()
-      expect(_.size(xmlOrders)).toEqual 0
-      done()
+  it 'should return empty collection when no unsynced orders are available', ->
+
+    syncedOrder = _u.deepClone @order
+
+    syncedOrder.syncInfo = [
+      channel:
+        id: @channel.id
+      ]
+
+    unsyncedOrders = @orderService.unsyncedOrders([syncedOrder], @channel)
+    expect(_.size(unsyncedOrders)).toEqual 0
+
+  it 'should add syncInfo', ->
+    externalId = 'filename.txt'
+    @orderService
+      .addSyncInfo @order.id, @order.version, @channel, externalId
+    .then (result) =>
+      expect(result.body.syncInfo).toBeDefined()
+      expect (_.size(result.body.syncInfo)).to Equal 1
+      expect (_.size(result.body.syncInfo[0].channel)).toEqual @channel.id
+      expect (_.size(result.body.syncInfo[0].externalId)).toEqual externalId
     .fail (err) ->
       done _u.prettify err
-
-  it 'full turn around', (done) ->
-    @mapping.processOrders([@order], @channel).then (xmlOrders) ->
-      expect(_.size xmlOrders).toBe 1
-      done()
-    .fail (err) ->
-      done _u.prettify err
-
-  describe 'elastic.io', ->
-    it 'nothing to do', (done) ->
-      @mapping.elasticio {}, Config, (error, message) ->
-        done(_u.prettify(error), null, 4) if error
-        expect(message).toBe 'No data from elastic.io!'
-        done()
-
-    it 'full turn around', (done) ->
-      msg =
-        body: [@order]
-      @mapping.elasticio msg, Config, (error, message) ->
-        done(_u.prettify(error), null, 4) if error
-        expect(message.attachments).toBeDefined()
-        expect(message.attachments['touch-timestamp.txt']).toBeDefined()
-        done()
