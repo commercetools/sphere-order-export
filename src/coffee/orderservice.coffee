@@ -22,8 +22,7 @@ class OrderService
       not _.find order.syncInfo, (syncInfo) ->
         syncInfo.channel.id is channel.id
 
-  # TODO:
-  # retry if version of order is updated
+  # TODO: retry if version of order is updated
 
   ###
   Add a SyncInfo to a given order.
@@ -31,7 +30,7 @@ class OrderService
   @param {Channel} orderVersion Order resource version to update.
   @param {Channel} channel Channel which used for syncing.
   @param {String} externalId Id of external order resource (filename)
-  @return {Promise SyncInfo}
+  @return {Promise Result}
   ###
   addSyncInfo: (orderId, orderVersion, channel, externalId) ->
     data =
