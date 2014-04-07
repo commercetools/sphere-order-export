@@ -7,7 +7,7 @@ ChannelService = require '../lib/channelservice'
 
 jasmine.getEnv().defaultTimeoutInterval = 10000
 
-describe 'integration tests', ->
+describe 'channelservice tests', ->
 
   CHANNEL_KEY = 'OrderXmlFileExport'
   CHANNEL_ROLE = 'OrderExport'
@@ -19,7 +19,7 @@ describe 'integration tests', ->
 
     @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
     .then (result) =>
-      @channel = result.channel
+      @channel = result.body
       # get a tax category required for setting up shippingInfo
       #   (simply returning first found)
       @sphere.taxCategories.save(taxCategoryMock())
@@ -47,38 +47,26 @@ describe 'integration tests', ->
   afterEach (done) ->
     done()
 
-  it 'nothing to do', (done) ->
-    @mapping.processOrders([])
-    .then (xmlOrders) ->
-      expect(xmlOrders).toBeDefined()
-      expect(_.size(xmlOrders)).toEqual 0
+  it 'should create a new channel and return it', (done) ->
+    key = "channel-#{new Date().getTime()}"
+    @channelService.byKeyOrCreate(key, CHANNEL_ROLE)
+    .then (result) ->
+      expect(result.body).toBeDefined()
+      expect(result.body.key).toEqual key
+      expect(result.body.roles).toEqual [CHANNEL_ROLE]
       done()
     .fail (err) ->
       done(JSON.stringify err, null, 4)
 
-  it 'full turn around', (done) ->
-    @mapping.processOrders([@order], @channel).then (xmlOrders) ->
-      expect(_.size xmlOrders).toBe 1
+  it 'should fetch an existing channel and return it', (done) ->
+    @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
+    .then (result) =>
+      expect(result.body).toBeDefined()
+      expect(result.body.id).toEqual @channel.id
+      expect(result.body.roles).toEqual @channel.roles
       done()
     .fail (err) ->
       done(JSON.stringify err, null, 4)
-
-  describe 'elastic.io', ->
-    it 'nothing to do', (done) ->
-      @mapping.elasticio {}, Config, (error, message) ->
-        done(JSON.stringify error, null, 4) if error
-        expect(message).toBe 'No data from elastic.io!'
-        done()
-
-    it 'full turn around', (done) ->
-      msg =
-        body: [@order]
-      @mapping.elasticio msg, Config, (error, message) ->
-        done(JSON.stringify error, null, 4) if error
-        expect(message.attachments).toBeDefined()
-        expect(message.attachments['touch-timestamp.txt']).toBeDefined()
-        done()
-
 
 ###
 helper methods

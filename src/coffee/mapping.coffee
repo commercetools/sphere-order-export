@@ -23,9 +23,8 @@ class Mapping
       return
 
     @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
-    .then (channel) =>
-      @channel = channel
-
+    .then (result) =>
+      @channel = result.body
       @processOrders(msg.body.results, @channel)
     .then (xmlOrders) =>
 

@@ -35,15 +35,14 @@ class ChannelService
               }
             ]
 
-          @client.channels.byId(channel.id).update(update)
+          deferred.resolve @client.channels.byId(channel.id).update(update)
         else
-          deferred.resolve channel
+          deferred.resolve result
       else
-
         channel =
           key: key
-          roles: ['OrderExport']
-        @client.channels.save(channel)
+          roles: [role]
+        deferred.resolve @client.channels.save(channel)
 
     .fail (result) ->
       deferred.reject result
