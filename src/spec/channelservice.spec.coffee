@@ -59,6 +59,15 @@ describe 'channelservice tests', ->
     .fail (err) ->
       done _u.prettify(err)
 
+  it 'should fetch an existing channel, add given role and return it', (done) ->
+    @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
+    .then (result) =>
+      @channelService.byKeyOrCreate(CHANNEL_KEY, 'Primary')
+      .then (result) ->
+      done()
+    .fail (err) ->
+      done _u.prettify(err)
+
   it 'should fetch an existing channel and return it', (done) ->
     @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
     .then (result) =>
@@ -68,6 +77,14 @@ describe 'channelservice tests', ->
       done()
     .fail (err) ->
       done _u.prettify(err)
+
+  it 'should fail if role is not possible', (done) ->
+    key = "channel-#{new Date().getTime()}"
+    @channelService.byKeyOrCreate(key, 'bla')
+    .then (result) ->
+      done('Should fail if a wrong role is given.')
+    .fail (err) ->
+      done()
 
 ###
 helper methods
