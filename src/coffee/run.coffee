@@ -1,10 +1,11 @@
+_ = require 'underscore'
 Mapping = require '../lib/mapping'
 SphereClient = require 'sphere-node-client'
 package_json = require '../package.json'
 fs = require 'fs'
 argv = require('optimist')
   .usage('Usage: $0 --projectKey key --clientId id --clientSecret secret')
-  .default('timeout', 300000)
+  .default('timeout', 60000)
   .describe('projectKey', 'your SPHERE.IO project-key')
   .describe('clientId', 'your OAuth client id for the SPHERE.IO API')
   .describe('clientSecret', 'your OAuth client secret for the SPHERE.IO API')
@@ -25,8 +26,9 @@ options.sphere_client = sphere
 mapping = new Mapping options
 
 sphere.orders.perPage(0).fetch().then (result) ->
-  mapping.processOrders result.results, (xmlOrders) ->
-    for entry in xmlOrders
+  mapping.processOrders(result.body.results)
+  .then (xmlOrders) ->
+    _.each xmlOrders, (entry) ->
       content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
       fileName = "#{entry.id}.xml"
       fs.writeFile fileName, content, (err) ->
