@@ -26,7 +26,7 @@ argv = require('optimist')
 logger = new Logger
   streams: [
     { level: 'error', stream: process.stderr }
-    { level: argv.logLevel, path: "#{argv.logDir}/sphere-stock-xml-import_#{argv.projectKey}.log" }
+    { level: argv.logLevel, path: "#{argv.logDir}/sphere-order-xml-export_#{argv.projectKey}.log" }
   ]
 
 process.on 'SIGUSR2', -> logger.reopenFileStreams()
