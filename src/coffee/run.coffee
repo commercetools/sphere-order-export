@@ -6,10 +6,12 @@ fs = require 'fs'
 argv = require('optimist')
   .usage('Usage: $0 --projectKey key --clientId id --clientSecret secret')
   .default('timeout', 60000)
+  .default('fetchHours', 0) # by default don't restrict on modifications
   .describe('projectKey', 'your SPHERE.IO project-key')
   .describe('clientId', 'your OAuth client id for the SPHERE.IO API')
   .describe('clientSecret', 'your OAuth client secret for the SPHERE.IO API')
   .describe('timeout', 'Set timeout for requests')
+  .describe('fetchHours', 'Number of hours to fetch modified orders')
   .demand(['projectKey', 'clientId', 'clientSecret'])
   .argv
 
@@ -25,7 +27,7 @@ sphere = new SphereClient options
 options.sphere_client = sphere
 mapping = new Mapping options
 
-sphere.orders.perPage(0).fetch().then (result) ->
+sphere.orders.last("#{argv.fetchHours}h").perPage(0).fetch().then (result) ->
   mapping.processOrders(result.body.results)
   .then (xmlOrders) ->
     _.each xmlOrders, (entry) ->
