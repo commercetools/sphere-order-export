@@ -61,26 +61,29 @@ class Mapping
 
   processOrder: (order) ->
     deferred = Q.defer()
-    if order.customerId?
-      @client.customers.byId(order.customerId).fetch()
-      .then (result) =>
+    @client.customObjects.byId("paymentFlag/#{order.id}").fetch()
+    .then (result) =>
+      paymentInfo = result.body
+      if order.customerId?
+        @client.customers.byId(order.customerId).fetch()
+        .then (result) =>
+          entry =
+            id: order.id
+            xml: @mapOrder order, paymentInfo, result.body
+            version: order.version
+          deferred.resolve entry
+      else
         entry =
           id: order.id
-          xml: @mapOrder order, result
+          xml: @mapOrder order, paymentInfo
           version: order.version
         deferred.resolve entry
-      .fail (err) ->
-        deferred.reject err
-    else
-      entry =
-        id: order.id
-        xml: @mapOrder order
-        version: order.version
-      deferred.resolve entry
+    .fail (err) ->
+      deferred.reject err
 
     deferred.promise
 
-  mapOrder: (order, customer) ->
+  mapOrder: (order, paymentInfo, customer) ->
     xml = builder.create('order',
       { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.9')
@@ -120,11 +123,10 @@ class Mapping
 
     @_customerGroup(xml, order)
 
-    if order.paymentInfo
-      pi = order.paymentInfo
+    if paymentInfo?
       xPi = xml.e('paymentInfo')
-      @_add(xPi, pi, 'paymentMethod')
-      @_add(xPi, pi, 'paymentID')
+      @_add(xPi, paymentInfo, 'paymentMethod', 'value')
+      # @_add(xPi, paymentInfo, 'paymentID') # TODO: get data from custom object
 
     si = order.shippingInfo
     xSi = xml.e('shippingInfo')
