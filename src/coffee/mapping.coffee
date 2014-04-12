@@ -182,8 +182,13 @@ class Mapping
     @_taxRate(xml, elem)
 
   _attributes: (xml, elem) ->
+    val = elem.value
+    if _.has(val, 'key') and _.has(val, 'value')
+      val = val.key
+    if _.has(val, 'centAmount') and _.has (val, 'currencyCode')
+      val = "#{currencyCode} #{centAmount}"
     xml.e('name').t(elem.name).up()
-      .e('value').t(elem.value)
+      .e('value').t(val)
 
   _money: (xml, elem, name) ->
     xml.e(name)
