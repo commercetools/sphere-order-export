@@ -48,7 +48,7 @@ credentialsConfig = ProjectCredentialsConfig.create()
   sphere = new SphereClient options
   options.sphere_client = sphere
   mapping = new Mapping options
-  mapping = argv.standardShippingMethod
+  mapping.standardShippingMethod = argv.standardShippingMethod
 
   sphere.orders.last("#{argv.fetchHours}h").perPage(0).fetch().then (result) ->
     mapping.processOrders(result.body.results)
