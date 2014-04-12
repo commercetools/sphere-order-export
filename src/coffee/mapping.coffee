@@ -185,10 +185,10 @@ class Mapping
 
   _attributes: (xml, elem) ->
     val = elem.value
-    if _.has(val, 'key') and _.has(val, 'value')
+    if _.has(val, 'key') and _.has(val, 'label')
       val = val.key
     if _.has(val, 'centAmount') and _.has(val, 'currencyCode')
-      val = "#{currencyCode} #{centAmount}"
+      val = "#{val.currencyCode} #{val.centAmount}"
     xml.e('name').t(elem.name).up()
       .e('value').t(val)
 
