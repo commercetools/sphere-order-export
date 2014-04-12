@@ -16,6 +16,7 @@ class Mapping
     @client = new SphereClient options
     @orderService = new OrderService options
     @channelService = new ChannelService options
+    @standardShippingMethod = 'None'
 
   elasticio: (msg, cfg, next, snapshot) ->
     if _.isEmpty msg or _.isEmpty msg.body
@@ -125,14 +126,15 @@ class Mapping
       @_add(xPi, pi, 'paymentMethod')
       @_add(xPi, pi, 'paymentID')
 
-    if order.shippingInfo
-      si = order.shippingInfo
-      xSi = xml.e('shippingInfo')
+    si = order.shippingInfo
+    xSi = xml.e('shippingInfo')
+    if order.shippingInfo?
       @_add(xSi, si, 'shippingMethodName')
       @_add(xSi, si, 'trackingData')
-
       @_money(xSi, si, 'price')
       @_taxRate(xSi, si)
+    else
+      xSi.e('shippingMethodName').t(@standardShippingMethod).up()
 
     if order.lineItems
       for lineItem in order.lineItems
@@ -185,7 +187,7 @@ class Mapping
     val = elem.value
     if _.has(val, 'key') and _.has(val, 'value')
       val = val.key
-    if _.has(val, 'centAmount') and _.has (val, 'currencyCode')
+    if _.has(val, 'centAmount') and _.has(val, 'currencyCode')
       val = "#{currencyCode} #{centAmount}"
     xml.e('name').t(elem.name).up()
       .e('value').t(val)

@@ -11,10 +11,12 @@ argv = require('optimist')
   .describe('clientId', 'your OAuth client id for the SPHERE.IO API')
   .describe('clientSecret', 'your OAuth client secret for the SPHERE.IO API')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
+  .describe('standardShippingMethod', 'Allows to define the fallback shipping method name of order has none')
   .describe('outputDir', 'Folder to store resulting XML files in')
   .describe('logLevel', 'log level for file logging')
   .describe('logDir', 'directory to store logs')
   .describe('timeout', 'Set timeout for requests')
+  .default('standardShippingMethod', 'None')
   .default('outputDir', '.')
   .default('logLevel', 'info')
   .default('logDir', '.')
@@ -46,6 +48,7 @@ credentialsConfig = ProjectCredentialsConfig.create()
   sphere = new SphereClient options
   options.sphere_client = sphere
   mapping = new Mapping options
+  mapping = argv.standardShippingMethod
 
   sphere.orders.last("#{argv.fetchHours}h").perPage(0).fetch().then (result) ->
     mapping.processOrders(result.body.results)
