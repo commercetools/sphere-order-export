@@ -47,11 +47,11 @@ credentialsConfig = ProjectCredentialsConfig.create()
   options.sphere_client = sphere
   mapping = new Mapping options
 
-  sphere.orders.last("#{argv.fetchHours}h").perPage(0).fetch().then (result) =>
+  sphere.orders.last("#{argv.fetchHours}h").perPage(0).fetch().then (result) ->
     mapping.processOrders(result.body.results)
-    .then (xmlOrders) =>
+    .then (xmlOrders) ->
       logger.info "Storing #{_.size xmlOrders} file(s) to '#{argv.outputDir}'."
-      _.each xmlOrders, (entry) =>
+      _.each xmlOrders, (entry) ->
         content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
         fileName = "#{entry.id}.xml"
         fs.writeFile "#{argv.outputDir}/#{fileName}", content, (err) ->
