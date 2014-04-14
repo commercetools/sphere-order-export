@@ -43,28 +43,28 @@
   "dependencies": {
     "optimist": "0.6.1",
     "q": "1.0.0",
-    "request": "2.x",
-    "sphere-node-client": "0.6.1",
-    "sphere-node-sync": "0.5.0",
-    "sphere-node-utils": "0.4.1",
+    "request": "2.34.0",
+    "sphere-node-client": "0.6.6",
+    "sphere-node-sync": "0.5.3",
+    "sphere-node-utils": "0.4.7",
     "underscore": "1.6.0",
-    "xmlbuilder": "2.1.0"
+    "xmlbuilder": "2.2.1"
   },
   "devDependencies": {
-    "coveralls": "~2.8.0",
+    "coveralls": "2.10.0",
     "elasticio-cli": "~0.0.3",
-    "grunt": "~0.4.1",
-    "grunt-bump": "~0.0.11",
-    "grunt-cli": "~0.1.9",
-    "grunt-coffeelint": "~0.0.7",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-coffee": "~0.10.0",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-shell": "~0.6.4",
-    "istanbul": "~0.2.4",
-    "jasmine-node": "~1.13.0",
+    "grunt": "0.4.4",
+    "grunt-bump": "0.0.13",
+    "grunt-cli": "0.1.13",
+    "grunt-coffeelint": "0.0.8",
+    "grunt-contrib-clean": "0.5.0",
+    "grunt-contrib-coffee": "0.10.1",
+    "grunt-contrib-concat": "0.4.0",
+    "grunt-contrib-watch": "0.6.1",
+    "grunt-shell": "0.6.4",
+    "istanbul": "0.2.7",
+    "jasmine-node": "1.13.0",
     "sphere-coffeelint": "git://github.com/sphereio/sphere-coffeelint.git#master",
-    "xml2js": "0.4.1"
+    "xml2js": "0.4.2"
   }
 }
