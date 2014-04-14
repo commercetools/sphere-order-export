@@ -1,12 +1,11 @@
 _ = require 'underscore'
-builder = require 'xmlbuilder'
-{ElasticIo, _u} = require('sphere-node-utils')
-OrderService = require '../lib/orderservice'
-ChannelService = require '../lib/channelservice'
 Q = require 'q'
+builder = require 'xmlbuilder'
 SphereClient = require 'sphere-node-client'
+{ElasticIo, _u} = require 'sphere-node-utils'
+OrderService = require '../lib/orderservice'
 
-class Mapping
+class OrderExport
 
   BASE64 = 'base64'
   CHANNEL_KEY = 'OrderXmlFileExport'
@@ -14,8 +13,7 @@ class Mapping
 
   constructor: (options = {}) ->
     @client = new SphereClient options
-    @orderService = new OrderService options
-    @channelService = new ChannelService options
+    @orderService = new OrderService @client
     @standardShippingMethod = 'None'
 
   elasticio: (msg, cfg, next, snapshot) ->
@@ -23,10 +21,7 @@ class Mapping
       ElasticIo.returnSuccess 'No data from elastic.io!', next
       return
 
-    @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
-    .then (result) =>
-      @channel = result.body
-      @processOrders(msg.body.results, @channel)
+    @processOrders(msg.body.results)
     .then (xmlOrders) =>
 
       now = new Buffer(new Date().toISOString()).toString(BASE64)
@@ -44,8 +39,7 @@ class Mapping
         base64 = new Buffer(content).toString(BASE64)
         data.attachments[fileName] =
           content: base64
-        syncInfos.push @orderService.addSyncInfo xmlOrder.id, xmlOrder.version,
-          @channel, fileName
+        syncInfos.push @syncOrder xmlOrder, fileName
 
       Q.all(syncInfos)
       .then ->
@@ -53,11 +47,12 @@ class Mapping
     .fail (result) ->
       ElasticIo.returnFailure res, res, next
 
-  processOrders: (orders, channel) ->
-    unsyncedOrders = @orderService.unsyncedOrders orders, channel
-    promises = _.map unsyncedOrders, (order) =>
-      @processOrder order
-    Q.all(promises)
+  processOrders: (orders) ->
+    @client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
+    .then (result) =>
+      @channel = result.body
+      unsyncedOrders = @orderService.unsyncedOrders orders, @channel
+      Q.all _.map unsyncedOrders, (order) => @processOrder order
 
   processOrder: (order) ->
     deferred = Q.defer()
@@ -79,6 +74,9 @@ class Mapping
       deferred.resolve entry
 
     deferred.promise
+
+  syncOrder: (xmlOrder, filename) ->
+    @orderService.addSyncInfo xmlOrder.id, xmlOrder.version, @channel, filename
 
   mapOrder: (order, customer) ->
     xml = builder.create('order',
@@ -246,4 +244,4 @@ class Mapping
     value = fallback unless value
     xml.e(xAttr).t(value).up() if value
 
-module.exports = Mapping
+module.exports = OrderExport
