@@ -1,10 +1,8 @@
-_ = require 'underscore'
-Mapping = require '../lib/mapping'
-SphereClient = require 'sphere-node-client'
-{ElasticIo, _u} = require('sphere-node-utils')
-Config = require '../config'
 fs = require 'fs'
-ChannelService = require '../lib/channelservice'
+_ = require 'underscore'
+{ElasticIo, _u} = require 'sphere-node-utils'
+OrderExport = require '../lib/orderexport'
+Config = require '../config'
 SpecHelper = require './helper'
 
 jasmine.getEnv().defaultTimeoutInterval = 10000
@@ -15,11 +13,10 @@ describe 'integration tests', ->
   CHANNEL_ROLE = 'OrderExport'
 
   beforeEach (done) ->
-    @sphere = new SphereClient Config
-    @mapping = new Mapping Config
-    @channelService = new ChannelService Config
+    @orderExport = new OrderExport Config
+    @sphere = @orderExport.client
 
-    @channelService.byKeyOrCreate(CHANNEL_KEY, CHANNEL_ROLE)
+    @sphere.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
     .then (result) =>
       @channel = result.channel
       # get a tax category required for setting up shippingInfo
@@ -52,7 +49,7 @@ describe 'integration tests', ->
     done()
 
   it 'nothing to do', (done) ->
-    @mapping.processOrders([])
+    @orderExport.processOrders([])
     .then (xmlOrders) ->
       expect(xmlOrders).toBeDefined()
       expect(_.size(xmlOrders)).toEqual 0
@@ -61,7 +58,7 @@ describe 'integration tests', ->
       done _u.prettify err
 
   it 'full turn around', (done) ->
-    @mapping.processOrders([@order], @channel).then (xmlOrders) ->
+    @orderExport.processOrders([@order], @channel).then (xmlOrders) ->
       expect(_.size xmlOrders).toBe 1
       done()
     .fail (err) ->
@@ -69,7 +66,7 @@ describe 'integration tests', ->
 
   describe 'elastic.io', ->
     it 'nothing to do', (done) ->
-      @mapping.elasticio {}, Config, (error, message) ->
+      @orderExport.elasticio {}, Config, (error, message) ->
         done(_u.prettify(error), null, 4) if error
         expect(message).toBe 'No data from elastic.io!'
         done()
@@ -77,7 +74,7 @@ describe 'integration tests', ->
     it 'full turn around', (done) ->
       msg =
         body: [@order]
-      @mapping.elasticio msg, Config, (error, message) ->
+      @orderExport.elasticio msg, Config, (error, message) ->
         done(_u.prettify(error), null, 4) if error
         expect(message.attachments).toBeDefined()
         expect(message.attachments['touch-timestamp.txt']).toBeDefined()
