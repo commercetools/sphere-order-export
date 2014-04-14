@@ -1,4 +1,4 @@
-Mapping = require('./lib/mapping');
+OrderExport = require('./lib/orderexport');
 
 exports.process = function(msg, cfg, next, snapshot) {
   config = {
@@ -6,8 +6,8 @@ exports.process = function(msg, cfg, next, snapshot) {
     client_secret: cfg.sphereClientSecret,
     project_key: cfg.sphereProjectKey
   };
-  var mapping = new Mapping({
+  var orderExport = new OrderExport({
     config: config
   });
-  mapping.elasticio(msg, cfg, next, snapshot);
+  orderExport.elasticio(msg, cfg, next, snapshot);
 }
