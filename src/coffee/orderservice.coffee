@@ -1,14 +1,9 @@
-_ = require('underscore')._
-SphereClient = require 'sphere-node-client'
-InventoryUpdater = require('sphere-node-sync').InventoryUpdater
 Q = require 'q'
+_ = require 'underscore'
 
 class OrderService
 
-  constructor: (options = {}) ->
-    unless options.sphere_client
-      options.sphere_client = new SphereClient options
-    @client = options.sphere_client
+  constructor: (@client) ->
 
   ###
   Returns only orders which haven't been synced using the given channel.
@@ -20,7 +15,7 @@ class OrderService
     _.select orders, (order) ->
       order.syncInfo or= []
       not _.find order.syncInfo, (syncInfo) ->
-        syncInfo.channel.id is channel.id
+        syncInfo.channel.id is channel?.id
 
   # TODO: retry if version of order is updated
 
