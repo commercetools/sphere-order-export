@@ -21,10 +21,7 @@ class OrderExport
       ElasticIo.returnSuccess 'No data from elastic.io!', next
       return
 
-    @client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
-    .then (result) =>
-      @channel = result.body
-      @processOrders(msg.body.results, @channel)
+    @processOrders(msg.body.results)
     .then (xmlOrders) =>
 
       now = new Buffer(new Date().toISOString()).toString(BASE64)
@@ -42,8 +39,7 @@ class OrderExport
         base64 = new Buffer(content).toString(BASE64)
         data.attachments[fileName] =
           content: base64
-        syncInfos.push @orderService.addSyncInfo xmlOrder.id, xmlOrder.version,
-          @channel, fileName
+        syncInfos.push @syncOrder xmlOrder, fileName
 
       Q.all(syncInfos)
       .then ->
@@ -51,9 +47,12 @@ class OrderExport
     .fail (result) ->
       ElasticIo.returnFailure res, res, next
 
-  processOrders: (orders, channel) ->
-    unsyncedOrders = @orderService.unsyncedOrders orders, channel
-    Q.all _.map unsyncedOrders, (order) => @processOrder order
+  processOrders: (orders) ->
+    @client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
+    .then (result) =>
+      @channel = result.body
+      unsyncedOrders = @orderService.unsyncedOrders orders, @channel
+      Q.all _.map unsyncedOrders, (order) => @processOrder order
 
   processOrder: (order) ->
     deferred = Q.defer()
@@ -79,6 +78,10 @@ class OrderExport
 
     deferred.promise
 
+  syncOrder: (xmlOrder, filename) ->
+    @orderService.addSyncInfo xmlOrder.id, xmlOrder.version, @channel, filename
+
+  mapOrder: (order, customer) ->
   mapOrder: (order, paymentInfo, customer) ->
     xml = builder.create('order',
       { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })

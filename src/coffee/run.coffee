@@ -96,35 +96,45 @@ credentialsConfig = ProjectCredentialsConfig.create()
     orderExport.processOrders(result.body.results)
   .then (xmlOrders) =>
     logger.info "Storing #{_.size xmlOrders} file(s) to '#{@outputDir}'."
+    orderReferences = []
     Q.all _.map xmlOrders, (entry) =>
       content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
       fileName = "#{entry.id}.xml"
+      orderReferences.push name: fileName, entry: entry
       fs.write "#{@outputDir}/#{fileName}", content
-  .then =>
-    {sftpHost, sftpUsername, sftpPassword, sftpTarget} = argv
-    if sftpHost and sftpUsername and sftpPassword and sftpTarget
-      sftpClient = new Sftp
-        host: sftpHost
-        username: sftpUsername
-        password: sftpPassword
-        logger: logger
-      sftpClient.openSftp()
-      .then (sftp) =>
-        fs.list(@outputDir)
-        .then (files) ->
-          logger.debug "About to upload #{_.size files} file(s) from #{@outputDir} to #{sftpTarget}"
-          Qutils.processList files, (filename) ->
-            logger.debug "Uploading #{@outputDir}/#{filename}"
-            sftpClient.safePutFile(sftp, "#{@outputDir}/#{filename}", "#{sftpTarget}/#{filename}")
-          .then ->
-            logger.info 'Successfully uploaded #{_.size files} file(s)'
+    .then =>
+      {sftpHost, sftpUsername, sftpPassword, sftpTarget} = argv
+      if sftpHost and sftpUsername and sftpPassword and sftpTarget
+        sftpClient = new Sftp
+          host: sftpHost
+          username: sftpUsername
+          password: sftpPassword
+          logger: logger
+        sftpClient.openSftp()
+        .then (sftp) =>
+          fs.list(@outputDir)
+          .then (files) ->
+            logger.debug "About to upload #{_.size files} file(s) from #{@outputDir} to #{sftpTarget}"
+            Qutils.processList files, (filename) ->
+              logger.debug "Uploading #{@outputDir}/#{filename}"
+              sftpClient.safePutFile(sftp, "#{@outputDir}/#{filename}", "#{sftpTarget}/#{filename}")
+              .then ->
+                xml = _.find orderReferences, (r) -> r.name is filename
+                if xml
+                  logger.debug "About to sync order #{filename}"
+                  orderExport.syncOrder xml.entry, filename
+                else
+                  logger.warn "Not able to create syncInfo for #{filename} as xml for that file was not found"
+                  Q()
+            .then ->
+              logger.info "Successfully uploaded #{_.size files} file(s)"
+              sftpClient.close(sftp)
+              Q()
+          .fail (err) ->
             sftpClient.close(sftp)
-            Q()
-        .fail (err) ->
-          sftpClient.close(sftp)
-          Q.reject err
-    else
-      Q()
+            Q.reject err
+      else
+        Q()
   .then ->
     logger.info 'Orders export complete'
     process.exit(0)
