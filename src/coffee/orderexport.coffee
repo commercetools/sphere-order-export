@@ -56,7 +56,7 @@ class OrderExport
 
   processOrder: (order) ->
     deferred = Q.defer()
-    @client.customObjects.byId("paymentFlag/#{order.id}").fetch()
+    @client.customObjects.byId("orderPaymentInfo/#{order.id}").fetch()
     .then (result) =>
       paymentInfo = result.body
       if order.customerId?
@@ -123,8 +123,9 @@ class OrderExport
 
     if paymentInfo?
       xPi = xml.e('paymentInfo')
-      @_add(xPi, paymentInfo, 'paymentMethod', 'value')
-      # @_add(xPi, paymentInfo, 'paymentID') # TODO: get data from custom object
+      @_add(xPi, paymentInfo.value, 'paymentMethod')
+      @_add(xPi, paymentInfo.value, 'paymentID')
+      # TODO: get data from custom object
 
     si = order.shippingInfo
     xSi = xml.e('shippingInfo')

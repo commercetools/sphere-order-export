@@ -41,12 +41,11 @@ describe 'integration tests', ->
         .import SpecHelper.orderMock(@shippingMethod, @product, @taxCategory)
     .then (result) =>
       @order = result.body
+      @sphere.customObjects.save SpecHelper.orderPaymentInfo(@order.id)
+    .then (result) ->
       done()
     .fail (err) ->
       done _u.prettify err
-
-  afterEach (done) ->
-    done()
 
   it 'nothing to do', (done) ->
     @orderExport.processOrders([])
