@@ -2,7 +2,7 @@ fs = require 'q-io/fs'
 Q = require 'q'
 _ = require 'underscore'
 tmp = require 'tmp'
-{ProjectCredentialsConfig, Sftp, Qutils} = require 'sphere-node-utils'
+{ProjectCredentialsConfig, Sftp, Qutils, TaskQueue} = require 'sphere-node-utils'
 package_json = require '../package.json'
 OrderExport = require '../lib/orderexport'
 Logger = require './logger'
@@ -15,9 +15,10 @@ argv = require('optimist')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name of order has none')
   .describe('useExportTmpDir', 'whether to use a tmp folder to store resulting XML files in or not (if no, files will be created under \'./exports\')')
-  .describe('sftpHost', 'the SFTP host')
-  .describe('sftpUsername', 'the SFTP username')
-  .describe('sftpPassword', 'the SFTP password')
+  .describe('sftpCredentials', 'the path to a JSON file where to read the credentials from')
+  .describe('sftpHost', 'the SFTP host (overwrite value in sftpCredentials JSON, if given)')
+  .describe('sftpUsername', 'the SFTP username (overwrite value in sftpCredentials JSON, if given)')
+  .describe('sftpPassword', 'the SFTP password (overwrite value in sftpCredentials JSON, if given)')
   .describe('sftpTarget', 'path in the SFTP server to where to move the worked files')
   .describe('logLevel', 'log level for file logging')
   .describe('logDir', 'directory to store logs')
@@ -71,7 +72,12 @@ ensureExportDir = ->
         .then -> Q(exportsPath)
     .fail (err) -> Q.reject(err)
 
-credentialsConfig = ProjectCredentialsConfig.create()
+readJsonFromPath = (path) ->
+  return Q({}) unless path
+  fs.read(path).then (content) ->
+    Q JSON.parse(content)
+
+ProjectCredentialsConfig.create()
 .then (credentials) ->
   options =
     config: credentials.enrichCredentials
@@ -87,6 +93,8 @@ credentialsConfig = ProjectCredentialsConfig.create()
   orderExport.standardShippingMethod = argv.standardShippingMethod
   client = orderExport.client
 
+  tq = new TaskQueue
+
   ensureExportDir()
   .then (outputDir) =>
     logger.debug "Created output dir at #{outputDir}"
@@ -96,30 +104,46 @@ credentialsConfig = ProjectCredentialsConfig.create()
     orderExport.processOrders(result.body.results)
   .then (xmlOrders) =>
     logger.info "Storing #{_.size xmlOrders} file(s) to '#{@outputDir}'."
-    orderReferences = []
+    @orderReferences = []
     Q.all _.map xmlOrders, (entry) =>
-      content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
-      fileName = "#{entry.id}.xml"
-      orderReferences.push name: fileName, entry: entry
-      fs.write "#{@outputDir}/#{fileName}", content
-    .then =>
-      {sftpHost, sftpUsername, sftpPassword, sftpTarget} = argv
-      if sftpHost and sftpUsername and sftpPassword and sftpTarget
-        sftpClient = new Sftp
+      tq.addTask =>
+        content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
+        fileName = "#{entry.id}.xml"
+        @orderReferences.push name: fileName, entry: entry
+        fs.write "#{@outputDir}/#{fileName}", content
+  .then =>
+    {sftpCredentials, sftpHost, sftpUsername, sftpPassword} = argv
+    if sftpCredentials or (sftpHost and sftpUsername and sftpPassword)
+
+      readJsonFromPath(sftpCredentials)
+      .then (credentials) ->
+        projectSftpCredentials = credentials[argv.projectKey] or {}
+        {host, username, password, sftpTarget} = _.defaults projectSftpCredentials,
           host: sftpHost
           username: sftpUsername
           password: sftpPassword
+          sftpTarget: argv.sftpTarget
+
+        throw new Error 'Missing sftp host' unless host
+        throw new Error 'Missing sftp username' unless username
+        throw new Error 'Missing sftp password' unless password
+
+        sftpClient = new Sftp
+          host: host
+          username: username
+          password: password
           logger: logger
+
         sftpClient.openSftp()
         .then (sftp) =>
           fs.list(@outputDir)
           .then (files) ->
-            logger.debug "About to upload #{_.size files} file(s) from #{@outputDir} to #{sftpTarget}"
+            logger.info "About to upload #{_.size files} file(s) from #{@outputDir} to #{sftpTarget}"
             Qutils.processList files, (filename) ->
               logger.debug "Uploading #{@outputDir}/#{filename}"
               sftpClient.safePutFile(sftp, "#{@outputDir}/#{filename}", "#{sftpTarget}/#{filename}")
               .then ->
-                xml = _.find orderReferences, (r) -> r.name is filename
+                xml = _.find @orderReferences, (r) -> r.name is filename
                 if xml
                   logger.debug "About to sync order #{filename}"
                   orderExport.syncOrder xml.entry, filename
@@ -133,8 +157,11 @@ credentialsConfig = ProjectCredentialsConfig.create()
           .fail (err) ->
             sftpClient.close(sftp)
             Q.reject err
-      else
-        Q()
+      .fail (err) ->
+        logger.error err, "Problems on getting sftp credentials from config files for project #{argv.projectKey}."
+        process.exit(1)
+    else
+      Q()
   .then ->
     logger.info 'Orders export complete'
     process.exit(0)
@@ -144,6 +171,6 @@ credentialsConfig = ProjectCredentialsConfig.create()
   .done()
 
 .fail (err) ->
-  logger.error err, "Problems on getting client credentials from config files."
+  logger.error err, 'Problems on getting client credentials from config files.'
   process.exit(1)
 .done()
