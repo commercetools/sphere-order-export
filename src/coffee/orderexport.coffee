@@ -81,7 +81,6 @@ class OrderExport
   syncOrder: (xmlOrder, filename) ->
     @orderService.addSyncInfo xmlOrder.id, xmlOrder.version, @channel, filename
 
-  mapOrder: (order, customer) ->
   mapOrder: (order, paymentInfo, customer) ->
     xml = builder.create('order',
       { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
