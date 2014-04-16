@@ -2,10 +2,9 @@ fs = require 'q-io/fs'
 Q = require 'q'
 _ = require 'underscore'
 tmp = require 'tmp'
-{ProjectCredentialsConfig, Sftp, Qutils, TaskQueue} = require 'sphere-node-utils'
+{Logger, ProjectCredentialsConfig, Sftp, Qutils, TaskQueue} = require 'sphere-node-utils'
 package_json = require '../package.json'
 OrderExport = require '../lib/orderexport'
-Logger = require './logger'
 
 argv = require('optimist')
   .usage('Usage: $0 --projectKey key --clientId id --clientSecret secret')
@@ -35,9 +34,10 @@ argv = require('optimist')
   .argv
 
 logOptions =
+  name: "#{package_json.name}-#{package_json.version}:#{argv.projectKey}"
   streams: [
     { level: 'error', stream: process.stderr }
-    { level: argv.logLevel, path: "#{argv.logDir}/sphere-order-xml-import_#{argv.projectKey}.log" }
+    { level: argv.logLevel, path: "#{argv.logDir}/sphere-order-xml-import.log" }
   ]
 logOptions.silent = argv.logSilent if argv.logSilent
 logger = new Logger logOptions
