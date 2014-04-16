@@ -4,6 +4,7 @@ _ = require 'underscore'
 OrderExport = require '../lib/orderexport'
 Config = require '../config'
 SpecHelper = require './helper'
+{parseString} = require 'xml2js'
 
 jasmine.getEnv().defaultTimeoutInterval = 10000
 
@@ -62,9 +63,11 @@ describe 'integration tests', ->
   it 'full turn around', (done) ->
     @orderExport.processOrders([@order], @channel).then (xmlOrders) =>
       expect(_.size xmlOrders).toBe 1
-      expect(xmlOrders[0].customerNumber).toEqual @customer.customerNumber
-      expect(xmlOrders[0].externalCustomerId).toEqual @customer.externalId
-      done()
+      doc = xmlOrders[0].xml
+      parseString doc, (err, result) =>
+        expect(result.order.customerNumber[0]).toEqual @customer.customerNumber
+        expect(result.order.externalCustomerId[0]).toEqual @customer.externalId
+        done()
     .fail (err) ->
       done _u.prettify err
 

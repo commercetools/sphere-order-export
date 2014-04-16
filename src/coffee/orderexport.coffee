@@ -80,6 +80,7 @@ class OrderExport
     @orderService.addSyncInfo xmlOrder.id, xmlOrder.version, @channel, filename
 
   mapOrder: (order, customer) ->
+
     xml = builder.create('order',
       { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.9')

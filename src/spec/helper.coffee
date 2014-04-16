@@ -115,4 +115,5 @@ module.exports =
       email: "#{firstName}.#{lastName}@commercetools.de"
       firstName: firstName
       lastName: lastName
-      password: "#{unique}"
+      password: "password-#{unique}"
+      externalId: "external-#{unique}"
