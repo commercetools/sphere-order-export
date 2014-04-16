@@ -59,9 +59,10 @@ class OrderExport
     if order.customerId?
       @client.customers.byId(order.customerId).fetch()
       .then (result) =>
+        customer = result.body
         entry =
           id: order.id
-          xml: @mapOrder order, result
+          xml: @mapOrder order, customer
           version: order.version
         deferred.resolve entry
       .fail (err) ->
@@ -79,6 +80,7 @@ class OrderExport
     @orderService.addSyncInfo xmlOrder.id, xmlOrder.version, @channel, filename
 
   mapOrder: (order, customer) ->
+
     xml = builder.create('order',
       { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.9')
