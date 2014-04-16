@@ -37,8 +37,10 @@ describe 'integration tests', ->
       @sphere.products.save SpecHelper.productMock(productType)
     .then (result) =>
       @product = result.body
-      @sphere.orders
-        .import SpecHelper.orderMock(@shippingMethod, @product, @taxCategory)
+      @sphere.customers.save SpecHelper.customerMock()
+    .then (result) =>
+      @customer = result.body.customer
+      @sphere.orders.import SpecHelper.orderMock(@shippingMethod, @product, @taxCategory, @customer)
     .then (result) =>
       @order = result.body
       done()
@@ -58,8 +60,10 @@ describe 'integration tests', ->
       done _u.prettify err
 
   it 'full turn around', (done) ->
-    @orderExport.processOrders([@order], @channel).then (xmlOrders) ->
+    @orderExport.processOrders([@order], @channel).then (xmlOrders) =>
       expect(_.size xmlOrders).toBe 1
+      expect(xmlOrders[0].customerNumber).toEqual @customer.customerNumber
+      expect(xmlOrders[0].externalCustomerId).toEqual @customer.externalId
       done()
     .fail (err) ->
       done _u.prettify err
