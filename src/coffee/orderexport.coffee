@@ -59,9 +59,10 @@ class OrderExport
     if order.customerId?
       @client.customers.byId(order.customerId).fetch()
       .then (result) =>
+        customer = result.body
         entry =
           id: order.id
-          xml: @mapOrder order, result
+          xml: @mapOrder order, customer
           version: order.version
         deferred.resolve entry
       .fail (err) ->
