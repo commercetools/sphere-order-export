@@ -2,10 +2,9 @@ fs = require 'q-io/fs'
 Q = require 'q'
 _ = require 'underscore'
 tmp = require 'tmp'
-{ProjectCredentialsConfig, Sftp, Qutils, TaskQueue} = require 'sphere-node-utils'
+{ExtendedLogger, ProjectCredentialsConfig, Sftp, Qutils, TaskQueue} = require 'sphere-node-utils'
 package_json = require '../package.json'
 OrderExport = require '../lib/orderexport'
-Logger = require './logger'
 
 argv = require('optimist')
   .usage('Usage: $0 --projectKey key --clientId id --clientSecret secret')
@@ -35,17 +34,22 @@ argv = require('optimist')
   .argv
 
 logOptions =
+  name: "#{package_json.name}-#{package_json.version}"
   streams: [
     { level: 'error', stream: process.stderr }
     { level: argv.logLevel, path: "#{argv.logDir}/sphere-order-xml-import_#{argv.projectKey}.log" }
   ]
 logOptions.silent = argv.logSilent if argv.logSilent
-logger = new Logger logOptions
+logger = new ExtendedLogger
+  additionalFields:
+    project_key: argv.projectKey
+  logConfig: logOptions
 if argv.logSilent
-  logger.trace = -> # noop
-  logger.debug = -> # noop
+  logger.bunyanLogger.trace = -> # noop
+  logger.bunyanLogger.debug = -> # noop
 
 process.on 'SIGUSR2', -> logger.reopenFileStreams()
+process.on 'exit', => process.exit(@exitCode)
 
 tmp.setGracefulCleanup()
 createTmpDir = ->
@@ -78,7 +82,7 @@ readJsonFromPath = (path) ->
     Q JSON.parse(content)
 
 ProjectCredentialsConfig.create()
-.then (credentials) ->
+.then (credentials) =>
   options =
     config: credentials.enrichCredentials
       project_key: argv.projectKey
@@ -87,7 +91,7 @@ ProjectCredentialsConfig.create()
     timeout: argv.timeout
     user_agent: "#{package_json.name} - #{package_json.version}"
     logConfig:
-      logger: logger
+      logger: logger.bunyanLogger
 
   orderExport = new OrderExport options
   orderExport.standardShippingMethod = argv.standardShippingMethod
@@ -116,7 +120,7 @@ ProjectCredentialsConfig.create()
     if sftpCredentials or (sftpHost and sftpUsername and sftpPassword)
 
       readJsonFromPath(sftpCredentials)
-      .then (credentials) ->
+      .then (credentials) =>
         projectSftpCredentials = credentials[argv.projectKey] or {}
         {host, username, password, sftpTarget} = _.defaults projectSftpCredentials,
           host: sftpHost
@@ -157,20 +161,24 @@ ProjectCredentialsConfig.create()
           .fail (err) ->
             sftpClient.close(sftp)
             Q.reject err
-      .fail (err) ->
+      .fail (err) =>
         logger.error err, "Problems on getting sftp credentials from config files for project #{argv.projectKey}."
-        process.exit(1)
+        # process.exit(1)
+        @exitCode = 1
     else
       Q()
-  .then ->
+  .then =>
     logger.info 'Orders export complete'
-    process.exit(0)
-  .fail (error) ->
+    # process.exit(0)
+    @exitCode = 0
+  .fail (error) =>
     logger.error error, 'Oops, something went wrong!'
-    process.exit(1)
+    # process.exit(1)
+    @exitCode = 1
   .done()
 
-.fail (err) ->
+.fail (err) =>
   logger.error err, 'Problems on getting client credentials from config files.'
-  process.exit(1)
+  # process.exit(1)
+  @exitCode = 1
 .done()

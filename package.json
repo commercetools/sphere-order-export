@@ -45,7 +45,7 @@
     "q": "1.0.0",
     "q-io": "1.11.0",
     "sphere-node-client": "0.6.6",
-    "sphere-node-utils": "0.4.7",
+    "sphere-node-utils": "0.4.9",
     "tmp": "0.0.23",
     "underscore": "1.6.0",
     "xmlbuilder": "2.2.1"
