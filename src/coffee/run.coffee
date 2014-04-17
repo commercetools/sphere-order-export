@@ -141,12 +141,12 @@ ProjectCredentialsConfig.create()
         sftpClient.openSftp()
         .then (sftp) =>
           fs.list(@outputDir)
-          .then (files) ->
+          .then (files) =>
             logger.info "About to upload #{_.size files} file(s) from #{@outputDir} to #{sftpTarget}"
-            Qutils.processList files, (filename) ->
+            Qutils.processList files, (filename) =>
               logger.debug "Uploading #{@outputDir}/#{filename}"
               sftpClient.safePutFile(sftp, "#{@outputDir}/#{filename}", "#{sftpTarget}/#{filename}")
-              .then ->
+              .then =>
                 xml = _.find @orderReferences, (r) -> r.name is filename
                 if xml
                   logger.debug "About to sync order #{filename}"
