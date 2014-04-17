@@ -94,8 +94,13 @@ class OrderExport
 
     xml.e('customerNumber')
       .t(customer.customerNumber) if customer?.customerNumber
-    xml.e('externalCustomerId')
-      .t(customer.externalId) if customer?.externalId
+
+    if customer?.externalId
+      xml.e('externalCustomerId')
+        .t(customer.externalId)
+    else
+      xml.e('externalCustomerId')
+        .t(customer?.customerNumber) if customer?.customerNumber
 
     states = [ 'orderState', 'shipmentState', 'paymentState' ]
     for attr in states
