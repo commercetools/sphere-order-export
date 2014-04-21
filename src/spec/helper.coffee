@@ -66,13 +66,15 @@ module.exports =
       masterVariant:
         sku: "sku-#{unique}"
 
-  orderMock: (shippingMethod, product, taxCategory) ->
+  orderMock: (shippingMethod, product, taxCategory, customer) ->
     unique = new Date().getTime()
     order =
       id: "order-#{unique}"
       orderState: 'Open'
       paymentState: 'Pending'
       shipmentState: 'Pending'
+      customerId: customer.id
+      customerEmail: customer.email
 
       lineItems: [ {
         productId: product.id
@@ -111,3 +113,15 @@ module.exports =
         shippingMethod:
           typeId: 'shipping-method'
           id: shippingMethod.id
+
+  customerMock: ->
+    unique = new Date().getTime()
+    firstName = "Heinz-#{unique}"
+    lastName = "Mayer-#{unique}"
+    customer =
+      customerNumber: "c-#{unique}"
+      email: "#{firstName}.#{lastName}@commercetools.de"
+      firstName: firstName
+      lastName: lastName
+      password: "password-#{unique}"
+      externalId: "external-#{unique}"

@@ -208,15 +208,41 @@ describe '#mapOrder', ->
       expect(result.order.shippingInfo[0].taxRate[0].includedInPrice[0]).toBe 'true'
       done()
 
-  it 'customer', (done) ->
+  it 'should not export customer', (done) ->
+    order = {}
+    doc = @orderExport.mapOrder order
+    parseString doc, (err, result) ->
+      expect(result.order.customerNumber).toBeUndefined()
+      expect(result.order.externalCustomerId).toBeUndefined()
+      done()
+
+
+  it 'should export externalCustomerId', (done) ->
+    order = {}
+    customer =
+      externalId: '111-222-333'
+    doc = @orderExport.mapOrder order, customer
+    parseString doc, (err, result) ->
+      expect(result.order.customerNumber).toBeUndefined()
+      expect(result.order.externalCustomerId[0]).toBe customer.externalId
+      done()
+
+  it 'should export customerNumber as externalCustomerId', (done) ->
+    order = {}
+    customer =
+      customerNumber: '111-222'
+    doc = @orderExport.mapOrder order, customer
+    parseString doc, (err, result) ->
+      expect(result.order.customerNumber[0]).toBe customer.customerNumber
+      expect(result.order.externalCustomerId[0]).toBe customer.customerNumber
+      done()
+
+  it 'should export customerNumber and externalCustomerId', (done) ->
     order = {}
     customer =
       customerNumber: '111-222'
       externalId: '111-222-333'
-
-    console.log JSON.stringify customer, null, 2
-
-    doc = @orderExport.mapOrder order, null, customer
+    doc = @orderExport.mapOrder order, customer
     parseString doc, (err, result) ->
       expect(result.order.customerNumber[0]).toBe customer.customerNumber
       expect(result.order.externalCustomerId[0]).toBe customer.externalId
