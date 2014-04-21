@@ -2,6 +2,14 @@ _ = require 'underscore'
 
 module.exports =
 
+  orderPaymentInfo: (orderId) ->
+    orderPaymentInfo =
+      container: 'orderPaymentInfo'
+      key: orderId
+      value:
+        paymentMethod: 'Cash'
+        paymentID: '7'
+
   shippingMethodMock: (zone, taxCategory) ->
     unique = new Date().getTime()
     shippingMethod =

@@ -176,11 +176,13 @@ describe '#mapOrder', ->
       done()
 
   it 'paymentInfo', (done) ->
-    order =
-      paymentInfo:
-        paymentID: '7'
+    order = {}
+    paymentInfo =
+      value:
         paymentMethod: 'Cash'
-    doc = @orderExport.mapOrder order
+        paymentID: '7'
+
+    doc = @orderExport.mapOrder order, paymentInfo, null
     parseString doc, (err, result) ->
       expect(result.order.paymentInfo).not.toBeUndefined()
       expect(result.order.paymentInfo[0].paymentID[0]).toBe '7'
@@ -216,7 +218,7 @@ describe '#mapOrder', ->
     order = {}
     customer =
       externalId: '111-222-333'
-    doc = @orderExport.mapOrder order, customer
+    doc = @orderExport.mapOrder order, null, customer
     parseString doc, (err, result) ->
       expect(result.order.customerNumber).toBeUndefined()
       expect(result.order.externalCustomerId[0]).toBe customer.externalId
@@ -226,7 +228,7 @@ describe '#mapOrder', ->
     order = {}
     customer =
       customerNumber: '111-222'
-    doc = @orderExport.mapOrder order, customer
+    doc = @orderExport.mapOrder order, null, customer
     parseString doc, (err, result) ->
       expect(result.order.customerNumber[0]).toBe customer.customerNumber
       expect(result.order.externalCustomerId[0]).toBe customer.customerNumber
@@ -237,7 +239,7 @@ describe '#mapOrder', ->
     customer =
       customerNumber: '111-222'
       externalId: '111-222-333'
-    doc = @orderExport.mapOrder order, customer
+    doc = @orderExport.mapOrder order, null, customer
     parseString doc, (err, result) ->
       expect(result.order.customerNumber[0]).toBe customer.customerNumber
       expect(result.order.externalCustomerId[0]).toBe customer.externalId
