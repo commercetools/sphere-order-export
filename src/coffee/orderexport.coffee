@@ -10,7 +10,7 @@ class OrderExport
   BASE64 = 'base64'
   CHANNEL_KEY = 'OrderXmlFileExport'
   CHANNEL_ROLE = 'OrderExport'
-  CONTAINER_PAYMENT = 'checkoutinfo'
+  CONTAINER_PAYMENT = 'checkoutInfo'
 
   constructor: (options = {}) ->
     @client = new SphereClient options

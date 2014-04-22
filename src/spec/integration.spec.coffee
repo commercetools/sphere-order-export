@@ -12,7 +12,7 @@ describe 'integration tests', ->
 
   CHANNEL_KEY = 'OrderXmlFileExport'
   CHANNEL_ROLE = 'OrderExport'
-  CONTAINER_PAYMENT = 'checkoutinfo'
+  CONTAINER_PAYMENT = 'checkoutInfo'
 
   beforeEach (done) ->
     @orderExport = new OrderExport Config
