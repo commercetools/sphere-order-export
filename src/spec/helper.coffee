@@ -2,9 +2,9 @@ _ = require 'underscore'
 
 module.exports =
 
-  orderPaymentInfo: (orderId) ->
+  orderPaymentInfo: (container, orderId) ->
     orderPaymentInfo =
-      container: 'orderPaymentInfo'
+      container: container
       key: orderId
       value:
         paymentMethod: 'Cash'

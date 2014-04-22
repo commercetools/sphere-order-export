@@ -175,7 +175,7 @@ describe '#mapOrder', ->
       expect(cg.name[0]).toBe 'B2B'
       done()
 
-  it 'paymentInfo', (done) ->
+  it 'should export paymentMethod and paymentId', (done) ->
     order = {}
     paymentInfo =
       value:
@@ -187,6 +187,32 @@ describe '#mapOrder', ->
       expect(result.order.paymentInfo).not.toBeUndefined()
       expect(result.order.paymentInfo[0].paymentID[0]).toBe '7'
       expect(result.order.paymentInfo[0].paymentMethod[0]).toBe 'Cash'
+      done()
+
+  it 'should export only paymentMethod', (done) ->
+    order = {}
+    paymentInfo =
+      value:
+        paymentMethod: 'Cash'
+
+    doc = @orderExport.mapOrder order, paymentInfo, null
+    parseString doc, (err, result) ->
+      expect(result.order.paymentInfo).not.toBeUndefined()
+      expect(result.order.paymentInfo[0].paymentID).toBeUndefined()
+      expect(result.order.paymentInfo[0].paymentMethod[0]).toBe 'Cash'
+      done()
+
+  it 'should export only paymentId', (done) ->
+    order = {}
+    paymentInfo =
+      value:
+        paymentID: '7'
+
+    doc = @orderExport.mapOrder order, paymentInfo, null
+    parseString doc, (err, result) ->
+      expect(result.order.paymentInfo).not.toBeUndefined()
+      expect(result.order.paymentInfo[0].paymentID[0]).toBe '7'
+      expect(result.order.paymentInfo[0].paymentMethod).toBeUndefined()
       done()
 
   it 'shippingInfo', (done) ->

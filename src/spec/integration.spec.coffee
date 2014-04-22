@@ -12,6 +12,7 @@ describe 'integration tests', ->
 
   CHANNEL_KEY = 'OrderXmlFileExport'
   CHANNEL_ROLE = 'OrderExport'
+  CONTAINER_PAYMENT = 'checkoutinfo'
 
   beforeEach (done) ->
     @orderExport = new OrderExport Config
@@ -44,7 +45,7 @@ describe 'integration tests', ->
       @sphere.orders.import SpecHelper.orderMock(@shippingMethod, @product, @taxCategory, @customer)
     .then (result) =>
       @order = result.body
-      @sphere.customObjects.save SpecHelper.orderPaymentInfo(@order.id)
+      @sphere.customObjects.save SpecHelper.orderPaymentInfo(CONTAINER_PAYMENT, @order.id)
     .then (result) ->
       done()
     .fail (err) ->

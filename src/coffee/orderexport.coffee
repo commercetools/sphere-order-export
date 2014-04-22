@@ -10,6 +10,7 @@ class OrderExport
   BASE64 = 'base64'
   CHANNEL_KEY = 'OrderXmlFileExport'
   CHANNEL_ROLE = 'OrderExport'
+  CONTAINER_PAYMENT = 'checkoutinfo'
 
   constructor: (options = {}) ->
     @client = new SphereClient options
@@ -56,7 +57,7 @@ class OrderExport
 
   processOrder: (order) ->
     deferred = Q.defer()
-    @client.customObjects.byId("orderPaymentInfo/#{order.id}").fetch()
+    @client.customObjects.byId("#{CONTAINER_PAYMENT}/#{order.id}").fetch()
     .then (result) =>
       paymentInfo = result.body
       if order.customerId?
@@ -128,8 +129,8 @@ class OrderExport
 
     if paymentInfo?
       xPi = xml.e('paymentInfo')
-      @_add(xPi, paymentInfo.value, 'paymentMethod')
-      @_add(xPi, paymentInfo.value, 'paymentID')
+      @_add(xPi, paymentInfo.value, 'paymentMethod') if paymentInfo.value.paymentMethod
+      @_add(xPi, paymentInfo.value, 'paymentID') if paymentInfo.value.paymentID
       # TODO: get data from custom object
 
     si = order.shippingInfo
