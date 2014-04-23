@@ -143,7 +143,9 @@ ProjectCredentialsConfig.create()
           fs.list(@outputDir)
           .then (files) =>
             logger.info "About to upload #{_.size files} file(s) from #{@outputDir} to #{sftpTarget}"
-            Qutils.processList files, (filename) =>
+            Qutils.processList files, (fileParts) =>
+              throw new Error 'Files should be processed once at a time' if fileParts.length isnt 1
+              filename = fileParts[0]
               logger.debug "Uploading #{@outputDir}/#{filename}"
               sftpClient.safePutFile(sftp, "#{@outputDir}/#{filename}", "#{sftpTarget}/#{filename}")
               .then =>
@@ -154,6 +156,7 @@ ProjectCredentialsConfig.create()
                 else
                   logger.warn "Not able to create syncInfo for #{filename} as xml for that file was not found"
                   Q()
+            , {accumulate: false}
             .then ->
               logger.info "Successfully uploaded #{_.size files} file(s)"
               sftpClient.close(sftp)
