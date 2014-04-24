@@ -11,6 +11,7 @@ argv = require('optimist')
   .describe('projectKey', 'your SPHERE.IO project-key')
   .describe('clientId', 'your OAuth client id for the SPHERE.IO API')
   .describe('clientSecret', 'your OAuth client secret for the SPHERE.IO API')
+  .describe('sphereHost', 'SPHERE.IO API host to connecto to')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name of order has none')
   .describe('useExportTmpDir', 'whether to use a tmp folder to store resulting XML files in or not (if no, files will be created under \'./exports\')')
@@ -92,6 +93,8 @@ ProjectCredentialsConfig.create()
     user_agent: "#{package_json.name} - #{package_json.version}"
     logConfig:
       logger: logger.bunyanLogger
+
+  options.host = argv.sphereHost if argv.sphereHost
 
   orderExport = new OrderExport options
   orderExport.standardShippingMethod = argv.standardShippingMethod
