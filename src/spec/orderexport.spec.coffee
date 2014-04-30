@@ -257,7 +257,7 @@ describe '#mapOrder', ->
     doc = @orderExport.mapOrder order, null, customer
     parseString doc, (err, result) ->
       expect(result.order.customerNumber[0]).toBe customer.customerNumber
-      expect(result.order.externalCustomerId[0]).toBe customer.customerNumber
+      expect(result.order.externalCustomerId).toBeUndefined()
       done()
 
   it 'should export customerNumber and externalCustomerId', (done) ->
