@@ -180,7 +180,7 @@ describe '#mapOrder', ->
     paymentInfo =
       value:
         paymentMethod: 'Cash'
-        paymentID: '7'
+        paymentTransaction: '7'
 
     doc = @orderExport.mapOrder order, paymentInfo, null
     parseString doc, (err, result) ->
@@ -206,7 +206,7 @@ describe '#mapOrder', ->
     order = {}
     paymentInfo =
       value:
-        paymentID: '7'
+        paymentTransaction: '7'
 
     doc = @orderExport.mapOrder order, paymentInfo, null
     parseString doc, (err, result) ->

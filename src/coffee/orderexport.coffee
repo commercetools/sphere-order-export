@@ -127,8 +127,7 @@ class OrderExport
     if paymentInfo?
       xPi = xml.e('paymentInfo')
       @_add(xPi, paymentInfo.value, 'paymentMethod') if paymentInfo.value.paymentMethod
-      @_add(xPi, paymentInfo.value, 'paymentID') if paymentInfo.value.paymentID
-      # TODO: get data from custom object
+      xPi.e('paymentID').t(paymentInfo.value.paymentTransaction).up() if paymentInfo.value.paymentTransaction
 
     si = order.shippingInfo
     xSi = xml.e('shippingInfo')
