@@ -1,8 +1,8 @@
 {
-  "name": "sphere-order-xml-export",
-  "description": "Quick and easy way to export your orders from SPHERE.IO into XML files.",
+  "name": "sphere-order-export",
+  "description": "Quick and easy way to export your orders from SPHERE.IO into files.",
   "version": "0.17.0",
-  "homepage": "https://github.com/commercetools/sphere-order-xml-export",
+  "homepage": "https://github.com/sphereio/sphere-order-export",
   "keywords": [
     "sphere",
     "api",
@@ -22,15 +22,15 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/commercetools/sphere-order-xml-export.git"
+    "url": "https://github.com/sphereio/sphere-order-export.git"
   },
   "bugs": {
-    "url": "https://github.com/commercetools/sphere-order-xml-export/issues"
+    "url": "https://github.com/sphereio/sphere-order-export/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/commercetools/sphere-order-xml-export/blob/master/LICENSE-MIT"
+      "url": "https://github.com/sphereio/sphere-order-export/blob/master/LICENSE-MIT"
     }
   ],
   "main": "elasticio.js",
