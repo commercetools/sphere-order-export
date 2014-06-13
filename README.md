@@ -1,7 +1,7 @@
 sphere-order-export
 ===================
 
-[![Build Status](https://travis-ci.org/sphereio/sphere-order-export.png?branch=master)](https://travis-ci.org/sphereio/sphere-order-export) [![Dependency Status](https://david-dm.org/sphereio/sphere-order-export.svg)](https://david-dm.org/sphereio/sphere-order-export) [![devDependency Status](https://david-dm.org/sphereio/sphere-order-export/dev-status.svg)](https://david-dm.org/sphereio/sphere-order-export#info=devDependencies)
+[![Build Status](https://travis-ci.org/sphereio/sphere-order-export.png?branch=master)](https://travis-ci.org/sphereio/sphere-order-export) [![Coverage Status](https://coveralls.io/repos/sphereio/sphere-order-export/badge.png)](https://coveralls.io/r/sphereio/sphere-order-export) [![Dependency Status](https://david-dm.org/sphereio/sphere-order-export.svg)](https://david-dm.org/sphereio/sphere-order-export) [![devDependency Status](https://david-dm.org/sphereio/sphere-order-export/dev-status.svg)](https://david-dm.org/sphereio/sphere-order-export#info=devDependencies)
 
 This project contains a component to export your orders from a SPHERE.IO project. The resulting format can either be an XML file - one per order - or a CSV file containing a list of orders.
 
