@@ -96,8 +96,9 @@ ProjectCredentialsConfig.create()
 
   options.host = argv.sphereHost if argv.sphereHost
 
+  options.standardShippingMethod = argv.standardShippingMethod
+
   orderExport = new OrderExport options
-  orderExport.standardShippingMethod = argv.standardShippingMethod
   client = orderExport.client
 
   tq = new TaskQueue

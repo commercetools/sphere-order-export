@@ -1,10 +1,9 @@
 {parseString} = require 'xml2js'
-OrderExport = require '../lib/orderexport'
-Config = require '../config'
+XmlMapping = require '../lib/xmlmapping'
 
 describe '#mapOrder', ->
   beforeEach ->
-    @orderExport = new OrderExport Config
+    @xmlMapping = new XmlMapping
 
   it 'simple', (done) ->
     order =
@@ -13,7 +12,7 @@ describe '#mapOrder', ->
       version: 1
       externalCustomerId: '111-2222-33333'
 
-    doc = @orderExport.mapOrder order
+    doc = @xmlMapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.xsdVersion[0]).toBe '0.9'
       expect(result.order.id[0]).toBe 'abc'
@@ -46,7 +45,7 @@ describe '#mapOrder', ->
           id: 1
           sku: '345'
       ]
-    doc = @orderExport.mapOrder order
+    doc = @xmlMapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.lineItems.length).toBe 1
       li = result.order.lineItems[0]
@@ -89,7 +88,7 @@ describe '#mapOrder', ->
           country: 'DE'
           id: 'ABC'
       ]
-    doc = @orderExport.mapOrder order
+    doc = @xmlMapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.customLineItems.length).toBe 1
       cli = result.order.customLineItems[0]
@@ -126,7 +125,7 @@ describe '#mapOrder', ->
             currencyCode: 'EUR',
             centAmount: 190
           ]
-    doc = @orderExport.mapOrder order
+    doc = @xmlMapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.taxedPrice).not.toBeUndefined()
       expect(result.order.taxedPrice[0].totalNet[0].currencyCode[0]).toBe 'EUR'
@@ -142,7 +141,7 @@ describe '#mapOrder', ->
     order =
       shippingAddress:
         title: 'Prof. Dr.'
-    doc = @orderExport.mapOrder order
+    doc = @xmlMapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.shippingAddress).not.toBeUndefined()
       expect(result.order.shippingAddress[0].title[0]).toBe 'Prof. Dr.'
@@ -152,7 +151,7 @@ describe '#mapOrder', ->
     order =
       billingAddress:
         pOBox: '123456789'
-    doc = @orderExport.mapOrder order
+    doc = @xmlMapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.billingAddress).not.toBeUndefined()
       expect(result.order.billingAddress[0].pOBox[0]).toBe '123456789'
@@ -167,7 +166,7 @@ describe '#mapOrder', ->
           id: '213'
           version: 3
           name: 'B2B'
-    doc = @orderExport.mapOrder order
+    doc = @xmlMapping.mapOrder order
     parseString doc, (err, result) ->
       cg = result.order.customerGroup[0]
       expect(cg.id[0]).toBe '213'
@@ -182,7 +181,7 @@ describe '#mapOrder', ->
         paymentMethod: 'Cash'
         paymentTransaction: '7'
 
-    doc = @orderExport.mapOrder order, paymentInfo, null
+    doc = @xmlMapping.mapOrder order, paymentInfo, null
     parseString doc, (err, result) ->
       expect(result.order.paymentInfo).not.toBeUndefined()
       expect(result.order.paymentInfo[0].paymentID[0]).toBe '7'
@@ -195,7 +194,7 @@ describe '#mapOrder', ->
       value:
         paymentMethod: 'Cash'
 
-    doc = @orderExport.mapOrder order, paymentInfo, null
+    doc = @xmlMapping.mapOrder order, paymentInfo, null
     parseString doc, (err, result) ->
       expect(result.order.paymentInfo).not.toBeUndefined()
       expect(result.order.paymentInfo[0].paymentID).toBeUndefined()
@@ -208,7 +207,7 @@ describe '#mapOrder', ->
       value:
         paymentTransaction: '7'
 
-    doc = @orderExport.mapOrder order, paymentInfo, null
+    doc = @xmlMapping.mapOrder order, paymentInfo, null
     parseString doc, (err, result) ->
       expect(result.order.paymentInfo).not.toBeUndefined()
       expect(result.order.paymentInfo[0].paymentID[0]).toBe '7'
@@ -223,7 +222,7 @@ describe '#mapOrder', ->
           centAmount: 999
         taxRate:
           includedInPrice: true
-    doc = @orderExport.mapOrder order
+    doc = @xmlMapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.shippingInfo).not.toBeUndefined()
       expect(result.order.shippingInfo[0].price[0].currencyCode[0]).toBe 'USD'
@@ -233,7 +232,7 @@ describe '#mapOrder', ->
 
   it 'should not export customer', (done) ->
     order = {}
-    doc = @orderExport.mapOrder order
+    doc = @xmlMapping.mapOrder order
     parseString doc, (err, result) ->
       expect(result.order.customerNumber).toBeUndefined()
       expect(result.order.externalCustomerId).toBeUndefined()
@@ -244,7 +243,7 @@ describe '#mapOrder', ->
     order = {}
     customer =
       externalId: '111-222-333'
-    doc = @orderExport.mapOrder order, null, customer
+    doc = @xmlMapping.mapOrder order, null, customer
     parseString doc, (err, result) ->
       expect(result.order.customerNumber).toBeUndefined()
       expect(result.order.externalCustomerId[0]).toBe customer.externalId
@@ -254,7 +253,7 @@ describe '#mapOrder', ->
     order = {}
     customer =
       customerNumber: '111-222'
-    doc = @orderExport.mapOrder order, null, customer
+    doc = @xmlMapping.mapOrder order, null, customer
     parseString doc, (err, result) ->
       expect(result.order.customerNumber[0]).toBe customer.customerNumber
       expect(result.order.externalCustomerId).toBeUndefined()
@@ -265,7 +264,7 @@ describe '#mapOrder', ->
     customer =
       customerNumber: '111-222'
       externalId: '111-222-333'
-    doc = @orderExport.mapOrder order, null, customer
+    doc = @xmlMapping.mapOrder order, null, customer
     parseString doc, (err, result) ->
       expect(result.order.customerNumber[0]).toBe customer.customerNumber
       expect(result.order.externalCustomerId[0]).toBe customer.externalId

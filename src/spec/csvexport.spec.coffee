@@ -1,9 +1,9 @@
-OrderExport = require '../lib/orderexport'
+CsvMapping = require '../lib/csvmapping'
 Config = require '../config'
 
-xdescribe '#mapOrder', ->
+describe '#mapOrders', ->
   beforeEach ->
-    @orderExport = new OrderExport Config
+    @csvMapping = new CsvMapping()
 
   it 'export base attributes', ->
     template =
@@ -163,9 +163,10 @@ xdescribe '#mapOrder', ->
       xyz,10002
       """
 
-    csv = @orderExport.toCSV template, orders
+    csv = @csvMapping.mapOrders template, orders
     expect(csv).toBe expectedCSV
 
+xdescribe 'disabled', ->
   it 'export prices', ->
     template =
       """
