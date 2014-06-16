@@ -49,8 +49,7 @@ describe '#mapOrders', ->
       done(_.prettify err)
     .done()
 
-xdescribe "TODO", ->
-  it 'export addresses', ->
+  it 'export addresses', (done) ->
     template =
       """
       id,orderNumber,billingAddress.firstName,billingAddress.lastName,billingAddress.streetName,billingAddress.streetNumber,billingAddress.postalCode,billingAddress.city,billingAddress.country,shippingAddress.firstName,shippingAddress.lastName,shippingAddress.streetName,shippingAddress.streetNumber,shippingAddress.postalCode,shippingAddress.city,shippingAddress.country
@@ -59,14 +58,19 @@ xdescribe "TODO", ->
     expectedCSV =
       """
       id,orderNumber,billingAddress.firstName,billingAddress.lastName,billingAddress.streetName,billingAddress.streetNumber,billingAddress.postalCode,billingAddress.city,billingAddress.country,shippingAddress.firstName,shippingAddress.lastName,shippingAddress.streetName,shippingAddress.streetNumber,shippingAddress.postalCode,shippingAddress.city,shippingAddress.country
-      abc,10001,John,Doe,"Some Street",11,11111,"Some City",US,John,Doe,"Some Street",11,11111,"Some City",US
-      xyz,10002,Jane,Doe,"Some Other Street",22,22222,"Some Other City",US,Jane,Doe,"Some Other Street",22,22222,"Some Other City",US
+      abc,10001,John,Doe,Some Street,11,11111,Some City,US,John,Doe,Some Street,11,11111,Some City,US
+      xyz,10002,Jane,Doe,Some Other Street ,22,22222,Some Other City,US,Jane,Doe,Some Other Street ,22,22222,Some Other City,US
       """
 
-    csv = @orderExport.toCSV template, exampleorders
-    expect(csv).toBe expectedCSV
+    @csvMapping.mapOrders(template, exampleorders.orders)
+    .then (result) ->
+      expect(result).toBe expectedCSV
+      done()
+    .fail (err) ->
+      done(_.prettify err)
+    .done()
 
-  it 'export lineItems', ->
+  xit 'export lineItems', (done) ->
     template =
       """
       id,orderNumber,lineItems.id,lineItems.productId,lineItems.name.en,lineItems.variant.variantId,lineItems.variant.sku,lineItems.quantity,price
@@ -82,5 +86,10 @@ xdescribe "TODO", ->
       zyz,10002,LineItemId-2-1,ProductId-2-1,Product-2-1,1,SKU-2-1,1,"US USD 2380"
       """
 
-    csv = @orderExport.toCSV template, exampleorders
-    expect(csv).toBe expectedCSV
+    @csvMapping.mapOrders(template, exampleorders.orders)
+    .then (result) ->
+      expect(result).toBe expectedCSV
+      done()
+    .fail (err) ->
+      done(_.prettify err)
+    .done()
