@@ -9,7 +9,7 @@ class CsvMapping
 
     @analyseTemplate(template)
     .then (header) =>
-      csv = []
+      csv = [header]
       _.each orders, (order) =>
         csv.push @mapOrder(order, header)
 

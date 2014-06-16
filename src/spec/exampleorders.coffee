@@ -98,7 +98,7 @@ exports.orders =
   }
 },{
   id: 'xyz'
-  orderNumber: '10001'
+  orderNumber: '10002'
   version: 1
   lineItems: [{
     id: 'LineItemId-2-1'
