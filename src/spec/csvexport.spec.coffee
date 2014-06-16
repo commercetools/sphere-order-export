@@ -7,7 +7,7 @@ describe '#mapOrders', ->
   beforeEach ->
     @csvMapping = new CsvMapping()
 
-  it 'export base attributes', (done) ->
+  it 'should export base attributes', (done) ->
     template =
       """
       id,orderNumber
@@ -28,7 +28,7 @@ describe '#mapOrders', ->
       done(_.prettify err)
     .done()
 
-  xit 'export prices', (done) ->
+  it 'should export prices', (done) ->
     template =
       """
       id,orderNumber,totalPrice,totalNet,totalGross
@@ -37,8 +37,8 @@ describe '#mapOrders', ->
     expectedCSV =
       """
       id,orderNumber,totalPrice,totalNet,totalGross
-      abc,10001,USD 5950,USD 5000,USD 950
-      xyz,10002,USD 2380,USD 2000,USD 380
+      abc,10001,USD 5950,USD 5000,USD 5950
+      xyz,10002,USD 2380,USD 2000,USD 2380
       """
 
     @csvMapping.mapOrders(template, exampleorders.orders)

@@ -1,6 +1,7 @@
 _ = require 'underscore'
 Q = require 'q'
 Csv = require 'csv'
+access = require('safe-access')
 
 class CsvMapping
 
@@ -8,9 +9,9 @@ class CsvMapping
     deferred = Q.defer()
 
     @analyseTemplate(template)
-    .then (header) =>
+    .then ([header, mappings]) =>
       rows = _.map orders, (order) =>
-        @mapOrder(order, header)
+        @mapOrder(order, mappings)
 
       Csv().from([header].concat rows)
       .to.string (asString) ->
@@ -21,31 +22,29 @@ class CsvMapping
 
     deferred.promise
 
-  mapOrder: (order, header) ->
-    _.map header, (head, index) ->
-      order[head]
-
-  _analyseTemplate: (template) ->
-    deferred = Q.defer()
-
-    @parse(template)
-    .then (data) =>
-      header = _.map data, (entry) =>
-        @mapHeaderToAccessor(entry)
-      deferred.resolve header
-
-    deferred.promise
+  mapOrder: (order, mappings) ->
+    _.map mappings, (mapping, index) ->
+      value = access order, mapping[0]
+      if _.size(mapping) is 2 and _.isFunction mapping[1]
+        mapping[1].call undefined, value
+      else
+        value
 
   analyseTemplate: (template) ->
     @parse(template)
-    .then (data) =>
-      Q _.map data, (entry) =>
+    .then (header) =>
+      mappings = _.map header, (entry) =>
         @mapHeaderToAccessor(entry)
+      Q [header, mappings]
 
   mapHeaderToAccessor: (entry) ->
-    # TODO: get json path for header in order to get value
-    # TODO: think about how to format values - eg. prices
-    entry
+    switch entry
+      when 'totalNet', 'totalGross' then ["taxedPrice.#{entry}", formatPrice]
+      when 'totalPrice' then [entry, formatPrice]
+      else [entry]
+
+  formatPrice = (price) ->
+    "#{price.currencyCode} #{price.centAmount}"
 
   # TODO: Move to sphere-node-utils
   parse: (csvString) ->
