@@ -9,37 +9,43 @@ class CsvMapping
 
     @analyseTemplate(template)
     .then (header) =>
-      csv = [header]
-      _.each orders, (order) =>
-        csv.push @mapOrder(order, header)
+      rows = _.map orders, (order) =>
+        @mapOrder(order, header)
 
-      Csv().from(csv)
+      Csv().from([header].concat rows)
       .to.string (asString) ->
         deferred.resolve asString
 
-    .fail (err) ->
-      deferred.reject err
-    .done()
+      .on 'error', (error) ->
+        deferred.reject error
 
     deferred.promise
 
   mapOrder: (order, header) ->
-    row = []
-    _.each header, (head, index) ->
-      row[index] = order[head]
+    _.map header, (head, index) ->
+      order[head]
 
-    row
-
-  analyseTemplate: (template) ->
+  _analyseTemplate: (template) ->
     deferred = Q.defer()
+
     @parse(template)
-    .then (header) ->
-      # TODO: analyse!
+    .then (data) =>
+      header = _.map data, (entry) =>
+        @mapHeaderToAccessor(entry)
       deferred.resolve header
 
-    .done()
-
     deferred.promise
+
+  analyseTemplate: (template) ->
+    @parse(template)
+    .then (data) =>
+      Q _.map data, (entry) =>
+        @mapHeaderToAccessor(entry)
+
+  mapHeaderToAccessor: (entry) ->
+    # TODO: get json path for header in order to get value
+    # TODO: think about how to format values - eg. prices
+    entry
 
   # TODO: Move to sphere-node-utils
   parse: (csvString) ->

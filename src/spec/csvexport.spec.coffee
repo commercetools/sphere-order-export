@@ -1,3 +1,5 @@
+_ = require 'underscore'
+_.mixin require('sphere-node-utils')._u
 CsvMapping = require '../lib/csvmapping'
 exampleorders = require './exampleorders'
 
@@ -23,11 +25,10 @@ describe '#mapOrders', ->
       expect(result).toBe expectedCSV
       done()
     .fail (err) ->
-      done(err)
+      done(_.prettify err)
     .done()
 
-xdescribe 'disabled', ->
-  it 'export prices', ->
+  xit 'export prices', (done) ->
     template =
       """
       id,orderNumber,totalPrice,totalNet,totalGross
@@ -40,9 +41,15 @@ xdescribe 'disabled', ->
       xyz,10002,USD 2380,USD 2000,USD 380
       """
 
-    csv = @orderExport.toCSV template, exampleorders
-    expect(csv).toBe expectedCSV
+    @csvMapping.mapOrders(template, exampleorders.orders)
+    .then (result) ->
+      expect(result).toBe expectedCSV
+      done()
+    .fail (err) ->
+      done(_.prettify err)
+    .done()
 
+xdescribe "TODO", ->
   it 'export addresses', ->
     template =
       """
