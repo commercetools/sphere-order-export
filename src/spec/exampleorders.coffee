@@ -3,7 +3,7 @@ exports.orders =
   id: 'abc'
   orderNumber: '10001'
   version: 1
-  lineItems: [
+  lineItems: [{
     id: 'LineItemId-1-1'
     productId: 'ProductId-1-1'
     name:
@@ -14,7 +14,7 @@ exports.orders =
       images: []
       attributes: []
     }
-    quantity: 1
+    quantity: 2
     price: {
       country: 'US'
       value: {
@@ -29,25 +29,51 @@ exports.orders =
       id: 'taxRateId'
       country: 'US'
     }
-  ]
+  },{
+    id: 'LineItemId-1-2'
+    productId: 'ProductId-1-2'
+    name:
+      { en: 'Product-1-2' }
+    variant: {
+      variantId: 2
+      sku: 'SKU-1-2'
+      images: []
+      attributes: []
+    }
+    quantity: 3
+    price: {
+      country: 'US'
+      value: {
+        currencyCode: 'USD'
+        centAmount: 1190
+      }
+    }
+    taxRate: {
+      name: 'Standard Tax Rate'
+      amount: 0.19
+      includedInPrice: true
+      id: 'taxRateId'
+      country: 'US'
+    }
+  }]
   customLineItems: []
   totalPrice: {
     currencyCode: 'USD'
-    centAmount: 1190
+    centAmount: 5950
   }
   taxedPrice: {
     totalNet: {
       currencyCode: 'USD'
-      centAmount: 1000
+      centAmount: 5000
     }
     totalGross: {
       currencyCode: 'USD'
-      centAmount: 1190
+      centAmount: 5950
     }
     taxPortions: [{
       amount: {
         currencyCode: 'USD'
-        centAmount: 190
+        centAmount: 950
       }
       rate: 0.19
     }]
@@ -74,7 +100,7 @@ exports.orders =
   id: 'xyz'
   orderNumber: '10001'
   version: 1
-  lineItems: [
+  lineItems: [{
     id: 'LineItemId-2-1'
     productId: 'ProductId-2-1'
     name:
@@ -100,7 +126,7 @@ exports.orders =
       id: 'taxRateId'
       country: 'US'
     }
-  ]
+  }]
   customLineItems: []
   totalPrice: {
     currencyCode: 'USD'
@@ -124,21 +150,21 @@ exports.orders =
     }]
   }
   shippingAddress: {
-    firstName: 'John'
+    firstName: 'Jane'
     lastName: 'Doe'
-    streetName: 'Some Street'
-    streetNumber: '11'
-    postalCode: '11111'
-    city: 'Some City'
+    streetName: 'Some Other Street '
+    streetNumber: '22'
+    postalCode: '22222'
+    city: 'Some Other City'
     country: 'US'
   }
   billingAddress: {
-    firstName: 'John'
+    firstName: 'Jane'
     lastName: 'Doe'
-    streetName: 'Some Street'
-    streetNumber: '11'
-    postalCode: '11111'
-    city: 'Some City'
+    streetName: 'Some Other Street '
+    streetNumber: '22'
+    postalCode: '22222'
+    city: 'Some Other City'
     country: 'US'
   }
 }]
