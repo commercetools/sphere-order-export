@@ -5,7 +5,7 @@ describe '#mapOrders', ->
   beforeEach ->
     @csvMapping = new CsvMapping()
 
-  it 'export base attributes', ->
+  it 'export base attributes', (done) ->
     template =
       """
       id,orderNumber
@@ -18,8 +18,13 @@ describe '#mapOrders', ->
       xyz,10002
       """
 
-    csv = @csvMapping.mapOrders template, exampleorders
-    expect(csv).toBe expectedCSV
+    @csvMapping.mapOrders(template, exampleorders.orders)
+    .then (result) ->
+      expect(result).toBe expectedCSV
+      done()
+    .fail (err) ->
+      done(err)
+    .done()
 
 xdescribe 'disabled', ->
   it 'export prices', ->
