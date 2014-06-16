@@ -70,20 +70,20 @@ describe '#mapOrders', ->
       done(_.prettify err)
     .done()
 
-  xit 'export lineItems', (done) ->
+  it 'export lineItems', (done) ->
     template =
       """
-      id,orderNumber,lineItems.id,lineItems.productId,lineItems.name.en,lineItems.variant.variantId,lineItems.variant.sku,lineItems.quantity,price
+      id,orderNumber,lineItems.id,lineItems.productId,lineItems.name.en,lineItems.variant.variantId,lineItems.variant.sku,lineItems.quantity,lineItems.price
       """
 
     expectedCSV =
       """
-      id,orderNumber,lineItems.id,lineItems.productId,lineItems.name.en,lineItems.variant.variantId,lineItems.variant.sku,lineItems.quantity,price
+      id,orderNumber,lineItems.id,lineItems.productId,lineItems.name.en,lineItems.variant.variantId,lineItems.variant.sku,lineItems.quantity,lineItems.price
       abc,10001,,,,,,,
-      abc,10001,LineItemId-1-1,ProductId-1-1,Product-1-1,1,SKU-1-1,2,"US USD 1190"
-      abc,10001,LineItemId-1-2,ProductId-1-2,Product-1-2,2,SKU-1-2,3,"US USD 1190"
+      abc,10001,LineItemId-1-1,ProductId-1-1,Product-1-1,1,SKU-1-1,2,US-USD 1190
+      abc,10001,LineItemId-1-2,ProductId-1-2,Product-1-2,2,SKU-1-2,3,US-USD 1190
       xyz,10002,,,,,,,
-      zyz,10002,LineItemId-2-1,ProductId-2-1,Product-2-1,1,SKU-2-1,1,"US USD 2380"
+      xyz,10002,LineItemId-2-1,ProductId-2-1,Product-2-1,1,SKU-2-1,1,US-USD 2380
       """
 
     @csvMapping.mapOrders(template, exampleorders.orders)
