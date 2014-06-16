@@ -6,8 +6,6 @@ access = require('safe-access')
 class CsvMapping
 
   mapOrders: (template, orders) ->
-    deferred = Q.defer()
-
     @analyseTemplate(template)
     .then ([header, mappings]) =>
       rows = []
@@ -15,16 +13,8 @@ class CsvMapping
         @mapOrder(order, mappings)
 
       data = _.flatten rows, true
-
-      Csv().from([header].concat data)
-      .to.string (asString) ->
-        deferred.resolve asString
-
-      .on 'error', (error) ->
-        deferred.reject error
-
-    deferred.promise
-
+      Q @toCSV(header, data)
+    
   mapOrder: (order, mappings) ->
     rows = []
     rows.push _.map mappings, (mapping) =>
@@ -91,6 +81,17 @@ class CsvMapping
     .on 'error', (error) ->
       deferred.reject error
 
+    deferred.promise
+
+  toCSV: (header, data) ->
+    deferred = Q.defer()
+    
+    Csv().from([header].concat data)
+    .to.string (asString) ->
+      deferred.resolve asString
+    .on 'error', (error) ->
+      deferred.reject error
+    
     deferred.promise
 
 
