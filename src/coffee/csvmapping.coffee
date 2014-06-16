@@ -6,56 +6,57 @@ access = require('safe-access')
 class CsvMapping
 
   mapOrders: (template, orders) ->
-    @analyseTemplate(template)
+    @_analyseTemplate(template)
     .then ([header, mappings]) =>
       rows = []
       rows = rows.concat _.map orders, (order) =>
-        @mapOrder(order, mappings)
+        @_mapOrder(order, mappings)
 
       data = _.flatten rows, true
       Q @toCSV(header, data)
     
-  mapOrder: (order, mappings) ->
+  _mapOrder: (order, mappings) ->
     rows = []
     rows.push _.map mappings, (mapping) =>
-      @getValue order, mapping
+      @_getValue order, mapping
 
     if order.lineItems? and @hasLineItemHeader?
       _.each order.lineItems, (lineItem, index) =>
         rows.push _.map mappings, (mapping) =>
           if /lineItems/.test(mapping)
             lineItemMapping = [mapping[0].replace(/lineItems/, "lineItems[#{index}]"), mapping[1]]
-            @getValue order, lineItemMapping
+            @_getValue order, lineItemMapping
           else
-            @getValue order, mapping
+            @_getValue order, mapping
 
     rows
 
-  getValue: (order, mapping) ->
+  _getValue: (order, mapping) ->
     value = access order, mapping[0]
     if _.size(mapping) is 2 and _.isFunction mapping[1]
       mapping[1].call undefined, value
     else
       value
 
-  analyseTemplate: (template) ->
+  _analyseTemplate: (template) ->
     @parse(template)
     .then (header) =>
       mappings = _.map header, (entry) =>
         if /lineItems/.test entry
           @hasLineItemHeader = true
-        @mapHeaderToAccessor(entry)
+        @_mapHeader(entry)
       Q [header, mappings]
 
-  mapHeaderToAccessor: (entry) ->
+  _mapHeader: (entry) ->
     switch entry
       when 'totalNet', 'totalGross' then ["taxedPrice.#{entry}", formatMoney]
       when 'totalPrice' then [entry, formatMoney]
       when 'lineItems.price' then [entry, formatPrice]
       else [entry]
 
+  # TODO: Move method below to sphere-node-utils
   formatPrice = (price) ->
-    if price?
+    if price? and price.value?
       countryPart = ''
       if price.country?
         countryPart = "#{price.country}-"
@@ -70,7 +71,6 @@ class CsvMapping
   formatMoney = (money) ->
     "#{money.currencyCode} #{money.centAmount}"
 
-  # TODO: Move to sphere-node-utils
   parse: (csvString) ->
     deferred = Q.defer()
 
