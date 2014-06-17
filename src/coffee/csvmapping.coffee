@@ -8,8 +8,7 @@ class CsvMapping
   mapOrders: (template, orders) ->
     @_analyseTemplate(template)
     .then ([header, mappings]) =>
-      rows = []
-      rows = rows.concat _.map orders, (order) =>
+      rows = _.map orders, (order) =>
         @_mapOrder(order, mappings)
 
       data = _.flatten rows, true

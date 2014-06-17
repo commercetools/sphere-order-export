@@ -8,7 +8,7 @@ SpecHelper = require './helper'
 
 jasmine.getEnv().defaultTimeoutInterval = 10000
 
-describe 'integration tests', ->
+xdescribe 'integration tests', ->
 
   CHANNEL_KEY = 'OrderXmlFileExport'
   CHANNEL_ROLE = 'OrderExport'
