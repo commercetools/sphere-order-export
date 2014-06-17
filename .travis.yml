@@ -1,6 +1,9 @@
 language: node_js
 node_js:
 - '0.10'
+branches:
+  except:
+  - latest
 before_script:
 - echo '{}' > ${HOME}/elastic.json
 - touch ${HOME}/.env
