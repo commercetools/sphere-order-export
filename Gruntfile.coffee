@@ -10,7 +10,7 @@ module.exports = (grunt) ->
       banner: "/* ===========================================================\n" +
         "# <%= pkg.name %> - v<%= pkg.version %>\n" +
         "# ==============================================================\n" +
-        "# Copyright (c) 2013 <%= pkg.author.name %>\n" +
+        "# Copyright (c) 2014 <%= pkg.author.name %>\n" +
         "# Licensed under the MIT license.\n" +
         "*/\n"
 
@@ -87,6 +87,22 @@ module.exports = (grunt) ->
         command: 'istanbul cover jasmine-node --forceExit --captureExceptions test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage'
       jasmine:
         command: 'jasmine-node --verbose --captureExceptions test'
+      publish:
+        command: 'npm publish'
+
+    bump:
+      options:
+        files: ['package.json']
+        updateConfigs: ['pkg']
+        commit: true
+        commitMessage: 'Bump version to %VERSION%'
+        commitFiles: ['-a']
+        createTag: true
+        tagName: 'v%VERSION%'
+        tagMessage: 'Version %VERSION%'
+        push: true
+        pushTo: 'origin'
+        gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
 
   # load plugins that provide the tasks defined in the config
   grunt.loadNpmTasks "grunt-coffeelint"
@@ -101,3 +117,6 @@ module.exports = (grunt) ->
   grunt.registerTask "build", ["clean", "coffeelint", "coffee", "concat"]
   grunt.registerTask "test", ["build", "shell:jasmine"]
   grunt.registerTask "coverage", ["build", "shell:coverage"]
+  grunt.registerTask 'release', 'Release a new version, push it and publish it', (target) ->
+    target = 'patch' unless target
+    grunt.task.run "bump-only:#{target}", 'test', 'bump-commit', 'shell:publish'
