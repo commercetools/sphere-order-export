@@ -33,6 +33,9 @@
       "url": "https://github.com/sphereio/sphere-order-export/blob/master/LICENSE-MIT"
     }
   ],
+  "bin": {
+    "order-export": "bin/order-export"
+  },
   "main": "elasticio.js",
   "engines": {
     "node": ">= 0.8.0"
