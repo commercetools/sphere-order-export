@@ -1,7 +1,7 @@
 {
   "name": "sphere-order-export",
   "description": "Quick and easy way to export your orders from SPHERE.IO into files.",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "homepage": "https://github.com/sphereio/sphere-order-export",
   "keywords": [
     "sphere",
