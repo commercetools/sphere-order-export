@@ -15,7 +15,8 @@ argv = require('optimist')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name of order has none')
   .describe('useExportTmpDir', 'whether to use a tmp folder to store resulting XML files in or not (if no, files will be created under \'./exports\')')
-  .describe('csvTemplate', 'CSV template to define the structure of the export. If present only one CSV file will be generated. If not present the tool generates XML files.')
+  .describe('csvTemplate', 'CSV template to define the structure of the export - if present only one CSV file will be generated, otherwise XML files')
+  .describe('csvFile', "CSV file to export template to, otherwise see option 'useExportTmpDir'")
   .describe('sftpCredentials', 'the path to a JSON file where to read the credentials from')
   .describe('sftpHost', 'the SFTP host (overwrite value in sftpCredentials JSON, if given)')
   .describe('sftpUsername', 'the SFTP username (overwrite value in sftpCredentials JSON, if given)')
@@ -117,9 +118,10 @@ ProjectCredentialsConfig.create()
   .then (result) =>
     @orderReferences = []
     if isCsvMode()
-      logger.info "Storing CSV export to '#{@outputDir}/#{fileName}'."
+      csvFile = argv.csvFile or "#{@outputDir}/orders.csv"
+      logger.info "Storing CSV export to '#{csvFile}'."
       fileName = 'orders.csv'
-      Q(fs.write "#{@outputDir}/#{fileName}", result)
+      Q(fs.write csvFile, result)
     else
       logger.info "Storing #{_.size result} file(s) to '#{@outputDir}'."
       Q.all _.map result, (entry) =>
