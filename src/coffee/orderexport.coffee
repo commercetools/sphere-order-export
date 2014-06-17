@@ -1,9 +1,11 @@
 _ = require 'underscore'
 Q = require 'q'
+fs = require 'q-io/fs'
 SphereClient = require 'sphere-node-client'
 {ElasticIo, _u} = require 'sphere-node-utils'
 OrderService = require '../lib/orderservice'
 XmlMapping = require './xmlmapping'
+CsvMapping = require './csvMapping'
 
 class OrderExport
 
@@ -16,6 +18,7 @@ class OrderExport
     @client = new SphereClient options
     @orderService = new OrderService @client
     @xmlMapping = new XmlMapping options
+    @csvMapping = new CsvMapping options
 
   elasticio: (msg, cfg, next, snapshot) ->
     if _.isEmpty msg or _.isEmpty msg.body
@@ -48,12 +51,16 @@ class OrderExport
     .fail (result) ->
       ElasticIo.returnFailure res, res, next
 
-  processOrders: (orders) ->
-    @client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
-    .then (result) =>
-      @channel = result.body
-      unsyncedOrders = @orderService.unsyncedOrders orders, @channel
-      Q.all _.map unsyncedOrders, (order) => @processOrder order
+  processOrders: (orders, csvTemplate) ->
+    if csvTemplate?
+      fs.read(csvTemplate).then (content) =>
+        @csvMapping.mapOrders content, orders
+    else
+      @client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
+      .then (result) =>
+        @channel = result.body
+        unsyncedOrders = @orderService.unsyncedOrders orders, @channel
+        Q.all _.map unsyncedOrders, (order) => @processOrder order
 
   processOrder: (order) ->
     deferred = Q.defer()

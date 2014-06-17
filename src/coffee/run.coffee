@@ -15,6 +15,7 @@ argv = require('optimist')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name of order has none')
   .describe('useExportTmpDir', 'whether to use a tmp folder to store resulting XML files in or not (if no, files will be created under \'./exports\')')
+  .describe('csvTemplate', 'CSV template to define the structure of the export. If present only one CSV file will be generated. If not present the tool generates XML files.')
   .describe('sftpCredentials', 'the path to a JSON file where to read the credentials from')
   .describe('sftpHost', 'the SFTP host (overwrite value in sftpCredentials JSON, if given)')
   .describe('sftpUsername', 'the SFTP username (overwrite value in sftpCredentials JSON, if given)')
@@ -26,7 +27,7 @@ argv = require('optimist')
   .describe('timeout', 'Set timeout for requests')
   .default('fetchHours', 0) # by default don't restrict on modifications
   .default('standardShippingMethod', 'None')
-  .default('useExportTmpDir', true)
+  .default('useExportTmpDir', false)
   .default('logLevel', 'info')
   .default('logDir', '.')
   .default('logSilent', false)
@@ -82,6 +83,9 @@ readJsonFromPath = (path) ->
   fs.read(path).then (content) ->
     Q JSON.parse(content)
 
+isCsvMode = ->
+  argv.csvTemplate?
+
 ProjectCredentialsConfig.create()
 .then (credentials) =>
   options =
@@ -109,16 +113,21 @@ ProjectCredentialsConfig.create()
     @outputDir = outputDir
     client.orders.last("#{argv.fetchHours}h").perPage(0).fetch()
   .then (result) ->
-    orderExport.processOrders(result.body.results)
-  .then (xmlOrders) =>
-    logger.info "Storing #{_.size xmlOrders} file(s) to '#{@outputDir}'."
+    orderExport.processOrders(result.body.results, argv.csvTemplate)
+  .then (result) =>
     @orderReferences = []
-    Q.all _.map xmlOrders, (entry) =>
-      tq.addTask =>
-        content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
-        fileName = "#{entry.id}.xml"
-        @orderReferences.push name: fileName, entry: entry
-        fs.write "#{@outputDir}/#{fileName}", content
+    if isCsvMode()
+      logger.info "Storing CSV export to '#{@outputDir}/#{fileName}'."
+      fileName = 'orders.csv'
+      Q(fs.write "#{@outputDir}/#{fileName}", result)
+    else
+      logger.info "Storing #{_.size result} file(s) to '#{@outputDir}'."
+      Q.all _.map result, (entry) =>
+        tq.addTask =>
+          content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
+          fileName = "#{entry.id}.xml"
+          @orderReferences.push name: fileName, entry: entry
+          fs.write "#{@outputDir}/#{fileName}", content
   .then =>
     {sftpCredentials, sftpHost, sftpUsername, sftpPassword} = argv
     if sftpCredentials or (sftpHost and sftpUsername and sftpPassword)
