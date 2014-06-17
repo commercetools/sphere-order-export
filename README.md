@@ -67,8 +67,13 @@ In order to export a list of orders you have to define a CSV template and pass t
 The following headers can be used in the CSV template
 - id
 - orderNumber
-- TODO
-- lineItems.price
+- totalPrice
+- totalNet
+- totalGross
+- lineItems.*
+- lineItems.variant.*
+- shippingAddress.*
+- billingAddress.*
 
 > Note that when at least one `lineItems` header is given the resulting CSV contains a row per lineItem. Otherwise it only contains one row per order.
 
