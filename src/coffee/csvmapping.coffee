@@ -12,7 +12,7 @@ class CsvMapping
         @_mapOrder(order, mappings)
 
       data = _.flatten rows, true
-      Q @toCSV(header, data)
+      @toCSV(header, data)
     
   _mapOrder: (order, mappings) ->
     rows = []
@@ -55,7 +55,7 @@ class CsvMapping
 
   # TODO: Move method below to sphere-node-utils
   formatPrice = (price) ->
-    if price? and price.value?
+    if price?.value?
       countryPart = ''
       if price.country?
         countryPart = "#{price.country}-"
