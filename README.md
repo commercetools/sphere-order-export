@@ -60,14 +60,15 @@ Options:
 
 ### CSV export
 
-In order to export a list of orders you have to define a CSV template and pass the path to it in the `--csvTemplate` argument.
+To export a list of orders you have to define a CSV template and pass the path to it via the `--csvTemplate` argument.
 
 #### CSV format
 
 The following headers can be used in the CSV template
 - id
 - orderNumber
-- totalPrice
+- totalPrice -> results in a formated output of the price like `USD 9999`
+- totalPrice.centAmount -> results in the pure number of `9999` - allows better sorting
 - totalNet
 - totalGross
 - lineItems.*
@@ -75,12 +76,17 @@ The following headers can be used in the CSV template
 - shippingAddress.*
 - billingAddress.*
 
+In general you can get access to any property of the order object. Find a reference in our [API documentation](http://dev.sphere.io/http-api-projects-orders.html#order).
+
 > Note that when at least one `lineItems` header is given the resulting CSV contains a row per lineItem. Otherwise it only contains one row per order.
 
 ### XML export
 
-TODO
+Using the XML export generates for each order one XML file contain all it's details.
+Use this option to sync the SPHERE.IO orders with any external system.
+
+To ensure that you won't export your orders twice the tool stores the file name it exported the order to in the `syncInfo` of that order.
 
 ### SFTP upload
 
-TODO
+To use this tool as a background task we built in an SFTP connector that automatically uploads the exported orders to an SFTP location defined by the `--sftp*` arguments.
