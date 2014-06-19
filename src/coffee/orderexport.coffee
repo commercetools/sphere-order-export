@@ -5,7 +5,7 @@ SphereClient = require 'sphere-node-client'
 {ElasticIo, _u} = require 'sphere-node-utils'
 OrderService = require '../lib/orderservice'
 XmlMapping = require './xmlmapping'
-CsvMapping = require './csvMapping'
+CsvMapping = require './csvmapping'
 
 class OrderExport
 
