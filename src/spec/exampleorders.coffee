@@ -1,6 +1,8 @@
 exports.orders =
 [{
   id: 'abc'
+  createdAt: '1970-01-01T00:00:00.001Z'
+  lastModifiedAt: '1970-01-01T00:00:00.002Z'
   orderNumber: '10001'
   version: 1
   lineItems: [{
@@ -96,9 +98,50 @@ exports.orders =
     city: 'Some City'
     country: 'US'
   }
+  shippingInfo: {
+    price: {
+      centAmount: 499
+      currencyCode: "USD"
+    }
+    shippingRate: {
+      price: {
+        centAmount: 499
+        currencyCode: "USD"
+      }
+      freeAbove: {
+        centAmount: 20000
+        currencyCode: "USD"
+      }
+    }
+    taxRate: {
+      name: 'Standard Tax Rate'
+      amount: 0.19
+      includedInPrice: true
+      id: 'taxRateId'
+      country: 'US'
+    }
+    taxCategory: {
+      typeId: 'tax-category'
+      id: 'taxCategoryId'
+    }
+    deliveries: [{
+      id: 'delivery-1-1'
+      createdAt: '1970-01-01T00:00:00.003Z'
+      items: [{
+        id: 'LineItemId-1-1'
+        quantity: 1
+      }
+      {
+        id: 'LineItemId-1-2'
+        quantity: 1
+      }]
+    }]
+  }
 },{
   id: 'xyz'
   orderNumber: '10002'
+  createdAt: '1970-01-01T00:00:00.004Z'
+  lastModifiedAt: '1970-01-01T00:00:00.005Z'
   version: 1
   lineItems: [{
     id: 'LineItemId-2-1'
@@ -166,5 +209,40 @@ exports.orders =
     postalCode: '22222'
     city: 'Some Other City'
     country: 'US'
+  }
+  shippingInfo: {
+    price: {
+      centAmount: 499
+      currencyCode: "USD"
+    }
+    shippingRate: {
+      price: {
+        centAmount: 499
+        currencyCode: "USD"
+      }
+      freeAbove: {
+        centAmount: 20000
+        currencyCode: "USD"
+      }
+    }
+    taxRate: {
+      name: 'Standard Tax Rate'
+      amount: 0.19
+      includedInPrice: true
+      id: 'taxRateId'
+      country: 'US'
+    }
+    taxCategory: {
+      typeId: 'tax-category'
+      id: 'taxCategoryId'
+    }
+    deliveries: [{
+      id: 'deliveryId-2-1'
+      createdAt: '1970-01-01T00:00:00.006Z'
+      items: [{
+        id: 'LineItemId-2-1'
+        quantity: 1
+      }]
+    }]
   }
 }]
