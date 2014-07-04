@@ -36,7 +36,7 @@ $ grunt build
 
 ```
 $ node lib/run.js help
-Usage: node ./lib/run.js --projectKey key --clientId id --clientSecret secret
+Usage: ./bin/order-export --projectKey key --clientId id --clientSecret secret
 
 Options:
   --projectKey              your SPHERE.IO project-key                                                                                                                        [required]
