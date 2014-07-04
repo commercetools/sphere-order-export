@@ -170,3 +170,27 @@ describe '#mapOrders', ->
     .fail (err) ->
       done(_.prettify err)
     .done()
+
+  it 'export lineItems with images', (done) ->
+    template =
+      """
+      id,orderNumber,lineItems.id,lineItems.variant.images
+      """
+
+    expectedCSV =
+      """
+      id,orderNumber,lineItems.id,lineItems.variant.images
+      abc,10001,,
+      abc,10001,LineItemId-1-1,http://www.example.org/image-1-1-3.jpg;http://www.example.org/image-1-1-2.jpg;http://www.example.org/image-1-1-1.jpg;
+      abc,10001,LineItemId-1-2,http://www.example.org/image-1-2-2.jpg;http://www.example.org/image-1-2-1.jpg;
+      xyz,10002,,
+      xyz,10002,LineItemId-2-1,http://www.example.org/image-2-1-1.jpg;
+      """
+
+    @csvMapping.mapOrders(template, exampleorders.orders)
+    .then (result) ->
+      expect(result).toBe expectedCSV
+      done()
+    .fail (err) ->
+      done(_.prettify err)
+    .done()

@@ -13,7 +13,25 @@ exports.orders =
     variant: {
       variantId: 1
       sku: 'SKU-1-1'
-      images: []
+      images: [{
+        url: "http://www.example.org/image-1-1-1.jpg"
+        dimensions: {
+          w: 0
+          h: 0
+        }
+      },{
+        url: "http://www.example.org/image-1-1-2.jpg"
+        dimensions: {
+          w: 0
+          h: 0
+        }
+      },{
+        url: "http://www.example.org/image-1-1-3.jpg"
+        dimensions: {
+          w: 0
+          h: 0
+        }
+      }]
       attributes: []
     }
     quantity: 2
@@ -58,7 +76,19 @@ exports.orders =
     variant: {
       variantId: 2
       sku: 'SKU-1-2'
-      images: []
+      images: [{
+        url: "http://www.example.org/image-1-2-1.jpg"
+        dimensions: {
+          w: 0
+          h: 0
+        }
+      },{
+        url: "http://www.example.org/image-1-2-2.jpg"
+        dimensions: {
+          w: 0
+          h: 0
+        }
+      }]
       attributes: []
     }
     quantity: 3
@@ -198,7 +228,13 @@ exports.orders =
     variant: {
       variantId: 1
       sku: 'SKU-2-1'
-      images: []
+      images: [{
+        url: "http://www.example.org/image-2-1-1.jpg"
+        dimensions: {
+          w: 0
+          h: 0
+        }
+      }]
       attributes: []
     }
     quantity: 1

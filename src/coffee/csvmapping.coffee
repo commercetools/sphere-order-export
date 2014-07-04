@@ -52,6 +52,7 @@ class CsvMapping
       when 'totalPrice' then [entry, formatMoney]
       when 'lineItems.price' then [entry, formatPrice]
       when 'lineItems.state' then [entry, formatStates]
+      when 'lineItems.variant.images' then [entry, formatImages]
       else [entry]
 
   # TODO: Move method below to sphere-node-utils
@@ -74,6 +75,11 @@ class CsvMapping
   formatStates = (states) ->
     _.reduce states, (cell, state) ->
       "#{state.state.obj.key}:#{state.quantity};#{cell}"
+    , ''
+
+  formatImages = (images) ->
+    _.reduce images, (cell, image) ->
+      "#{image.url};#{cell}"
     , ''
 
   parse: (csvString) ->
