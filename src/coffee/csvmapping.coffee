@@ -72,11 +72,16 @@ class CsvMapping
   formatMoney = (money) ->
     "#{money.currencyCode} #{money.centAmount}"
 
+  # states are expanded
+  # TODO: Catch case that only item is present and don't show delimiter
+  # TODO: Make delimiter configurable
   formatStates = (states) ->
     _.reduce states, (cell, state) ->
       "#{state.state.obj.key}:#{state.quantity};#{cell}"
     , ''
 
+  # TODO: Catch case that only item is present and don't show delimiter
+  # TODO: Make delimiter configurable
   formatImages = (images) ->
     _.reduce images, (cell, image) ->
       "#{image.url};#{cell}"
