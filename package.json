@@ -49,7 +49,7 @@
     "q": "1.0.0",
     "q-io": "1.11.0",
     "safe-access": "0.1.0",
-    "sphere-node-client": "0.7.2",
+    "sphere-node-client": "0.7.3",
     "sphere-node-utils": "0.4.11",
     "tmp": "0.0.23",
     "underscore": "1.6.0",
