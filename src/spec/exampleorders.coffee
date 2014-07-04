@@ -24,6 +24,25 @@ exports.orders =
         centAmount: 1190
       }
     }
+    state: [{
+      quantity: 1
+      state: {
+        typeId: 'state'
+        id: 'state-1'
+        obj: {
+          key: 'firstState'
+        }
+      }
+    },{
+      quantity: 1
+      state: {
+        typeId: 'state'
+        id: 'state-2'
+        obj: {
+          key: 'secondState'
+        }
+      }
+    }]
     taxRate: {
       name: 'Standard Tax Rate'
       amount: 0.19
@@ -50,6 +69,34 @@ exports.orders =
         centAmount: 1190
       }
     }
+    state: [{
+      quantity: 1
+      state: {
+        typeId: 'state'
+        id: 'state-1'
+        obj: {
+          key: 'firstState'
+        }
+      }
+    },{
+      quantity: 1
+      state: {
+        typeId: 'state'
+        id: 'state-1'
+        obj: {
+          key: 'secondState'
+        }
+      }
+    },{
+      quantity: 1
+      state: {
+        typeId: 'state'
+        id: 'state-3'
+        obj: {
+          key: 'thirdState'
+        }
+      }
+    }]
     taxRate: {
       name: 'Standard Tax Rate'
       amount: 0.19
@@ -162,6 +209,16 @@ exports.orders =
         centAmount: 2380
       }
     }
+    state: [{
+      quantity: 1
+      state: {
+        typeId: 'state'
+        id: 'state-1'
+        obj: {
+          key: 'firstState'
+        }
+      }
+    }]
     taxRate: {
       name: 'Standard Tax Rate'
       amount: 0.19

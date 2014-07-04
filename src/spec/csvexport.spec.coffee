@@ -147,3 +147,26 @@ describe '#mapOrders', ->
       done(_.prettify err)
     .done()
 
+  it 'export lineItems with states', (done) ->
+    template =
+      """
+      id,orderNumber,lineItems.id,lineItems.state
+      """
+
+    expectedCSV =
+      """
+      id,orderNumber,lineItems.id,lineItems.state
+      abc,10001,,
+      abc,10001,LineItemId-1-1,secondState:1;firstState:1;
+      abc,10001,LineItemId-1-2,thirdState:1;secondState:1;firstState:1;
+      xyz,10002,,
+      xyz,10002,LineItemId-2-1,firstState:1;
+      """
+
+    @csvMapping.mapOrders(template, exampleorders.orders)
+    .then (result) ->
+      expect(result).toBe expectedCSV
+      done()
+    .fail (err) ->
+      done(_.prettify err)
+    .done()

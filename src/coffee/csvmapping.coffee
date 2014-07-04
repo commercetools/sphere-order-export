@@ -13,7 +13,7 @@ class CsvMapping
 
       data = _.flatten rows, true
       @toCSV(header, data)
-    
+
   _mapOrder: (order, mappings) ->
     rows = []
     rows.push _.map mappings, (mapping) =>
@@ -51,6 +51,7 @@ class CsvMapping
       when 'totalNet', 'totalGross' then ["taxedPrice.#{entry}", formatMoney]
       when 'totalPrice' then [entry, formatMoney]
       when 'lineItems.price' then [entry, formatPrice]
+      when 'lineItems.state' then [entry, formatStates]
       else [entry]
 
   # TODO: Move method below to sphere-node-utils
@@ -70,6 +71,11 @@ class CsvMapping
   formatMoney = (money) ->
     "#{money.currencyCode} #{money.centAmount}"
 
+  formatStates = (states) ->
+    _.reduce states, (cell, state) ->
+      "#{state.state.obj.key}:#{state.quantity};#{cell}"
+    , ''
+
   parse: (csvString) ->
     deferred = Q.defer()
 
@@ -84,13 +90,13 @@ class CsvMapping
 
   toCSV: (header, data) ->
     deferred = Q.defer()
-    
+
     Csv().from([header].concat data)
     .to.string (asString) ->
       deferred.resolve asString
     .on 'error', (error) ->
       deferred.reject error
-    
+
     deferred.promise
 
 
