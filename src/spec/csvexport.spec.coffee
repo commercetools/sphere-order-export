@@ -195,7 +195,7 @@ describe '#mapOrders', ->
       done(_.prettify err)
     .done()
 
-  it 'export lineItems with channel', (done) ->
+  xit 'export lineItems with channel', (done) ->
     template =
       """
       id,orderNumber,lineItems.id,lineItems.supplyChannel
