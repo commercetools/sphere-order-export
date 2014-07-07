@@ -76,19 +76,7 @@ exports.orders =
     variant: {
       variantId: 2
       sku: 'SKU-1-2'
-      images: [{
-        url: "http://www.example.org/image-1-2-1.jpg"
-        dimensions: {
-          w: 0
-          h: 0
-        }
-      },{
-        url: "http://www.example.org/image-1-2-2.jpg"
-        dimensions: {
-          w: 0
-          h: 0
-        }
-      }]
+      images: []
       attributes: []
     }
     quantity: 3
@@ -133,6 +121,13 @@ exports.orders =
       includedInPrice: true
       id: 'taxRateId'
       country: 'US'
+    }
+    supplyChannel: {
+      typeId: "channel"
+      id: "channel-2"
+      obj: {
+        key: "secondChannel"
+      }
     }
   }]
   customLineItems: []
@@ -261,6 +256,13 @@ exports.orders =
       includedInPrice: true
       id: 'taxRateId'
       country: 'US'
+    }
+    supplyChannel: {
+      typeId: "channel"
+      id: "channel-2"
+      obj: {
+        key: "secondChannel"
+      }
     }
   }]
   customLineItems: []
