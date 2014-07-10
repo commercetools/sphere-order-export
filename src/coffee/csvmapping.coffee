@@ -53,6 +53,7 @@ class CsvMapping
       when 'lineItems.price' then [entry, formatPrice]
       when 'lineItems.state' then [entry, formatStates]
       when 'lineItems.variant.images' then [entry, formatImages]
+      when 'lineItems.supplyChannel' then [entry, formatChannel]
       else [entry]
 
   # TODO: Move method below to sphere-node-utils
@@ -86,6 +87,10 @@ class CsvMapping
     _.reduce images, (cell, image) ->
       "#{image.url};#{cell}"
     , ''
+
+  formatChannel = (channel) ->
+    if channel?
+      "#{channel.obj.key}"
 
   parse: (csvString) ->
     deferred = Q.defer()
