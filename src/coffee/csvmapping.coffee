@@ -89,7 +89,8 @@ class CsvMapping
     , ''
 
   formatChannel = (channel) ->
-    "#{channel.obj.key}"
+    if channel?
+      "#{channel.obj.key}"
 
   parse: (csvString) ->
     deferred = Q.defer()
