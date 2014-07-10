@@ -71,9 +71,9 @@ The following headers can be used in the CSV template
 - totalPrice.centAmount -> results in the pure number of `9999` - allows better sorting
 - totalNet
 - totalGross
-- lineItems.*
-- lineItems.variant.*
-- shippingAddress.*
+- lineItems.* - eg. `id`, `state` or `supplyChannel`
+- lineItems.variant.* - eg. `sku` or `images`
+- shippingAddress.* - eg. `lastName` or `postalCode`
 - billingAddress.*
 
 In general you can get access to any property of the order object. Find a reference in our [API documentation](http://dev.sphere.io/http-api-projects-orders.html#order).
