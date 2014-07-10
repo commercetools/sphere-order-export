@@ -91,11 +91,11 @@ class CsvMapping
     deferred = Q.defer()
 
     Csv().from.string(csvString)
-    .to.array (data) ->
-      deferred.resolve data[0]
-
     .on 'error', (error) ->
       deferred.reject error
+
+    .to.array (data) ->
+      deferred.resolve data[0]
 
     deferred.promise
 
