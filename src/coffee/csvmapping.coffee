@@ -5,6 +5,11 @@ access = require('safe-access')
 
 class CsvMapping
 
+  COLUMNS_FOR_ALL_ROWS = [
+    'id'
+    'orderNumber'
+  ]
+
   mapOrders: (template, orders) ->
     @_analyseTemplate(template)
     .then ([header, mappings]) =>
@@ -25,7 +30,7 @@ class CsvMapping
           if /lineItems/.test(mapping)
             lineItemMapping = [mapping[0].replace(/lineItems/, "lineItems[#{index}]"), mapping[1]]
             @_getValue order, lineItemMapping
-          else
+          else if _.contains COLUMNS_FOR_ALL_ROWS, mapping[0]
             @_getValue order, mapping
 
     rows

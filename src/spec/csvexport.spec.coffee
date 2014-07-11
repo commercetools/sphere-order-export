@@ -94,7 +94,7 @@ describe '#mapOrders', ->
       done(_.prettify err)
     .done()
 
-  xit 'export lineItems and prices', (done) ->
+  it 'export lineItems and prices', (done) ->
     template =
       """
       id,orderNumber,lineItems.id,lineItems.productId,lineItems.name.en,lineItems.variant.variantId,lineItems.variant.sku,lineItems.quantity,lineItems.price,totalPrice,totalNet,totalGross
@@ -106,7 +106,7 @@ describe '#mapOrders', ->
       abc,10001,,,,,,,,USD 5950,USD 5000,USD 5950
       abc,10001,LineItemId-1-1,ProductId-1-1,Product-1-1,1,SKU-1-1,2,US-USD 1190,,,
       abc,10001,LineItemId-1-2,ProductId-1-2,Product-1-2,2,SKU-1-2,3,US-USD 1190,,,
-      xyz,10002,,,,,,,,USD 5950,USD 5000,USD 5950
+      xyz,10002,,,,,,,,USD 2380,USD 2000,USD 2380
       xyz,10002,LineItemId-2-1,ProductId-2-1,Product-2-1,1,SKU-2-1,1,US-USD 2380,,,
       """
 
