@@ -71,6 +71,7 @@ The following headers can be used in the CSV template
 - totalPrice.centAmount -> results in the pure number of `9999` - allows better sorting
 - totalNet
 - totalGross
+- customerGroup
 - lineItems.* - eg. `id`, `state` or `supplyChannel`
 - lineItems.variant.* - eg. `sku` or `images`
 - shippingAddress.* - eg. `lastName` or `postalCode`
