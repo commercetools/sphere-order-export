@@ -287,6 +287,13 @@ exports.orders =
       rate: 0.19
     }]
   }
+  customerGroup: {
+    typeId: 'customer-group'
+    id: 'customer-group-2'
+    obj: {
+      name: 'cool customers'
+    }
+  }
   shippingAddress: {
     firstName: 'Jane'
     lastName: 'Doe'

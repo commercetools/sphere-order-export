@@ -59,6 +59,7 @@ class CsvMapping
       when 'lineItems.state' then [entry, formatStates]
       when 'lineItems.variant.images' then [entry, formatImages]
       when 'lineItems.supplyChannel' then [entry, formatChannel]
+      when 'customerGroup' then [entry, formatCustomerGroup]
       else [entry]
 
   # TODO: Move method below to sphere-node-utils
@@ -96,6 +97,10 @@ class CsvMapping
   formatChannel = (channel) ->
     if channel?
       "#{channel.obj.key}"
+
+  formatCustomerGroup = (customerGroup) ->
+    if customerGroup?
+      "#{customerGroup.obj.name}"
 
   parse: (csvString) ->
     deferred = Q.defer()

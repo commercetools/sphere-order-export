@@ -112,7 +112,7 @@ ProjectCredentialsConfig.create()
   .then (outputDir) =>
     logger.debug "Created output dir at #{outputDir}"
     @outputDir = outputDir
-    client.orders.expand('lineItems[*].state[*].state').expand('lineItems[*].supplyChannel').last("#{argv.fetchHours}h").perPage(0).fetch()
+    client.orders.expand('lineItems[*].state[*].state').expand('lineItems[*].supplyChannel').expand('customerGroup').last("#{argv.fetchHours}h").perPage(0).fetch()
   .then (result) ->
     orderExport.processOrders(result.body.results, argv.csvTemplate)
   .then (result) =>

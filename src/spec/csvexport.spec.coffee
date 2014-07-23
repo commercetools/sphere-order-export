@@ -218,3 +218,24 @@ describe '#mapOrders', ->
     .fail (err) ->
       done(_.prettify err)
     .done()
+
+  it 'export orders with customerGroup', (done) ->
+    template =
+      """
+      id,orderNumber,customerGroup
+      """
+
+    expectedCSV =
+      """
+      id,orderNumber,customerGroup
+      abc,10001,
+      xyz,10002,cool customers
+      """
+
+    @csvMapping.mapOrders(template, exampleorders.orders)
+    .then (result) ->
+      expect(result).toBe expectedCSV
+      done()
+    .fail (err) ->
+      done(_.prettify err)
+    .done()
