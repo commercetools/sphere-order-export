@@ -22,10 +22,10 @@ describe 'orderservice', ->
 
   it 'should add syncInfo', ->
     externalId = 'filename.txt'
-    spyOn(@orderExport.client.orders, 'save')
+    spyOn(@orderExport.client.orders, 'update')
     @orderExport.syncOrder {id: 'aaa', version: 1}, externalId
 
-    expect(@orderExport.client.orders.save).toHaveBeenCalledWith
+    expect(@orderExport.client.orders.update).toHaveBeenCalledWith
       version: 1
       actions: [
         action: 'updateSyncInfo'

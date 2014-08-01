@@ -38,6 +38,6 @@ class OrderService
         externalId: externalId
       ]
 
-    @client.orders.byId(orderId).save(data)
+    @client.orders.byId(orderId).update(data)
 
 module.exports = OrderService
