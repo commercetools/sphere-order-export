@@ -1,3 +1,4 @@
+path = require 'path'
 _ = require 'underscore'
 Promise = require 'bluebird'
 fs = Promise.promisifyAll require('fs')
@@ -14,7 +15,8 @@ argv = require('optimist')
   .describe('sphereHost', 'SPHERE.IO API host to connecto to')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name of order has none')
-  .describe('useExportTmpDir', 'whether to use a tmp folder to store resulting XML files in or not (if no, files will be created under \'./exports\')')
+  .describe('targetDir', 'the folder where exported files are saved')
+  .describe('useExportTmpDir', 'whether to use a system tmp folder to store exported files')
   .describe('csvTemplate', 'CSV template to define the structure of the export - if present only one CSV file will be generated, otherwise XML files')
   .describe('csvFile', "CSV file to export template to, otherwise see option 'useExportTmpDir'")
   .describe('fileWithTimestamp', 'whether exported file should contain a timestamp')
@@ -31,6 +33,7 @@ argv = require('optimist')
   .default('fetchHours', 0) # by default don't restrict on modifications
   .default('standardShippingMethod', 'None')
   .default('useExportTmpDir', false)
+  .default('targetDir', path.join(__dirname,'../exports'))
   .default('fileWithTimestamp', false)
   .default('logLevel', 'info')
   .default('logDir', '.')
@@ -73,7 +76,7 @@ ensureExportDir = ->
     # unsafeCleanup: recursively removes the created temporary directory, even when it's not empty
     tmp.dirAsync {unsafeCleanup: true}
   else
-    exportsPath = "#{__dirname}/../exports"
+    exportsPath = argv.targetDir
     fsExistsAsync(exportsPath)
     .then (exists) ->
       if exists
