@@ -22,6 +22,7 @@ argv = require('optimist')
   .describe('sftpUsername', 'the SFTP username (overwrite value in sftpCredentials JSON, if given)')
   .describe('sftpPassword', 'the SFTP password (overwrite value in sftpCredentials JSON, if given)')
   .describe('sftpTarget', 'path in the SFTP server to where to move the worked files')
+  .describe('sftpContinueOnProblems', 'ignore errors when processing a file and continue with the next one')
   .describe('logLevel', 'log level for file logging')
   .describe('logDir', 'directory to store logs')
   .describe('logSilent', 'use console to print messages')
@@ -33,6 +34,7 @@ argv = require('optimist')
   .default('logDir', '.')
   .default('logSilent', false)
   .default('timeout', 60000)
+  .default('sftpContinueOnProblems', false)
   .demand(['projectKey'])
   .argv
 
@@ -156,6 +158,7 @@ ProjectCredentialsConfig.create()
           fs.readdirAsync(@outputDir)
           .then (files) =>
             logger.info "About to upload #{_.size files} file(s) from #{@outputDir} to #{sftpTarget}"
+            filesSkipped = 0
             Promise.map files, (filename) =>
               logger.debug "Uploading #{@outputDir}/#{filename}"
               sftpClient.safePutFile(sftp, "#{@outputDir}/#{filename}", "#{sftpTarget}/#{filename}")
@@ -167,9 +170,20 @@ ProjectCredentialsConfig.create()
                 else
                   logger.warn "Not able to create syncInfo for #{filename} as xml for that file was not found"
                   Promise.resolve()
+              .catch (err) ->
+                if argv.sftpContinueOnProblems
+                  filesSkipped++
+                  logger.warn err, "There was an error processing the file #{file}, skipping and continue"
+                  Promise.resolve()
+                else
+                  Promise.reject err
             , {concurrency: 1}
             .then ->
-              logger.info "Successfully uploaded #{_.size files} file(s)"
+              totFiles = _.size(files)
+              if totFiles > 0
+                logger.info "Export to SFTP successfully finished: #{totFiles - filesSkipped} out of #{totFiles} files were processed"
+              else
+                logger.info "Export successfully finished: there were no new files to be processed"
               sftpClient.close(sftp)
               Promise.resolve()
           .finally -> sftpClient.close(sftp)
