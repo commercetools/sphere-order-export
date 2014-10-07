@@ -17,6 +17,7 @@ argv = require('optimist')
   .describe('useExportTmpDir', 'whether to use a tmp folder to store resulting XML files in or not (if no, files will be created under \'./exports\')')
   .describe('csvTemplate', 'CSV template to define the structure of the export - if present only one CSV file will be generated, otherwise XML files')
   .describe('csvFile', "CSV file to export template to, otherwise see option 'useExportTmpDir'")
+  .describe('fileWithTimestamp', 'whether exported file should contain a timestamp')
   .describe('sftpCredentials', 'the path to a JSON file where to read the credentials from')
   .describe('sftpHost', 'the SFTP host (overwrite value in sftpCredentials JSON, if given)')
   .describe('sftpUsername', 'the SFTP username (overwrite value in sftpCredentials JSON, if given)')
@@ -30,6 +31,7 @@ argv = require('optimist')
   .default('fetchHours', 0) # by default don't restrict on modifications
   .default('standardShippingMethod', 'None')
   .default('useExportTmpDir', false)
+  .default('fileWithTimestamp', false)
   .default('logLevel', 'info')
   .default('logDir', '.')
   .default('logSilent', false)
@@ -106,6 +108,8 @@ ProjectCredentialsConfig.create()
   .then (outputDir) =>
     logger.debug "Created output dir at #{outputDir}"
     @outputDir = outputDir
+
+    # fetch all orders
     client.orders.all()
     .expand('lineItems[*].state[*].state')
     .expand('lineItems[*].supplyChannel')
@@ -116,17 +120,23 @@ ProjectCredentialsConfig.create()
     orderExport.processOrders(result.body.results, argv.csvTemplate)
   .then (result) =>
     @orderReferences = []
+    ts = (new Date()).getTime()
     if isCsvMode()
-      csvFile = argv.csvFile or "#{@outputDir}/orders.csv"
+      if argv.fileWithTimestamp
+        fileName = "orders_#{ts}.csv"
+      else
+        fileName = 'orders.csv'
+      csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
       logger.info "Storing CSV export to '#{csvFile}'."
-      # TODO: timestamp option
-      fileName = 'orders.csv'
       fs.writeFileAsync csvFile, result
     else
       logger.info "Storing #{_.size result} file(s) to '#{@outputDir}'."
       Promise.map result, (entry) =>
         content = entry.xml.end(pretty: true, indent: '  ', newline: '\n')
-        fileName = "#{entry.id}.xml"
+        if argv.fileWithTimestamp
+          fileName = "#{entry.id}_#{ts}.xml"
+        else
+          fileName = "#{entry.id}.xml"
         @orderReferences.push name: fileName, entry: entry
         fs.writeFileAsync "#{@outputDir}/#{fileName}", content
       , {concurrency: 10}
@@ -194,7 +204,7 @@ ProjectCredentialsConfig.create()
         logger.error err, "Problems on getting sftp credentials from config files for project #{argv.projectKey}."
         @exitCode = 1
     else
-      Promise.resolve()
+      Promise.resolve() # no sftp
   .then =>
     logger.info 'Orders export complete'
     @exitCode = 0
@@ -202,7 +212,6 @@ ProjectCredentialsConfig.create()
     logger.error error, 'Oops, something went wrong!'
     @exitCode = 1
   .done()
-
 .catch (err) =>
   logger.error err, 'Problems on getting client credentials from config files.'
   @exitCode = 1
