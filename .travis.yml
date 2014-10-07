@@ -1,24 +1,29 @@
 language: node_js
 node_js:
-- '0.10'
+  - '0.10'
 branches:
   except:
-  - latest
+    - latest
+    - production
 before_script:
-- echo '{}' > ${HOME}/elastic.json
-- touch ${HOME}/.env
-- ./create_config.sh
+  - npm install -g grunt-cli
+  - ./create_config.sh
 script:
-- npm test
+  - npm test
+  - ./bin/order-export --projectKey ${SPHERE_PROJECT_KEY} --clientId ${SPHERE_CLIENT_ID} --clientSecret ${SPHERE_CLIENT_SECRET} --sftpHost ${SFTP_HOST} --sftpUsername ${SFTP_USERNAME} --sftpPassword ${SFTP_PASSWORD} --sftpTarget ${SFTP_TARGET} --sftpContinueOnProblems true --fetchHours 24 --fileWithTimestamp true
 env:
   global:
-  - secure: noHgcqki9gddvrROx2pib1TSUt3Xfhj/YFX54QswstEAPGE+2mFA62DXjqvd4t8ZjLoLX5KojNdDMoGikUTOO66YMqaKNtYHJzjXwQdnIQkbVrkY+Lxc57k9YupGG1MvEQ7PtzejzUi9wln5Ujm6CXVynG9htQo4sdiFFGJKDbE=
-  - secure: C1+yjnWRPTq0WKvtwVp724J901VMbYbSNJh5hqtpJt4/8nh+yjP0ldtF6M+3BbMQvRzrD1sz+PBW4arQJpZZV8sRBD/PG7yrSnvcNjofOXAnEBYIhQ7JpDEcvWaQUiz2L79WpS0nDaSOWfjr/KjN5KKRaK94XXx4O1iweUZWz/I=
-  - secure: SKwTkVkihFB2wuKpARuYJkxY7pHFUbuIoXADyshbp8S6SIWjI+R5vPc4qpMhOGBl4tKLqGmiBl7Hli8K7urnXN9tTzgStGfDs6FKHq0xv2myBG0+Qdq5EBRZ7mf83q5ZXYzd8GghFHopG4RPsRQ+3zO9oDlVgqeFkGke7qgUH1k=
+    - secure: lkoA3lqpvQVSle/zgArjGInqfOVpIdYBvjjKI6zLCwXblUezZuHTG5bE9sL4qItUIIXIYpwmLiii6Ki1VNozdQX39kLPEbqEDtTahD9+xUXASNaWx3puQ4tY0dx1PVroVeJsLiD1Rnl88FRN5q7PeGomDPtLUcfq9XTlJfNTMrw=
+    - secure: cDc7wSlakGOWOY36Gd7BTInWLcLLXBOZurSfiyZycSArBGHi7xKW8fHg5x8v5dM7RFB8dikoy6e0j6e+s3p9aCrSzzYuf7T7gME2ifHoa0IV5NpTpEN+d04PO7aJv6mKJfZJgXxMOTe716lC0dZ7/33JEQFUpm5x6vfasuwt7iQ=
+    - secure: eZWs9hk3dzRUB0EhqmdQIkwZ8NeNxRieSgWX/C3iEAXgcHzqLWdqiXp7koLLevfKOctZiukRao4L3MKUO0mm6xPp/jXrUmFJDg2vew8NegR9G5cLN1W/fclInZl6E5a6X80vqlTgKkiQTItu041o8O0c6QDhFmDliA/4/1zsNqc=
+    - secure: BT3EQ0Kzhbp1XZZER9Xq7AnVotA6cMbbNbzivqTxBoLtNogaQjYBW14MWnizMb8B7Z6HtUyw+fWU7PPKn0PIsyIBRzM5XEfVIf5HxRatyS75v51MOmzzPwz3TYN2DvzCxZWLe2Mrh2vZbr1twGK8TxE5V0ye80UiwkNsNJyhEa4= # host
+    - secure: Tw459kNIYcSGyX5oU8XvJtd4jFGcq7YPV8TBeeuW4ju2LDMUPVrkuazrKzY51oDJwjumnt1d9lLpQFdYRMIm/k7R9hFqfHfnT0Rr3QzO3A1tKPmOFATfkSGNlQqnD+H7SEgAlBa/tnKS2F3/78wZdgiDhIubaLa9n9OsHth1zXc= # username
+    - secure: DgU1phNgKAl9Tyk+2bNtle1ED6SBY6l9egD30B2X4WRhUCYYNoV9GPeKW8gnVX9GT/g50hho/0Iz5fD0aCjyCAyYTb1r0QGnLSG2eXHctX0AnulqFnvV3yAaDrcs0eR+knBPnEIJ3MyZPllB4G8eSturgE86NB04z3It0DtOECo= # psw
+    - secure: b6tBp04ubVoUsOUb0SGTSwxvxRSc2bxbHcFsHX1VaBxRjunwd7MgxVgvWw2y/R7pc1PYEcFrXR+9soJi2JFy0krFNoHgnv7+liPlnna1wEPmTCkHw2t06gtNb51EAOUJMfV+MjUlKn74NubGmquuhE1bjwuS1Knz00KakxNkzgM= # target
 notifications:
   hipchat:
     rooms:
-      secure: nJhb0+Vle68bKhgE/2BeIjOslESECiOiYpRwzCe/bufVbyORoo+tooGGUV4lkKN1uLsMNik1vQelRY/MM96qPt/TgyUgwGCagQPmh3zZ41sZuzOfYasBjLuh+cyneZi8rTD/V5PwQFrn5HVPnPx33e83SWDOl8Qbjnq+uFnXjS8=
+      secure: KfiSn4mdhFHxUbWG2EFDFx01VBNNncS8RYRw6ROcxVOsiaevLx/yqh2Yi7fTxWcoyG6Mp31Cxvx6w+dB58wIiZxZijtrVCU/agu/WGP6y/f4C/i2mRsnCXgf6GIC6fUXZVlFQKS0MVNqsx0d7fmR8jEej2/j7+hAOKMh/NsMvgE=
     template:
     - '%{repository}#%{build_number} (%{author}): %{message} (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Compare</a>)'
     format: html
