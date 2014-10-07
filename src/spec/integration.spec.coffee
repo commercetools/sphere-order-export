@@ -1,12 +1,10 @@
-fs = require 'fs'
 _ = require 'underscore'
-{ElasticIo, _u} = require 'sphere-node-utils'
+_.mixin require('underscore-mixins')
+{parseString} = require 'xml2js'
+{ElasticIo} = require 'sphere-node-utils'
 OrderExport = require '../lib/orderexport'
 Config = require '../config'
 SpecHelper = require './helper'
-{parseString} = require 'xml2js'
-
-jasmine.getEnv().defaultTimeoutInterval = 10000
 
 describe 'integration tests', ->
 
@@ -46,10 +44,9 @@ describe 'integration tests', ->
     .then (result) =>
       @order = result.body
       @sphere.customObjects.save SpecHelper.orderPaymentInfo(CONTAINER_PAYMENT, @order.id)
-    .then (result) ->
-      done()
-    .fail (err) ->
-      done _u.prettify err
+    .then (result) -> done()
+    .catch (err) -> done _.prettify err
+  , 20000 # 20sec
 
   it 'nothing to do', (done) ->
     @orderExport.processOrders([])
@@ -57,8 +54,7 @@ describe 'integration tests', ->
       expect(xmlOrders).toBeDefined()
       expect(_.size(xmlOrders)).toEqual 0
       done()
-    .fail (err) ->
-      done _u.prettify err
+    .catch (err) -> done _.prettify err
 
   it 'full turn around', (done) ->
     @orderExport.processOrders([@order], @channel).then (xmlOrders) =>
@@ -68,13 +64,12 @@ describe 'integration tests', ->
         expect(result.order.customerNumber[0]).toEqual @customer.customerNumber
         expect(result.order.externalCustomerId[0]).toEqual @customer.externalId
         done()
-    .fail (err) ->
-      done _u.prettify err
+    .catch (err) -> done _.prettify err
 
   describe 'elastic.io', ->
     it 'nothing to do', (done) ->
       @orderExport.elasticio {}, Config, (error, message) ->
-        done(_u.prettify(error), null, 4) if error
+        done(_.prettify(error), null, 4) if error
         expect(message).toBe 'No data from elastic.io!'
         done()
 
@@ -82,7 +77,7 @@ describe 'integration tests', ->
       msg =
         body: [@order]
       @orderExport.elasticio msg, Config, (error, message) ->
-        done(_u.prettify(error), null, 4) if error
+        done(_.prettify(error), null, 4) if error
         expect(message.attachments).toBeDefined()
         expect(message.attachments['touch-timestamp.txt']).toBeDefined()
         done()

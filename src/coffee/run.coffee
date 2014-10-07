@@ -1,8 +1,8 @@
-fs = require 'q-io/fs'
-Q = require 'q'
 _ = require 'underscore'
-tmp = require 'tmp'
-{ExtendedLogger, ProjectCredentialsConfig, Sftp, Qutils, TaskQueue} = require 'sphere-node-utils'
+Promise = require 'bluebird'
+fs = Promise.promisifyAll require('fs')
+tmp = Promise.promisifyAll require('tmp')
+{ExtendedLogger, ProjectCredentialsConfig, Sftp} = require 'sphere-node-utils'
 package_json = require '../package.json'
 OrderExport = require '../lib/orderexport'
 
@@ -55,37 +55,35 @@ process.on 'SIGUSR2', -> logger.reopenFileStreams()
 process.on 'exit', => process.exit(@exitCode)
 
 tmp.setGracefulCleanup()
-createTmpDir = ->
-  d = Q.defer()
-  # unsafeCleanup: recursively removes the created temporary directory, even when it's not empty
-  tmp.dir {unsafeCleanup: true}, (err, path) ->
-    if err
-      d.reject err
-    else
-      d.resolve path
-  d.promise
+
+fsExistsAsync = (path) ->
+  new Promise (resolve, reject) ->
+    fs.exists path, (exists) ->
+      if exists
+        resolve(true)
+      else
+        resolve(false)
 
 ensureExportDir = ->
   if "#{argv.useExportTmpDir}" is 'true'
-    createTmpDir()
+    # unsafeCleanup: recursively removes the created temporary directory, even when it's not empty
+    tmp.dirAsync {unsafeCleanup: true}
   else
     exportsPath = "#{__dirname}/../exports"
-    fs.exists(exportsPath)
+    fsExistsAsync(exportsPath)
     .then (exists) ->
       if exists
-        Q(exportsPath)
+        Promise.resolve(exportsPath)
       else
-        fs.makeDirectory(exportsPath)
-        .then -> Q(exportsPath)
-    .fail (err) -> Q.reject(err)
+        fs.mkdirAsync(exportsPath)
+        .then -> Promise.resolve(exportsPath)
 
 readJsonFromPath = (path) ->
-  return Q({}) unless path
-  fs.read(path).then (content) ->
-    Q JSON.parse(content)
+  return Promise.resolve({}) unless path
+  fs.readFileAsync(path, {encoding: 'utf-8'}).then (content) ->
+    Promise.resolve JSON.parse(content)
 
-isCsvMode = ->
-  argv.csvTemplate?
+isCsvMode = -> argv.csvTemplate?
 
 ProjectCredentialsConfig.create()
 .then (credentials) =>
@@ -96,23 +94,22 @@ ProjectCredentialsConfig.create()
       client_secret: argv.clientSecret
     timeout: argv.timeout
     user_agent: "#{package_json.name} - #{package_json.version}"
-    logConfig:
-      logger: logger.bunyanLogger
-
   options.host = argv.sphereHost if argv.sphereHost
-
   options.standardShippingMethod = argv.standardShippingMethod
 
   orderExport = new OrderExport options
   client = orderExport.client
 
-  tq = new TaskQueue
-
   ensureExportDir()
   .then (outputDir) =>
     logger.debug "Created output dir at #{outputDir}"
     @outputDir = outputDir
-    client.orders.expand('lineItems[*].state[*].state').expand('lineItems[*].supplyChannel').expand('customerGroup').last("#{argv.fetchHours}h").perPage(0).fetch()
+    client.orders.all()
+    .expand('lineItems[*].state[*].state')
+    .expand('lineItems[*].supplyChannel')
+    .expand('customerGroup')
+    .last("#{argv.fetchHours}h")
+    .fetch()
   .then (result) ->
     orderExport.processOrders(result.body.results, argv.csvTemplate)
   .then (result) =>
@@ -120,16 +117,17 @@ ProjectCredentialsConfig.create()
     if isCsvMode()
       csvFile = argv.csvFile or "#{@outputDir}/orders.csv"
       logger.info "Storing CSV export to '#{csvFile}'."
+      # TODO: timestamp option
       fileName = 'orders.csv'
-      Q(fs.write csvFile, result)
+      fs.writeFileAsync csvFile, result
     else
       logger.info "Storing #{_.size result} file(s) to '#{@outputDir}'."
-      Q.all _.map result, (entry) =>
-        tq.addTask =>
-          content = entry.xml.end(pretty: true, indent: '  ', newline: "\n")
-          fileName = "#{entry.id}.xml"
-          @orderReferences.push name: fileName, entry: entry
-          fs.write "#{@outputDir}/#{fileName}", content
+      Promise.map result, (entry) =>
+        content = entry.xml.end(pretty: true, indent: '  ', newline: '\n')
+        fileName = "#{entry.id}.xml"
+        @orderReferences.push name: fileName, entry: entry
+        fs.writeFileAsync "#{@outputDir}/#{fileName}", content
+      , {concurrency: 10}
   .then =>
     {sftpCredentials, sftpHost, sftpUsername, sftpPassword} = argv
     if sftpCredentials or (sftpHost and sftpUsername and sftpPassword)
@@ -155,12 +153,10 @@ ProjectCredentialsConfig.create()
 
         sftpClient.openSftp()
         .then (sftp) =>
-          fs.list(@outputDir)
+          fs.readdirAsync(@outputDir)
           .then (files) =>
             logger.info "About to upload #{_.size files} file(s) from #{@outputDir} to #{sftpTarget}"
-            Qutils.processList files, (fileParts) =>
-              throw new Error 'Files should be processed once at a time' if fileParts.length isnt 1
-              filename = fileParts[0]
+            Promise.map files, (filename) =>
               logger.debug "Uploading #{@outputDir}/#{filename}"
               sftpClient.safePutFile(sftp, "#{@outputDir}/#{filename}", "#{sftpTarget}/#{filename}")
               .then =>
@@ -170,33 +166,30 @@ ProjectCredentialsConfig.create()
                   orderExport.syncOrder xml.entry, filename
                 else
                   logger.warn "Not able to create syncInfo for #{filename} as xml for that file was not found"
-                  Q()
-            , {accumulate: false}
+                  Promise.resolve()
+            , {concurrency: 1}
             .then ->
               logger.info "Successfully uploaded #{_.size files} file(s)"
               sftpClient.close(sftp)
-              Q()
-          .fail (err) ->
-            sftpClient.close(sftp)
-            Q.reject err
-      .fail (err) =>
+              Promise.resolve()
+          .finally -> sftpClient.close(sftp)
+        .catch (err) =>
+          logger.error err, 'There was an error uploading the files to SFTP'
+          @exitCode = 1
+      .catch (err) =>
         logger.error err, "Problems on getting sftp credentials from config files for project #{argv.projectKey}."
-        # process.exit(1)
         @exitCode = 1
     else
-      Q()
+      Promise.resolve()
   .then =>
     logger.info 'Orders export complete'
-    # process.exit(0)
     @exitCode = 0
-  .fail (error) =>
+  .catch (error) =>
     logger.error error, 'Oops, something went wrong!'
-    # process.exit(1)
     @exitCode = 1
   .done()
 
-.fail (err) =>
+.catch (err) =>
   logger.error err, 'Problems on getting client credentials from config files.'
-  # process.exit(1)
   @exitCode = 1
 .done()

@@ -1,5 +1,5 @@
-Q = require 'q'
 _ = require 'underscore'
+Promise = require 'bluebird'
 
 class OrderService
 

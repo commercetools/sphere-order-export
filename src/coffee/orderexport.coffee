@@ -1,8 +1,9 @@
 _ = require 'underscore'
-Q = require 'q'
-fs = require 'q-io/fs'
-SphereClient = require 'sphere-node-client'
-{ElasticIo, _u} = require 'sphere-node-utils'
+_.mixin require('underscore-mixins')
+Promise = require 'bluebird'
+fs = Promise.promisifyAll require('fs')
+{SphereClient} = require 'sphere-node-sdk'
+{ElasticIo} = require 'sphere-node-utils'
 OrderService = require '../lib/orderservice'
 XmlMapping = require './xmlmapping'
 CsvMapping = require './csvmapping'
@@ -45,25 +46,22 @@ class OrderExport
           content: base64
         syncInfos.push @syncOrder xmlOrder, fileName
 
-      Q.all(syncInfos)
-      .then ->
-        ElasticIo.returnSuccess data, next
-    .fail (result) ->
-      ElasticIo.returnFailure res, res, next
+      Promise.all(syncInfos)
+      .then -> ElasticIo.returnSuccess data, next
+    .catch (result) -> ElasticIo.returnFailure res, res, next
 
   processOrders: (orders, csvTemplate) ->
     if csvTemplate?
-      fs.read(csvTemplate).then (content) =>
-        @csvMapping.mapOrders content, orders
+      fs.readFileAsync(csvTemplate, {encoding: 'utf-8'})
+      .then (content) => @csvMapping.mapOrders content, orders
     else
       @client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
       .then (result) =>
         @channel = result.body
         unsyncedOrders = @orderService.unsyncedOrders orders, @channel
-        Q.all _.map unsyncedOrders, (order) => @processOrder order
+        Promise.all _.map unsyncedOrders, (order) => @processOrder order
 
   processOrder: (order) ->
-    deferred = Q.defer()
     @client.customObjects.byId("#{CONTAINER_PAYMENT}/#{order.id}").fetch()
     .then (result) =>
       paymentInfo = result.body
@@ -74,20 +72,15 @@ class OrderExport
             id: order.id
             xml: @xmlMapping.mapOrder order, paymentInfo, result.body
             version: order.version
-          deferred.resolve entry
+          Promise.resolve entry
       else
         entry =
           id: order.id
           xml: @xmlMapping.mapOrder order, paymentInfo
           version: order.version
-        deferred.resolve entry
-    .fail (err) ->
-      deferred.reject err
-
-    deferred.promise
+        Promise.resolve entry
 
   syncOrder: (xmlOrder, filename) ->
     @orderService.addSyncInfo xmlOrder.id, xmlOrder.version, @channel, filename
-
 
 module.exports = OrderExport

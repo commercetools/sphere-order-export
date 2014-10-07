@@ -1,9 +1,10 @@
 _ = require 'underscore'
-_.mixin require('sphere-node-utils')._u
+_.mixin require('underscore-mixins')
 CsvMapping = require '../lib/csvmapping'
 exampleorders = require './exampleorders'
 
 describe '#mapOrders', ->
+
   beforeEach ->
     @csvMapping = new CsvMapping()
 
@@ -24,8 +25,7 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()
 
   it 'should export prices', (done) ->
@@ -45,8 +45,7 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()
 
   it 'export addresses', (done) ->
@@ -66,8 +65,7 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()
 
   it 'export lineItems', (done) ->
@@ -90,8 +88,7 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()
 
   it 'export lineItems and prices', (done) ->
@@ -114,8 +111,7 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()
 
   xit 'export lineItems and deliveries without parcels', (done) ->
@@ -143,8 +139,7 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()
 
   it 'export lineItems with states', (done) ->
@@ -167,8 +162,7 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()
 
   it 'export lineItems with images', (done) ->
@@ -191,8 +185,7 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()
 
   it 'export lineItems with channel', (done) ->
@@ -215,8 +208,7 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()
 
   it 'export orders with customerGroup', (done) ->
@@ -236,6 +228,5 @@ describe '#mapOrders', ->
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
-    .fail (err) ->
-      done(_.prettify err)
+    .catch (err) -> done(_.prettify err)
     .done()

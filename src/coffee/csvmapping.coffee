@@ -1,7 +1,7 @@
 _ = require 'underscore'
-Q = require 'q'
+Promise = require 'bluebird'
 Csv = require 'csv'
-access = require('safe-access')
+access = require 'safe-access'
 
 class CsvMapping
 
@@ -49,7 +49,7 @@ class CsvMapping
         if /lineItems/.test entry
           @hasLineItemHeader = true
         @_mapHeader(entry)
-      Q [header, mappings]
+      Promise.resolve [header, mappings]
 
   _mapHeader: (entry) ->
     switch entry
@@ -103,27 +103,15 @@ class CsvMapping
       "#{customerGroup.obj.name}"
 
   parse: (csvString) ->
-    deferred = Q.defer()
-
-    Csv().from.string(csvString)
-    .on 'error', (error) ->
-      deferred.reject error
-
-    .to.array (data) ->
-      deferred.resolve data[0]
-
-    deferred.promise
+    new Promise (resolve, reject) ->
+      Csv().from.string(csvString)
+      .on 'error', (error) -> reject error
+      .to.array (data) -> resolve data[0]
 
   toCSV: (header, data) ->
-    deferred = Q.defer()
-
-    Csv().from([header].concat data)
-    .to.string (asString) ->
-      deferred.resolve asString
-    .on 'error', (error) ->
-      deferred.reject error
-
-    deferred.promise
-
+    new Promise (resolve, reject) ->
+      Csv().from([header].concat data)
+      .on 'error', (error) -> reject error
+      .to.string (asString) -> resolve asString
 
 module.exports = CsvMapping
