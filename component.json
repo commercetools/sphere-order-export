@@ -27,7 +27,7 @@
   "actions": {
     "orderExport": {
       "title": "Order XML Export",
-      "main": "lib/elasticio.js",
+      "main": "lib/elasticio.js"
     }
   }
 }
