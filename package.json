@@ -39,7 +39,7 @@
   "bin": {
     "order-export": "bin/order-export"
   },
-  "main": "elasticio.js",
+  "main": "lib/run",
   "engines": {
     "node": ">= 0.10.0"
   },
