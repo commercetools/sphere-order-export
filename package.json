@@ -1,20 +1,23 @@
 {
   "name": "sphere-order-export",
-  "description": "Quick and easy way to export your orders from SPHERE.IO into files.",
+  "description": "Quick and easy way to export your orders from SPHERE.IO into files, with SFTP support!",
   "version": "0.17.7",
   "homepage": "https://github.com/sphereio/sphere-order-export",
+  "private": false,
   "keywords": [
     "sphere",
+    "sphereio",
     "api",
     "order",
     "export",
-    "xml"
+    "xml",
+    "csv"
   ],
   "author": {
     "name": "Hajo Eichler",
     "email": "hajo.eichler@commercetools.de"
   },
-  "contributors": [
+  "maintainers": [
     {
       "name": "Nicola Molinari",
       "email": "nicola.molinari@commercetools.de"
