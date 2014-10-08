@@ -31,7 +31,7 @@ argv = require('optimist')
   .describe('logDir', 'directory to store logs')
   .describe('logSilent', 'use console to print messages')
   .describe('timeout', 'Set timeout for requests')
-  .default('fetchHours', 48) # let's keep it limited to 24h
+  .default('fetchHours', 48) # let's keep it limited to 48h
   .default('standardShippingMethod', 'None')
   .default('exportType', 'xml')
   .default('exportUnsyncedOnly', true)

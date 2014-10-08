@@ -7,15 +7,19 @@ fs = Promise.promisifyAll require('fs')
 XmlMapping = require './mapping-utils/xml'
 CsvMapping = require './mapping-utils/csv'
 
+BASE64 = 'base64'
+CHANNEL_KEY = 'OrderXmlFileExport'
+CHANNEL_ROLE = 'OrderExport'
+CONTAINER_PAYMENT = 'checkoutInfo'
+
 class OrderExport
 
-  BASE64 = 'base64'
-  CHANNEL_KEY = 'OrderXmlFileExport'
-  CHANNEL_ROLE = 'OrderExport'
-  CONTAINER_PAYMENT = 'checkoutInfo'
-
   constructor: (options = {}) ->
-    @_exportOptions = options.export
+    @_exportOptions = _.defaults (options.export or {}),
+      fetchHours: 48
+      standardShippingMethod: 'None'
+      exportType: 'xml'
+      exportUnsyncedOnly: true
     @client = new SphereClient options.client
     @xmlMapping = new XmlMapping @_exportOptions
     @csvMapping = new CsvMapping @_exportOptions
@@ -26,7 +30,6 @@ class OrderExport
       return
 
     # TODO: xml only export?
-    @processOrders(msg.body.results)
     @client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
     .then (result) =>
       @channel = result.body
@@ -87,21 +90,13 @@ class OrderExport
         Promise.resolve allOrders
 
   _unsyncedOnly: (orders, channel) ->
-    _.select orders, (order) ->
+    _.filter orders, (order) ->
       order.syncInfo or= []
-      not _.find order.syncInfo, (syncInfo) ->
-        syncInfo.channel.id is channel?.id
-
-  # processOrders: (orders, csvTemplate) ->
-  #   if csvTemplate?
-  #     fs.readFileAsync(csvTemplate, {encoding: 'utf-8'})
-  #     .then (content) => @csvMapping.mapOrders content, orders
-  #   else
-  #     @client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
-  #     .then (result) =>
-  #       @channel = result.body
-  #       unsyncedOrders = @orderService.unsyncedOrders orders, @channel
-  #       Promise.all _.map unsyncedOrders, (order) => @processOrder order
+      if _.isEmpty order.syncInfo
+        return true
+      else
+        not _.find order.syncInfo, (syncInfo) ->
+          syncInfo.channel.id is channel?.id
 
   _processXmlOrder: (order) ->
     # TODO: what if customObject is not found?

@@ -13,52 +13,43 @@ describe 'integration tests', ->
   CONTAINER_PAYMENT = 'checkoutInfo'
 
   beforeEach (done) ->
-    @orderExport = new OrderExport Config
-    @sphere = @orderExport.client
+    @orderExport = new OrderExport client: Config
 
-    @sphere.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
+    @orderExport.client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
     .then (result) =>
       # get a tax category required for setting up shippingInfo
       #   (simply returning first found)
-      @sphere.taxCategories.save SpecHelper.taxCategoryMock()
+      @orderExport.client.taxCategories.save SpecHelper.taxCategoryMock()
     .then (result) =>
       @taxCategory = result.body
-      @sphere.zones.save SpecHelper.zoneMock()
+      @orderExport.client.zones.save SpecHelper.zoneMock()
     .then (result) =>
       zone = result.body
-      @sphere.shippingMethods
+      @orderExport.client.shippingMethods
         .save SpecHelper.shippingMethodMock(zone, @taxCategory)
     .then (result) =>
       @shippingMethod = result.body
-      @sphere.productTypes.save SpecHelper.productTypeMock()
+      @orderExport.client.productTypes.save SpecHelper.productTypeMock()
     .then (result) =>
       productType = result.body
-      @sphere.products.save SpecHelper.productMock(productType)
+      @orderExport.client.products.save SpecHelper.productMock(productType)
     .then (result) =>
       @product = result.body
-      @sphere.customers.save SpecHelper.customerMock()
+      @orderExport.client.customers.save SpecHelper.customerMock()
     .then (result) =>
       @customer = result.body.customer
-      @sphere.orders.import SpecHelper.orderMock(@shippingMethod, @product, @taxCategory, @customer)
+      @orderExport.client.orders.import SpecHelper.orderMock(@shippingMethod, @product, @taxCategory, @customer)
     .then (result) =>
       @order = result.body
-      @sphere.customObjects.save SpecHelper.orderPaymentInfo(CONTAINER_PAYMENT, @order.id)
+      @orderExport.client.customObjects.save SpecHelper.orderPaymentInfo(CONTAINER_PAYMENT, @order.id)
     .then (result) -> done()
     .catch (err) -> done _.prettify err
   , 20000 # 20sec
 
-  it 'nothing to do', (done) ->
-    @orderExport.processOrders([])
-    .then (xmlOrders) ->
-      expect(xmlOrders).toBeDefined()
-      expect(_.size(xmlOrders)).toEqual 0
-      done()
-    .catch (err) -> done _.prettify err
-
   it 'export as XML', (done) ->
-    @orderExport.processOrders([@order])
+    @orderExport.run()
     .then (xmlOrders) =>
-      expect(_.size xmlOrders).toBe 1
+      expect(_.size xmlOrders).toBeGreaterThan 1
       doc = xmlOrders[0].xml
       parseString doc, (err, result) =>
         expect(result.order.customerNumber[0]).toEqual @customer.customerNumber

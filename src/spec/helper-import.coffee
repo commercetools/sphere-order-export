@@ -24,7 +24,7 @@ client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
 .then (result) =>
   @shippingMethod = result.body
   client.productTypes.save SpecHelper.productTypeMock()
-.then (result) =>
+.then (result) ->
   productType = result.body
   client.products.save SpecHelper.productMock(productType)
 .then (result) =>
