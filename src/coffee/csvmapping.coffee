@@ -37,10 +37,11 @@ class CsvMapping
 
   _getValue: (order, mapping) ->
     value = access order, mapping[0]
+    return '' unless value
     if _.size(mapping) is 2 and _.isFunction mapping[1]
       mapping[1].call undefined, value
     else
-      value
+      value or ''
 
   _analyseTemplate: (template) ->
     @parse(template)

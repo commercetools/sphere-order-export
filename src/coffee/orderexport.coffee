@@ -62,6 +62,7 @@ class OrderExport
         Promise.all _.map unsyncedOrders, (order) => @processOrder order
 
   processOrder: (order) ->
+    # TODO: what if customObject is not found?
     @client.customObjects.byId("#{CONTAINER_PAYMENT}/#{order.id}").fetch()
     .then (result) =>
       paymentInfo = result.body

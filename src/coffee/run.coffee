@@ -212,6 +212,8 @@ ProjectCredentialsConfig.create()
     logger.info 'Orders export complete'
     @exitCode = 0
   .catch (error) =>
+    # TODO: if typeof error is Error then error.stack (or error.message)
+    # TODO: handle this in sphere-node-utils.Logger
     logger.error error, 'Oops, something went wrong!'
     @exitCode = 1
   .done()
