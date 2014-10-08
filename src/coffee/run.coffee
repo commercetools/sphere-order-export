@@ -15,10 +15,11 @@ argv = require('optimist')
   .describe('sphereHost', 'SPHERE.IO API host to connecto to')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name of order has none')
+  .describe('exportType', 'CSV or XML')
+  .describe('exportUnsyncedOnly', 'whether only unsynced orders will be exported or not')
   .describe('targetDir', 'the folder where exported files are saved')
   .describe('useExportTmpDir', 'whether to use a system tmp folder to store exported files')
   .describe('csvTemplate', 'CSV template to define the structure of the export - if present only one CSV file will be generated, otherwise XML files')
-  .describe('csvFile', "CSV file to export template to, otherwise see option 'useExportTmpDir'")
   .describe('fileWithTimestamp', 'whether exported file should contain a timestamp')
   .describe('sftpCredentials', 'the path to a JSON file where to read the credentials from')
   .describe('sftpHost', 'the SFTP host (overwrite value in sftpCredentials JSON, if given)')
@@ -30,10 +31,12 @@ argv = require('optimist')
   .describe('logDir', 'directory to store logs')
   .describe('logSilent', 'use console to print messages')
   .describe('timeout', 'Set timeout for requests')
-  .default('fetchHours', 0) # by default don't restrict on modifications
+  .default('fetchHours', 48) # let's keep it limited to 24h
   .default('standardShippingMethod', 'None')
-  .default('useExportTmpDir', false)
+  .default('exportType', 'xml')
+  .default('exportUnsyncedOnly', true)
   .default('targetDir', path.join(__dirname,'../exports'))
+  .default('useExportTmpDir', false)
   .default('fileWithTimestamp', false)
   .default('logLevel', 'info')
   .default('logDir', '.')
@@ -90,51 +93,48 @@ readJsonFromPath = (path) ->
   fs.readFileAsync(path, {encoding: 'utf-8'}).then (content) ->
     Promise.resolve JSON.parse(content)
 
-isCsvMode = -> argv.csvTemplate?
-
 ProjectCredentialsConfig.create()
 .then (credentials) =>
-  options =
+  clientOptions =
     config: credentials.enrichCredentials
       project_key: argv.projectKey
       client_id: argv.clientId
       client_secret: argv.clientSecret
     timeout: argv.timeout
     user_agent: "#{package_json.name} - #{package_json.version}"
-  options.host = argv.sphereHost if argv.sphereHost
-  options.standardShippingMethod = argv.standardShippingMethod
+  clientOptions.host = argv.sphereHost if argv.sphereHost
 
-  orderExport = new OrderExport options
-  client = orderExport.client
+  orderExport = new OrderExport
+    client: clientOptions
+    export:
+      fetchHours: argv.fetchHours
+      standardShippingMethod: argv.standardShippingMethod
+      exportType: argv.exportType
+      exportUnsyncedOnly: argv.exportUnsyncedOnly
+      csvTemplate: argv.csvTemplate
 
   ensureExportDir()
   .then (outputDir) =>
     logger.debug "Created output dir at #{outputDir}"
     @outputDir = outputDir
-
-    # fetch all orders
-    client.orders.all()
-    .expand('lineItems[*].state[*].state')
-    .expand('lineItems[*].supplyChannel')
-    .expand('customerGroup')
-    .last("#{argv.fetchHours}h")
-    .fetch()
-  .then (result) ->
-    orderExport.processOrders(result.body.results, argv.csvTemplate)
-  .then (result) =>
+    orderExport.run()
+  .then (data) =>
+    # TODO: xml export
+    # - one file for all (default)
+    # - one file for each order
     @orderReferences = []
     ts = (new Date()).getTime()
-    if isCsvMode()
+    if argv.exportType.toLowerCase() is 'csv'
       if argv.fileWithTimestamp
         fileName = "orders_#{ts}.csv"
       else
         fileName = 'orders.csv'
       csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
       logger.info "Storing CSV export to '#{csvFile}'."
-      fs.writeFileAsync csvFile, result
+      fs.writeFileAsync csvFile, data
     else
-      logger.info "Storing #{_.size result} file(s) to '#{@outputDir}'."
-      Promise.map result, (entry) =>
+      logger.info "Storing #{_.size data} file(s) to '#{@outputDir}'."
+      Promise.map data, (entry) =>
         content = entry.xml.end(pretty: true, indent: '  ', newline: '\n')
         if argv.fileWithTimestamp
           fileName = "#{entry.id}_#{ts}.xml"
@@ -214,7 +214,7 @@ ProjectCredentialsConfig.create()
   .catch (error) =>
     # TODO: if typeof error is Error then error.stack (or error.message)
     # TODO: handle this in sphere-node-utils.Logger
-    logger.error error, 'Oops, something went wrong!'
+    logger.error error.stack, 'Oops, something went wrong!'
     @exitCode = 1
   .done()
 .catch (err) =>
