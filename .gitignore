@@ -8,3 +8,4 @@ coverage
 config.js
 exports
 sftp-credentials.json
+foo
