@@ -1,82 +1,72 @@
 _ = require 'underscore'
 
+uniqueId = (prefix) ->
+  _.uniqueId "#{prefix}#{new Date().getTime()}_"
+
 module.exports =
 
   orderPaymentInfo: (container, orderId) ->
-    orderPaymentInfo =
-      container: container
-      key: orderId
-      value:
-        paymentMethod: 'Cash'
-        paymentID: '7'
+    container: container
+    key: orderId
+    value:
+      paymentMethod: 'Cash'
+      paymentID: '7'
 
   shippingMethodMock: (zone, taxCategory) ->
-    unique = new Date().getTime()
-    shippingMethod =
-      name: "S-#{unique}"
-      zoneRates: [{
+    name: uniqueId 'S'
+    zoneRates: [
+      {
         zone:
           typeId: 'zone'
           id: zone.id
-        shippingRates: [{
-          price:
-            currencyCode: 'EUR'
-            centAmount: 99
-          }]
-        }]
-      isDefault: false
-      taxCategory:
-        typeId: 'tax-category'
-        id: taxCategory.id
+        shippingRates: [
+          { price: {currencyCode: 'EUR', centAmount: 99}}
+        ]
+      }
+    ]
+    isDefault: false
+    taxCategory:
+      typeId: 'tax-category'
+      id: taxCategory.id
 
-
-  zoneMock: ->
-    unique = new Date().getTime()
-    zone =
-      name: "Z-#{unique}"
+  zoneMock: -> name: uniqueId 'Z'
 
   taxCategoryMock: ->
-    unique = new Date().getTime()
-    taxCategory =
-      name: "TC-#{unique}"
-      rates: [{
-          name: "5%",
-          amount: 0.05,
-          includedInPrice: false,
-          country: "DE",
-          id: "jvzkDxzl"
-        }]
+    name: uniqueId 'TC'
+    rates: [
+      {
+        name: '5%'
+        amount: 0.05
+        includedInPrice: false
+        country: 'DE'
+        id: 'jvzkDxzl'
+      }
+    ]
 
   productTypeMock: ->
-    unique = new Date().getTime()
-    productType =
-      name: "PT-#{unique}"
-      description: 'bla'
+    name: uniqueId 'PT'
+    description: 'bla'
 
   productMock: (productType) ->
-    unique = new Date().getTime()
-    product =
-      productType:
-        typeId: 'product-type'
-        id: productType.id
-      name:
-        en: "P-#{unique}"
-      slug:
-        en: "p-#{unique}"
-      masterVariant:
-        sku: "sku-#{unique}"
+    productType:
+      typeId: 'product-type'
+      id: productType.id
+    name:
+      en: uniqueId 'P'
+    slug:
+      en: uniqueId 'p'
+    masterVariant:
+      sku: uniqueId 'sku'
 
   orderMock: (shippingMethod, product, taxCategory, customer) ->
-    unique = new Date().getTime()
-    order =
-      id: "order-#{unique}"
-      orderState: 'Open'
-      paymentState: 'Pending'
-      shipmentState: 'Pending'
-      customerId: customer.id
-      customerEmail: customer.email
-
-      lineItems: [ {
+    id: uniqueId 'o'
+    orderState: 'Open'
+    paymentState: 'Pending'
+    shipmentState: 'Pending'
+    customerId: customer.id
+    customerEmail: customer.email
+    lineItems: [
+      {
         productId: product.id
         name:
           de: 'foo'
@@ -92,36 +82,36 @@ module.exports =
           value:
             centAmount: 999
             currencyCode: 'EUR'
-      } ]
-      totalPrice:
+      }
+    ]
+    totalPrice:
+      currencyCode: 'EUR'
+      centAmount: 999
+    returnInfo: []
+    shippingInfo:
+      shippingMethodName: 'UPS'
+      price:
         currencyCode: 'EUR'
-        centAmount: 999
-      returnInfo: []
-      shippingInfo:
-        shippingMethodName: 'UPS'
+        centAmount: 99
+      shippingRate:
         price:
           currencyCode: 'EUR'
           centAmount: 99
-        shippingRate:
-          price:
-            currencyCode: 'EUR'
-            centAmount: 99
-        taxRate: _.first taxCategory.rates
-        taxCategory:
-          typeId: 'tax-category'
-          id: taxCategory.id
-        shippingMethod:
-          typeId: 'shipping-method'
-          id: shippingMethod.id
+      taxRate: _.first taxCategory.rates
+      taxCategory:
+        typeId: 'tax-category'
+        id: taxCategory.id
+      shippingMethod:
+        typeId: 'shipping-method'
+        id: shippingMethod.id
 
   customerMock: ->
-    unique = new Date().getTime()
-    firstName = "Heinz-#{unique}"
-    lastName = "Mayer-#{unique}"
-    customer =
-      customerNumber: "c-#{unique}"
+    firstName = uniqueId 'Heinz'
+    lastName = uniqueId 'Mayer'
+    return
+      customerNumber: uniqueId 'c'
       email: "#{firstName}.#{lastName}@commercetools.de"
       firstName: firstName
       lastName: lastName
-      password: "password-#{unique}"
-      externalId: "external-#{unique}"
+      password: uniqueId 'password'
+      externalId: uniqueId 'external'

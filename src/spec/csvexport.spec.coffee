@@ -1,7 +1,7 @@
 _ = require 'underscore'
 _.mixin require('underscore-mixins')
 CsvMapping = require '../lib/csvmapping'
-exampleorders = require './exampleorders'
+ordersJson = require '../data/orders.json'
 
 describe '#mapOrders', ->
 
@@ -21,7 +21,7 @@ describe '#mapOrders', ->
       xyz,10002
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
@@ -41,7 +41,7 @@ describe '#mapOrders', ->
       xyz,10002,USD 2380,USD 2000,USD 2380
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
@@ -61,7 +61,7 @@ describe '#mapOrders', ->
       xyz,10002,Jane,Doe,Some Other Street ,22,22222,Some Other City,US,Jane,Doe,Some Other Street ,22,22222,Some Other City,US
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
@@ -84,7 +84,7 @@ describe '#mapOrders', ->
       xyz,10002,LineItemId-2-1,ProductId-2-1,Product-2-1,1,SKU-2-1,1,US-USD 2380
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
@@ -107,7 +107,7 @@ describe '#mapOrders', ->
       xyz,10002,LineItemId-2-1,ProductId-2-1,Product-2-1,1,SKU-2-1,1,US-USD 2380,,,
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
@@ -135,7 +135,7 @@ describe '#mapOrders', ->
       xyz,10002,,,,,deliveryId-2-1,LineItemId-2-1,1
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
@@ -158,7 +158,7 @@ describe '#mapOrders', ->
       xyz,10002,LineItemId-2-1,firstState:1;
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
@@ -181,7 +181,7 @@ describe '#mapOrders', ->
       xyz,10002,LineItemId-2-1,http://www.example.org/image-2-1-1.jpg;
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
@@ -204,7 +204,7 @@ describe '#mapOrders', ->
       xyz,10002,LineItemId-2-1,secondChannel
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()
@@ -224,7 +224,7 @@ describe '#mapOrders', ->
       xyz,10002,cool customers
       """
 
-    @csvMapping.mapOrders(template, exampleorders.orders)
+    @csvMapping.mapOrders(template, ordersJson)
     .then (result) ->
       expect(result).toBe expectedCSV
       done()

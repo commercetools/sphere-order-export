@@ -18,7 +18,6 @@ describe 'integration tests', ->
 
     @sphere.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
     .then (result) =>
-      @channel = result.channel
       # get a tax category required for setting up shippingInfo
       #   (simply returning first found)
       @sphere.taxCategories.save SpecHelper.taxCategoryMock()
@@ -56,8 +55,9 @@ describe 'integration tests', ->
       done()
     .catch (err) -> done _.prettify err
 
-  it 'full turn around', (done) ->
-    @orderExport.processOrders([@order], @channel).then (xmlOrders) =>
+  it 'export as XML', (done) ->
+    @orderExport.processOrders([@order])
+    .then (xmlOrders) =>
       expect(_.size xmlOrders).toBe 1
       doc = xmlOrders[0].xml
       parseString doc, (err, result) =>
@@ -65,6 +65,8 @@ describe 'integration tests', ->
         expect(result.order.externalCustomerId[0]).toEqual @customer.externalId
         done()
     .catch (err) -> done _.prettify err
+
+  # TODO: export as CSV
 
   describe 'elastic.io', ->
     it 'nothing to do', (done) ->
