@@ -42,15 +42,7 @@ module.exports = (grunt) ->
             dest + matchedSrcPath
           )
       testHelpers:
-        files: grunt.file.expandMapping(['**/helper.coffee'], 'test/',
-          flatten: false
-          cwd: 'src/spec'
-          ext: '.js'
-          rename: (dest, matchedSrcPath) ->
-            dest + matchedSrcPath
-          )
-      exampleOrders:
-        files: grunt.file.expandMapping(['**/exampleorders.coffee'], 'test/',
+        files: grunt.file.expandMapping(['**/helper.coffee', '**/helper-import.coffee'], 'test/',
           flatten: false
           cwd: 'src/spec'
           ext: '.js'

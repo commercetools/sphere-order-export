@@ -2,9 +2,9 @@ _ = require 'underscore'
 _.mixin require('underscore-mixins')
 {parseString} = require 'xml2js'
 {ElasticIo} = require 'sphere-node-utils'
-OrderExport = require '../lib/orderexport'
-Config = require '../config'
-SpecHelper = require './helper'
+OrderExport = require '../../lib/orderexport'
+Config = require '../../config'
+SpecHelper = require '../helper'
 
 describe 'integration tests', ->
 
