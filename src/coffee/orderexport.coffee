@@ -5,8 +5,8 @@ fs = Promise.promisifyAll require('fs')
 {SphereClient} = require 'sphere-node-sdk'
 {ElasticIo} = require 'sphere-node-utils'
 OrderService = require '../lib/orderservice'
-XmlMapping = require './xmlmapping'
-CsvMapping = require './csvmapping'
+XmlMapping = require './mapping-utils/xml'
+CsvMapping = require './mapping-utils/csv'
 
 class OrderExport
 

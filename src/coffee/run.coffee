@@ -5,7 +5,7 @@ fs = Promise.promisifyAll require('fs')
 tmp = Promise.promisifyAll require('tmp')
 {ExtendedLogger, ProjectCredentialsConfig, Sftp} = require 'sphere-node-utils'
 package_json = require '../package.json'
-OrderExport = require '../lib/orderexport'
+OrderExport = require './orderexport'
 
 argv = require('optimist')
   .usage('Usage: $0 --projectKey key --clientId id --clientSecret secret')

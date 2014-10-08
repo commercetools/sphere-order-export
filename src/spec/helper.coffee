@@ -108,10 +108,10 @@ module.exports =
   customerMock: ->
     firstName = uniqueId 'Heinz'
     lastName = uniqueId 'Mayer'
-    return
-      customerNumber: uniqueId 'c'
-      email: "#{firstName}.#{lastName}@commercetools.de"
-      firstName: firstName
-      lastName: lastName
-      password: uniqueId 'password'
-      externalId: uniqueId 'external'
+
+    customerNumber: uniqueId 'c'
+    email: "#{firstName}.#{lastName}@commercetools.de"
+    firstName: firstName
+    lastName: lastName
+    password: uniqueId 'password'
+    externalId: uniqueId 'external'
