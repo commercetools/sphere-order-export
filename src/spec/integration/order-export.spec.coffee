@@ -50,8 +50,8 @@ describe 'integration tests', ->
     @orderExport.run()
     .then (xmlOrders) =>
       expect(_.size xmlOrders).toBeGreaterThan 1
-      doc = xmlOrders[0].xml
-      parseString doc, (err, result) =>
+      expectedOrder = _.find xmlOrders, (o) => o.id is @order.id
+      parseString expectedOrder.xml, (err, result) =>
         expect(result.order.customerNumber[0]).toEqual @customer.customerNumber
         expect(result.order.externalCustomerId[0]).toEqual @customer.externalId
         done()

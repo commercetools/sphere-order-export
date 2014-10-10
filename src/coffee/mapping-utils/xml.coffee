@@ -6,6 +6,8 @@ class XmlMapping
   constructor: (options = {}) ->
     @standardShippingMethod = options.standardShippingMethod or 'None'
 
+  mapOrders: -> # TODO
+
   mapOrder: (order, paymentInfo, customer) ->
     xml = builder.create('order',
       { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
