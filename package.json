@@ -52,7 +52,7 @@
     "optimist": "0.6.1",
     "safe-access": "0.1.0",
     "sphere-node-sdk": "1.0.0-rc1",
-    "sphere-node-utils": "0.5.1",
+    "sphere-node-utils": "0.5.2",
     "tmp": "0.0.23",
     "underscore": "1.7.0",
     "underscore-mixins": "*",
