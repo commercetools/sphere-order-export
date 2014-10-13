@@ -62,6 +62,7 @@ class OrderExport
       else Promise.reject "Undefined export type '#{@_exportOptions.exportType}', supported 'csv' or 'xml'"
 
   csvExport: (orders) ->
+    # TODO: export all fields if no csvTemplate is defined?
     throw new Error 'You need to provide a csv template for exporting order information' unless @_exportOptions.csvTemplate
     fs.readFileAsync(@_exportOptions.csvTemplate, {encoding: 'utf-8'})
     .then (content) => @csvMapping.mapOrders content, orders
