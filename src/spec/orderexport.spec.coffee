@@ -14,6 +14,11 @@ describe 'OrderExport', ->
 
   beforeEach ->
     @orderExport = new OrderExport client: Config
+    expect(@orderExport._exportOptions).toEqual
+      fetchHours: 48
+      standardShippingMethod: 'None'
+      exportType: 'xml'
+      exportUnsyncedOnly: true
     @orderExport.channel = @orderExportChannel =
       id: 'channel-export'
       type: 'channel'
@@ -21,6 +26,10 @@ describe 'OrderExport', ->
   it '#run', -> # TODO
 
   it '#csvExport', -> # TODO
+
+  it 'should throw if no csv template is defined', ->
+    @orderExport._exportOptions.exportType = 'csv'
+    expect(=> @orderExport.csvExport()).toThrow new Error 'You need to provide a csv template for exporting order information'
 
   it '#xmlExport', -> # TODO
 

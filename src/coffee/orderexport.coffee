@@ -59,7 +59,7 @@ class OrderExport
     switch @_exportOptions.exportType.toLowerCase()
       when 'csv' then @_fetchOrders().then (orders) => @csvExport(orders)
       when 'xml' then @_fetchOrders().then (orders) => @xmlExport(orders)
-      else Promise.reject "Undefined export type '#{exportType}', supported 'csv' or 'xml'"
+      else Promise.reject "Undefined export type '#{@_exportOptions.exportType}', supported 'csv' or 'xml'"
 
   csvExport: (orders) ->
     throw new Error 'You need to provide a csv template for exporting order information' unless @_exportOptions.csvTemplate

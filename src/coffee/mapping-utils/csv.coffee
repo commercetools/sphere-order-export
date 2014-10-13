@@ -45,7 +45,8 @@ class CsvMapping
 
   _analyseTemplate: (template) ->
     @parse(template)
-    .then (header) =>
+    .then (data) =>
+      header = data[0]
       mappings = _.map header, (entry) =>
         if /lineItems/.test entry
           @hasLineItemHeader = true
@@ -107,7 +108,7 @@ class CsvMapping
     new Promise (resolve, reject) ->
       Csv().from.string(csvString)
       .on 'error', (error) -> reject error
-      .to.array (data) -> resolve data[0]
+      .to.array (data) -> resolve data
 
   toCSV: (header, data) ->
     new Promise (resolve, reject) ->

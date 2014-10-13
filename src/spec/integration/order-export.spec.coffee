@@ -6,7 +6,7 @@ OrderExport = require '../../lib/orderexport'
 Config = require '../../config'
 SpecHelper = require '../helper'
 
-describe 'integration tests', ->
+describe 'Integration tests', ->
 
   CHANNEL_KEY = 'OrderXmlFileExport'
   CHANNEL_ROLE = 'OrderExport'
@@ -46,10 +46,9 @@ describe 'integration tests', ->
     .catch (err) -> done _.prettify err
   , 20000 # 20sec
 
-  it 'export as XML', (done) ->
+  it 'should export as XML', (done) ->
     @orderExport.run()
     .then (xmlOrders) =>
-      expect(_.size xmlOrders).toBeGreaterThan 1
       expectedOrder = _.find xmlOrders, (o) => o.id is @order.id
       parseString expectedOrder.xml, (err, result) =>
         expect(result.order.customerNumber[0]).toEqual @customer.customerNumber
@@ -57,16 +56,31 @@ describe 'integration tests', ->
         done()
     .catch (err) -> done _.prettify err
 
-  # TODO: export as CSV
+  it 'should export as CSV', (done) ->
+    @orderExport._exportOptions.exportType = 'csv'
+    @orderExport._exportOptions.csvTemplate = __dirname + '/../../data/template-order-simple.csv'
+    @orderExport.run()
+    .then (csvData) =>
+      @orderExport.csvMapping.parse csvData
+      .then (parsed) ->
+        expect(parsed[0]).toEqual ['id', 'orderNumber', 'totalPrice', 'totalNet', 'totalGross']
+        expect(parsed[1][0]).toEqual jasmine.any(String)
+        expect(parsed[1][1]).toBe ''
+        expect(parsed[1][2]).toBe 'EUR 999'
+        expect(parsed[1][3]).toBe ''
+        expect(parsed[1][4]).toBe ''
+        done()
+    .catch (err) -> done _.prettify err
 
   describe 'elastic.io', ->
-    it 'nothing to do', (done) ->
+
+    it 'should do nothing', (done) ->
       @orderExport.elasticio {}, Config, (error, message) ->
         done(_.prettify(error), null, 4) if error
         expect(message).toBe 'No data from elastic.io!'
         done()
 
-    it 'full turn around', (done) ->
+    it 'should export', (done) ->
       msg =
         body: [@order]
       @orderExport.elasticio msg, Config, (error, message) ->
