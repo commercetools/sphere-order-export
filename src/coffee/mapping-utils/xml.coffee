@@ -6,7 +6,7 @@ class XmlMapping
   constructor: (options = {}) ->
     @standardShippingMethod = options.standardShippingMethod or 'None'
 
-  mapOrders: -> # TODO
+  mapOrders: -> # TODO: allow to map all orders into one xml
 
   mapOrder: (order, paymentInfo, customer) ->
     xml = builder.create('order',

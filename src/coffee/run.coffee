@@ -214,7 +214,7 @@ ProjectCredentialsConfig.create()
   .catch (error) =>
     # TODO: if typeof error is Error then error.stack (or error.message)
     # TODO: handle this in sphere-node-utils.Logger
-    logger.error error.stack, 'Oops, something went wrong!'
+    logger.error error, 'Oops, something went wrong!'
     @exitCode = 1
   .done()
 .catch (err) =>

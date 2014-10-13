@@ -74,8 +74,7 @@ class OrderExport
     .then (result) =>
       @channel = result.body
 
-      # fetch all orders
-      # TODO: query also for syncInfo?
+      # TODO: query also for syncInfo? -> not well supported by the API at the moment
       @client.orders.all()
       .expand('lineItems[*].state[*].state')
       .expand('lineItems[*].supplyChannel')
