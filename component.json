@@ -23,11 +23,11 @@
         "placeholder": "Paste your your SPHERE.IO client secret here"
       }
     }
-  },  
+  },
   "actions": {
     "orderExport": {
       "title": "Order XML Export",
-      "main": "elasticio.js"
+      "main": "lib/elasticio.js"
     }
   }
 }

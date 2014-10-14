@@ -1,20 +1,23 @@
 {
   "name": "sphere-order-export",
-  "description": "Quick and easy way to export your orders from SPHERE.IO into files.",
+  "description": "Quick and easy way to export your orders from SPHERE.IO into files, with SFTP support!",
   "version": "0.17.7",
   "homepage": "https://github.com/sphereio/sphere-order-export",
+  "private": false,
   "keywords": [
     "sphere",
+    "sphereio",
     "api",
     "order",
     "export",
-    "xml"
+    "xml",
+    "csv"
   ],
   "author": {
     "name": "Hajo Eichler",
     "email": "hajo.eichler@commercetools.de"
   },
-  "contributors": [
+  "maintainers": [
     {
       "name": "Nicola Molinari",
       "email": "nicola.molinari@commercetools.de"
@@ -36,23 +39,23 @@
   "bin": {
     "order-export": "bin/order-export"
   },
-  "main": "elasticio.js",
+  "main": "lib/run",
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">= 0.10.0"
   },
   "scripts": {
     "test": "grunt coverage"
   },
   "dependencies": {
+    "bluebird": "2.3.x",
     "csv": "0.3.7",
     "optimist": "0.6.1",
-    "q": "1.0.0",
-    "q-io": "1.11.0",
     "safe-access": "0.1.0",
-    "sphere-node-client": "0.7.6",
-    "sphere-node-utils": "0.4.11",
+    "sphere-node-sdk": "1.0.0-rc1",
+    "sphere-node-utils": "0.5.2",
     "tmp": "0.0.23",
-    "underscore": "1.6.0",
+    "underscore": "1.7.0",
+    "underscore-mixins": "*",
     "xmlbuilder": "2.2.1"
   },
   "devDependencies": {
