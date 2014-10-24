@@ -53,7 +53,7 @@ class OrderExport
 
       Promise.all(syncInfos)
       .then -> ElasticIo.returnSuccess data, next
-    .catch (result) -> ElasticIo.returnFailure res, res, next
+    .catch (err) -> ElasticIo.returnFailure err, err.message, next
 
   run: ->
     switch @_exportOptions.exportType.toLowerCase()

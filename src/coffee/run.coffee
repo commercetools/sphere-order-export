@@ -50,7 +50,7 @@ logOptions =
   name: "#{package_json.name}-#{package_json.version}"
   streams: [
     { level: 'error', stream: process.stderr }
-    { level: argv.logLevel, path: "#{argv.logDir}/sphere-order-xml-export.log" }
+    { level: argv.logLevel, path: "#{argv.logDir}/#{package_json.name}.log" }
   ]
 logOptions.silent = argv.logSilent if argv.logSilent
 logger = new ExtendedLogger
