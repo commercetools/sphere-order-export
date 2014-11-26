@@ -124,7 +124,7 @@ ProjectCredentialsConfig.create()
     # - one file for each order
     @orderReferences = []
     ts = (new Date()).getTime()
-    if argv.exportType.toLowerCase() is 'csv'
+    if exportType.toLowerCase() is 'csv'
       if argv.fileWithTimestamp
         fileName = "orders_#{ts}.csv"
       else
