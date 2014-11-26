@@ -15,7 +15,6 @@ argv = require('optimist')
   .describe('sphereHost', 'SPHERE.IO API host to connect to')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name if order has none')
-  .describe('exportType', 'CSV or XML')
   .describe('exportUnsyncedOnly', 'whether only unsynced orders will be exported or not')
   .describe('targetDir', 'the folder where exported files are saved')
   .describe('useExportTmpDir', 'whether to use a system tmp folder to store exported files')
@@ -33,7 +32,6 @@ argv = require('optimist')
   .describe('timeout', 'Set timeout for requests')
   .default('fetchHours', 48) # let's keep it limited to 48h
   .default('standardShippingMethod', 'None')
-  .default('exportType', 'xml')
   .default('exportUnsyncedOnly', true)
   .default('targetDir', path.join(__dirname,'../exports'))
   .default('useExportTmpDir', false)
@@ -104,12 +102,14 @@ ProjectCredentialsConfig.create()
     user_agent: "#{package_json.name} - #{package_json.version}"
   clientOptions.host = argv.sphereHost if argv.sphereHost
 
+  exportType = if argv.csvTemplate then 'csv' else 'xml'
+
   orderExport = new OrderExport
     client: clientOptions
     export:
       fetchHours: argv.fetchHours
       standardShippingMethod: argv.standardShippingMethod
-      exportType: argv.exportType
+      exportType: exportType
       exportUnsyncedOnly: argv.exportUnsyncedOnly
       csvTemplate: argv.csvTemplate
 
