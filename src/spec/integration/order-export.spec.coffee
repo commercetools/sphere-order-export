@@ -47,6 +47,7 @@ describe 'Integration tests', ->
   , 20000 # 20sec
 
   it 'should export as XML', (done) ->
+    @orderExport._exportOptions.fetchHours = 1
     @orderExport.run()
     .then (xmlOrders) =>
       expectedOrder = _.find xmlOrders, (o) => o.id is @order.id
