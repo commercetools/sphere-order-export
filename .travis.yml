@@ -5,6 +5,7 @@ branches:
   except:
     - latest
     - production
+    - /^v[0-9]\.[0-9]\.[0-9]$/
 before_script:
   - npm install -g grunt-cli
   - ./create_config.sh
@@ -33,3 +34,4 @@ notifications:
     format: html
     on_success: change
     on_failure: change
+sudo: false
