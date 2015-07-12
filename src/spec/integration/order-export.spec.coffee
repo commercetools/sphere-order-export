@@ -58,6 +58,7 @@ describe 'Integration tests', ->
     .catch (err) -> done _.prettify err
 
   it 'should export as CSV', (done) ->
+    @orderExport._exportOptions.fetchHours = 1
     @orderExport._exportOptions.exportType = 'csv'
     @orderExport._exportOptions.csvTemplate = __dirname + '/../../data/template-order-simple.csv'
     @orderExport.run()
@@ -72,6 +73,7 @@ describe 'Integration tests', ->
         expect(parsed[1][4]).toBe ''
         done()
     .catch (err) -> done _.prettify err
+  , 10000 #10sec
 
   describe 'elastic.io', ->
 
