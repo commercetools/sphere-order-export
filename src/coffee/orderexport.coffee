@@ -101,7 +101,11 @@ class OrderExport
   _processXmlOrder: (order) ->
     # TODO: what if customObject is not found?
     # TODO: why not doing it also for CSV export?
-    @client.customObjects.byId("#{CONTAINER_PAYMENT}/#{order.id}").fetch()
+    customObjectId = if order.cart
+      order.cart.id
+    else
+      order.id
+    @client.customObjects.byId("#{CONTAINER_PAYMENT}/#{customObjectId}").fetch()
     .then (result) =>
       paymentInfo = result.body
       if order.customerId?
