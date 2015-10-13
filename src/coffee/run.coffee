@@ -117,7 +117,7 @@ ensureCredentials(argv)
     user_agent: "#{package_json.name} - #{package_json.version}"
   clientOptions.host = argv.sphereHost if argv.sphereHost
   clientOptions.protocol = argv.sphereProtocol if argv.sphereProtocol
-  if program.sphereAuthHost
+  if argv.sphereAuthHost
     clientOptions.oauth_host = argv.sphereAuthHost
     clientOptions.rejectUnauthorized = false
   clientOptions.oauth_protocol = argv.sphereAuthProtocol if argv.sphereAuthProtocol
