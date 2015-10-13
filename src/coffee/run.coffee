@@ -12,6 +12,7 @@ argv = require('optimist')
   .describe('projectKey', 'your SPHERE.IO project-key')
   .describe('clientId', 'your OAuth client id for the SPHERE.IO API')
   .describe('clientSecret', 'your OAuth client secret for the SPHERE.IO API')
+  .describe('accessToken', 'an OAuth access token for the SPHERE.IO API')
   .describe('sphereHost', 'SPHERE.IO API host to connect to')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name if order has none')
@@ -91,13 +92,24 @@ readJsonFromPath = (path) ->
   fs.readFileAsync(path, {encoding: 'utf-8'}).then (content) ->
     Promise.resolve JSON.parse(content)
 
-ProjectCredentialsConfig.create()
+ensureCredentials = (argv) ->
+  if argv.accessToken
+    Promise.resolve
+      config:
+        project_key: argv.projectKey
+      access_token: argv.accessToken
+  else
+    ProjectCredentialsConfig.create()
+    .then (credentials) ->
+      Promise.resolve
+        config: credentials.enrichCredentials
+          project_key: argv.projectKey
+          client_id: argv.clientId
+          client_secret: argv.clientSecret
+
+ensureCredentials(argv)
 .then (credentials) =>
-  clientOptions =
-    config: credentials.enrichCredentials
-      project_key: argv.projectKey
-      client_id: argv.clientId
-      client_secret: argv.clientSecret
+  clientOptions = _.extend credentials,
     timeout: argv.timeout
     user_agent: "#{package_json.name} - #{package_json.version}"
   clientOptions.host = argv.sphereHost if argv.sphereHost
