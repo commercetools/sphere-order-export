@@ -12,6 +12,7 @@ argv = require('optimist')
   .describe('projectKey', 'your SPHERE.IO project-key')
   .describe('clientId', 'your OAuth client id for the SPHERE.IO API')
   .describe('clientSecret', 'your OAuth client secret for the SPHERE.IO API')
+  .describe('accessToken', 'an OAuth access token for the SPHERE.IO API')
   .describe('sphereHost', 'SPHERE.IO API host to connect to')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name if order has none')
@@ -98,6 +99,7 @@ ProjectCredentialsConfig.create()
       project_key: argv.projectKey
       client_id: argv.clientId
       client_secret: argv.clientSecret
+    access_token: argv.accessToken
     timeout: argv.timeout
     user_agent: "#{package_json.name} - #{package_json.version}"
   clientOptions.host = argv.sphereHost if argv.sphereHost
