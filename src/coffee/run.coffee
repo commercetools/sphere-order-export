@@ -14,7 +14,9 @@ argv = require('optimist')
   .describe('clientSecret', 'your OAuth client secret for the SPHERE.IO API')
   .describe('accessToken', 'an OAuth access token for the SPHERE.IO API')
   .describe('sphereHost', 'SPHERE.IO API host to connect to')
-  .describe('sphereProtocol', 'SPHERE.IO API protocol to connecto to')
+  .describe('sphereProtocol', 'SPHERE.IO API protocol to connect to')
+  .describe('sphereAuthHost', 'SPHERE.IO OAuth host to connect to')
+  .describe('sphereAuthProtocol', 'SPHERE.IO OAuth protocol to connect to')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name if order has none')
   .describe('exportUnsyncedOnly', 'whether only unsynced orders will be exported or not')
@@ -115,6 +117,10 @@ ensureCredentials(argv)
     user_agent: "#{package_json.name} - #{package_json.version}"
   clientOptions.host = argv.sphereHost if argv.sphereHost
   clientOptions.protocol = argv.sphereProtocol if argv.sphereProtocol
+  if program.sphereAuthHost
+    clientOptions.oauth_host = argv.sphereAuthHost
+    clientOptions.rejectUnauthorized = false
+  clientOptions.oauth_protocol = argv.sphereAuthProtocol if argv.sphereAuthProtocol
 
   exportType = if argv.csvTemplate then 'csv' else 'xml'
 
