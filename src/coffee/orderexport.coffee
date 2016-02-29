@@ -79,6 +79,7 @@ class OrderExport
       @client.orders.all()
       .expand('lineItems[*].state[*].state')
       .expand('lineItems[*].supplyChannel')
+      .expand('discountCodes[*].discountCode')
       .expand('customerGroup')
       .last("#{@_exportOptions.fetchHours}h")
       .fetch()
