@@ -65,7 +65,7 @@ describe 'Integration tests', ->
     .then (csvData) =>
       @orderExport.csvMapping.parse csvData
       .then (parsed) ->
-        expect(parsed[0]).toEqual ['id', 'orderNumber', 'totalPrice', 'totalNet', 'totalGross']
+        expect(parsed[0]).toEqual ['id', 'orderNumber', 'totalPrice', 'totalNet', 'totalGross', 'discountCodes']
         expect(parsed[1][0]).toEqual jasmine.any(String)
         expect(parsed[1][1]).toBe ''
         expect(parsed[1][2]).toBe 'EUR 999'
