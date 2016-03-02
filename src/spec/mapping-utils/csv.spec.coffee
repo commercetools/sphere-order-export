@@ -50,6 +50,24 @@ describe 'Mapping utils - XML', ->
       .catch (err) -> done(_.prettify err)
       .done()
 
+    it 'should export discount codes', (done) ->
+      template =
+        """
+        id,orderNumber,totalPrice,totalNet,totalGross,discountCodes
+        """
+      expectedCSV =
+        """
+        id,orderNumber,totalPrice,totalNet,totalGross,discountCodes
+        abc,10001,USD 5950,USD 5000,USD 5950,code1;code2
+        xyz,10002,USD 2380,USD 2000,USD 2380,code3
+        """
+
+      @csvMapping.mapOrders(template, ordersJson)
+      .then (result) ->
+        expect(result).toBe expectedCSV
+        done()
+      .catch (err) -> done(_.prettify err)
+
     it 'export addresses', (done) ->
       template =
         """

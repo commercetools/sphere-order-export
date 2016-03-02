@@ -62,8 +62,13 @@ class CsvMapping
       when 'lineItems.variant.images' then [entry, formatImages]
       when 'lineItems.supplyChannel' then [entry, formatChannel]
       when 'customerGroup' then [entry, formatCustomerGroup]
+      when 'discountCodes' then [entry, formatDiscountCodes]
       else [entry]
 
+  formatDiscountCodes = (discountCodes) ->
+    return _.map(discountCodes, ({ discountCode: { obj: { code } } }) ->
+      return code
+    ).join(';')
   # TODO: Move method below to sphere-node-utils
   formatPrice = (price) ->
     if price?.value?

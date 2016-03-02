@@ -1,1 +1,1 @@
-id,orderNumber,totalPrice,totalNet,totalGross
+id,orderNumber,totalPrice,totalNet,totalGross,discountCodes
