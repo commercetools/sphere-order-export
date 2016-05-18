@@ -34,6 +34,7 @@ argv = require('optimist')
   .describe('logDir', 'directory to store logs')
   .describe('logSilent', 'use console to print messages')
   .describe('timeout', 'Set timeout for requests')
+  .describe('exportCSVAsStream', 'Exports CSV as stream (to use for performance reasons)')
   .default('fetchHours', 48) # let's keep it limited to 48h
   .default('standardShippingMethod', 'None')
   .default('exportUnsyncedOnly', true)
@@ -45,6 +46,7 @@ argv = require('optimist')
   .default('logSilent', false)
   .default('timeout', 60000)
   .default('sftpContinueOnProblems', false)
+  .default('exportCSVAsStream', false)
   .demand(['projectKey'])
   .argv
 
@@ -95,6 +97,18 @@ readJsonFromPath = (path) ->
   fs.readFileAsync(path, {encoding: 'utf-8'}).then (content) ->
     Promise.resolve JSON.parse(content)
 
+exportCSVAsStream = (csvFile, orderExport) ->
+  new Promise (resolve, reject) ->
+    output = fs.createWriteStream csvFile, {encoding: 'utf-8'}
+    output.on 'error', (error) -> reject error
+    output.on 'finish', -> resolve()
+    orderExport.runCSVAndStreamToFile (data) =>
+      logger.info("Writing orders chunk... to #{csvFile}")
+      output.write data
+      Promise.resolve()
+    .then () -> output.end()
+    .catch (e) -> reject(e)
+
 ensureCredentials = (argv) ->
   if argv.accessToken
     Promise.resolve
@@ -137,32 +151,43 @@ ensureCredentials(argv)
   .then (outputDir) =>
     logger.debug "Created output dir at #{outputDir}"
     @outputDir = outputDir
-    orderExport.run()
-  .then (data) =>
-    # TODO: xml export
-    # - one file for all (default)
-    # - one file for each order
-    @orderReferences = []
-    ts = (new Date()).getTime()
-    if exportType.toLowerCase() is 'csv'
+    if argv.exportCSVAsStream
+      logger.info "Exporting orders as stream."
       if argv.fileWithTimestamp
+        ts = (new Date()).getTime()
         fileName = "orders_#{ts}.csv"
       else
         fileName = 'orders.csv'
       csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
-      logger.info "Storing CSV export to '#{csvFile}'."
-      fs.writeFileAsync csvFile, data
+      exportCSVAsStream(csvFile, orderExport)
+
     else
-      logger.info "Storing #{_.size data} file(s) to '#{@outputDir}'."
-      Promise.map data, (entry) =>
-        content = entry.xml.end(pretty: true, indent: '  ', newline: '\n')
-        if argv.fileWithTimestamp
-          fileName = "#{entry.id}_#{ts}.xml"
+      orderExport.run()
+      .then (data) =>
+        # TODO: xml export
+        # - one file for all (default)
+        # - one file for each order
+        @orderReferences = []
+        ts = (new Date()).getTime()
+        if exportType.toLowerCase() is 'csv'
+          if argv.fileWithTimestamp
+            fileName = "orders_#{ts}.csv"
+          else
+            fileName = 'orders.csv'
+          csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
+          logger.info "Storing CSV export to '#{csvFile}'."
+          fs.writeFileAsync csvFile, data
         else
-          fileName = "#{entry.id}.xml"
-        @orderReferences.push name: fileName, entry: entry
-        fs.writeFileAsync "#{@outputDir}/#{fileName}", content
-      , {concurrency: 10}
+          logger.info "Storing #{_.size data} file(s) to '#{@outputDir}'."
+          Promise.map data, (entry) =>
+            content = entry.xml.end(pretty: true, indent: '  ', newline: '\n')
+            if argv.fileWithTimestamp
+              fileName = "#{entry.id}_#{ts}.xml"
+            else
+              fileName = "#{entry.id}.xml"
+            @orderReferences.push name: fileName, entry: entry
+            fs.writeFileAsync "#{@outputDir}/#{fileName}", content
+          , {concurrency: 10}
   .then =>
     {sftpCredentials, sftpHost, sftpUsername, sftpPassword} = argv
     if sftpCredentials or (sftpHost and sftpUsername and sftpPassword)

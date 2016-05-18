@@ -61,11 +61,32 @@ class OrderExport
       when 'xml' then @_fetchOrders().then (orders) => @xmlExport(orders)
       else Promise.reject "Undefined export type '#{@_exportOptions.exportType}', supported 'csv' or 'xml'"
 
+  runCSVAndStreamToFile: (writeToFile) ->
+    @_getCSVOrderTemplate()
+    .then (template) => @csvMapping._analyseTemplate(template)
+    .then ([header, mappings]) =>
+      # write first the header
+      writeToFile("#{header.join(',')}\n")
+      .then () =>
+        @client.orders
+        .expand('lineItems[*].state[*].state')
+        .expand('lineItems[*].supplyChannel')
+        .expand('discountCodes[*].discountCode')
+        .expand('customerGroup')
+        .last("#{@_exportOptions.fetchHours}h")
+        .process (payload) =>
+          orders = payload.body.results
+          rows = _.map orders, (order) => @csvMapping._mapOrder(order, mappings)
+          data = _.flatten rows, true
+          @csvMapping.toCSVWithoutHeader(data)
+          .then (exportedOrders) ->
+            # write chunk of data
+            writeToFile(exportedOrders)
+        , { accumulate: false }
+
   csvExport: (orders) ->
     # TODO: export all fields if no csvTemplate is defined?
-    throw new Error 'You need to provide a csv template for exporting order information' unless @_exportOptions.csvTemplate
-    fs.readFileAsync(@_exportOptions.csvTemplate, {encoding: 'utf-8'})
-    .then (content) => @csvMapping.mapOrders content, orders
+    @_getCSVOrderTemplate().then (content) => @csvMapping.mapOrders content, orders
 
   xmlExport: (orders) ->
     Promise.map orders, (order) => @_processXmlOrder order
@@ -135,5 +156,10 @@ class OrderExport
         externalId: filename
       ]
     @client.orders.byId(xmlOrder.id).update(data)
+
+  _getCSVOrderTemplate: () ->
+    unless @_exportOptions.csvTemplate
+      throw new Error 'You need to provide a csv template for exporting order information'
+    fs.readFileAsync(@_exportOptions.csvTemplate, {encoding: 'utf-8'})
 
 module.exports = OrderExport
