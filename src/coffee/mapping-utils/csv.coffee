@@ -121,4 +121,10 @@ class CsvMapping
       .on 'error', (error) -> reject error
       .to.string (asString) -> resolve asString
 
+  toCSVWithoutHeader: (data) ->
+    new Promise (resolve, reject) ->
+      Csv().from(data)
+      .on 'error', (error) -> reject error
+      .to.string (asString) -> resolve asString
+
 module.exports = CsvMapping
