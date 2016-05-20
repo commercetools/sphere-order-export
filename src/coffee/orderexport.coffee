@@ -73,6 +73,7 @@ class OrderExport
         .expand('lineItems[*].supplyChannel')
         .expand('discountCodes[*].discountCode')
         .expand('customerGroup')
+        .perPage(@_exportOptions.perPage)
         .last("#{@_exportOptions.fetchHours}h")
         .process (payload) =>
           orders = payload.body.results
