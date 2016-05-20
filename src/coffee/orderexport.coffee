@@ -103,6 +103,7 @@ class OrderExport
       .expand('lineItems[*].supplyChannel')
       .expand('discountCodes[*].discountCode')
       .expand('customerGroup')
+      .perPage(@_exportOptions.perPage)
       .last("#{@_exportOptions.fetchHours}h")
       .fetch()
     .then (result) =>
