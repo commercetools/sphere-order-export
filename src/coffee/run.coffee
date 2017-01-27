@@ -6,6 +6,9 @@ tmp = Promise.promisifyAll require('tmp')
 {ExtendedLogger, ProjectCredentialsConfig, Sftp} = require 'sphere-node-utils'
 package_json = require '../package.json'
 OrderExport = require './orderexport'
+csv = require 'csv-parser'
+
+CHANNEL_KEY = 'OrderXmlFileExport'
 
 argv = require('optimist')
   .usage('Usage: $0 --projectKey key --clientId id --clientSecret secret')
@@ -24,6 +27,7 @@ argv = require('optimist')
   .describe('targetDir', 'the folder where exported files are saved')
   .describe('useExportTmpDir', 'whether to use a system tmp folder to store exported files')
   .describe('csvTemplate', 'CSV template to define the structure of the export')
+  .describe('createSyncActions', 'upload syncInfo update actions for orders exported (only supports sftp upload')
   .describe('fileWithTimestamp', 'whether exported file should contain a timestamp')
   .describe('sftpCredentials', 'the path to a JSON file where to read the credentials from')
   .describe('sftpHost', 'the SFTP host (overwrite value in sftpCredentials JSON, if given)')
@@ -45,6 +49,7 @@ argv = require('optimist')
   .default('fileWithTimestamp', false)
   .default('logLevel', 'info')
   .default('logDir', '.')
+  .default('createSyncActions', false)
   .default('logSilent', false)
   .default('timeout', 60000)
   .default('sftpContinueOnProblems', false)
@@ -128,6 +133,29 @@ ensureCredentials = (argv) ->
           client_id: argv.clientId
           client_secret: argv.clientSecret
 
+createSyncOrders = (fileName) ->
+  logger.debug "Creating order objects with sync Information"
+  new Promise (resolve, reject) ->
+    orders = []
+    fs.createReadStream(fileName)
+      .pipe(csv())
+      .on('data', (data) ->
+        order =
+          orderNumber: data.orderNumber
+          syncInfo: [{
+            externalId: fileName
+            channel: CHANNEL_KEY
+          }]
+        orders.push(order)
+      )
+      .on('end', () ->
+        logger.info "SyncInfo generated #{JSON.stringify(orders)}"
+        resolve(orders)
+      )
+      .on 'error', (err) ->
+        reject(err)
+
+
 ensureCredentials(argv)
 .then (credentials) =>
   clientOptions = _.extend credentials,
@@ -181,6 +209,7 @@ ensureCredentials(argv)
             fileName = 'orders.csv'
           csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
           logger.info "Storing CSV export to '#{csvFile}'."
+          @orderReferences.push fileName: csvFile, entry: data
           fs.writeFileAsync csvFile, data
         else
           logger.info "Storing #{_.size data} file(s) to '#{@outputDir}'."
@@ -226,13 +255,21 @@ ensureCredentials(argv)
               logger.debug "Uploading #{@outputDir}/#{filename}"
               sftpClient.safePutFile(sftp, "#{@outputDir}/#{filename}", "#{sftpTarget}/#{filename}")
               .then =>
-                xml = _.find @orderReferences, (r) -> r.name is filename
-                if xml
-                  logger.debug "About to sync order #{filename}"
-                  orderExport.syncOrder xml.entry, filename
+                if exportType.toLowerCase() is 'csv' and argv.createSyncActions
+                  createSyncOrders(@orderReferences[0].fileName)
+                    .then (orders) =>
+                      orderJsonFile = "tobeSyncOrders.json" # Can be renamed??
+                      fs.writeFileAsync("#{@outputDir}/#{orderJsonFile}", JSON.stringify(orders,null,2)).then =>
+                        logger.debug "Uploading #{@outputDir}/#{orderJsonFile}"
+                        sftpClient.safePutFile(sftp, "#{@outputDir}/#{orderJsonFile}", "#{sftpTarget}/#{orderJsonFile}")
                 else
-                  logger.warn "Not able to create syncInfo for #{filename} as xml for that file was not found"
-                  Promise.resolve()
+                  xml = _.find @orderReferences, (r) -> r.name is filename
+                  if xml
+                    logger.debug "About to sync order #{filename}"
+                    orderExport.syncOrder xml.entry, filename
+                  else
+                    logger.warn "Not able to create syncInfo for #{filename} as xml for that file was not found"
+                    Promise.resolve()
               .catch (err) ->
                 if argv.sftpContinueOnProblems
                   filesSkipped++
