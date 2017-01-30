@@ -155,7 +155,6 @@ createSyncOrders = (fileName) ->
       .on 'error', (err) ->
         reject(err)
 
-
 ensureCredentials(argv)
 .then (credentials) =>
   clientOptions = _.extend credentials,
@@ -258,10 +257,18 @@ ensureCredentials(argv)
                 if exportType.toLowerCase() is 'csv' and argv.createSyncActions
                   createSyncOrders(@orderReferences[0].fileName)
                     .then (orders) =>
-                      orderJsonFile = "tobeSyncOrders.json" # Can be renamed??
-                      fs.writeFileAsync("#{@outputDir}/#{orderJsonFile}", JSON.stringify(orders,null,2)).then =>
-                        logger.debug "Uploading #{@outputDir}/#{orderJsonFile}"
-                        sftpClient.safePutFile(sftp, "#{@outputDir}/#{orderJsonFile}", "#{sftpTarget}/#{orderJsonFile}")
+                      if orders.length
+                        if argv.fileWithTimestamp
+                          ts = (new Date()).getTime()
+                          ordersFileJSON = "orders_sync_#{ts}.json"
+                        else
+                          ordersFileJSON = 'orders_sync.json'
+                        fs.writeFileAsync("#{@outputDir}/#{ordersFileJSON}", JSON.stringify(orders,null,2)).then =>
+                          logger.debug "Uploading #{@outputDir}/#{ordersFileJSON}"
+                          sftpClient.safePutFile(sftp, "#{@outputDir}/#{ordersFileJSON}", "#{sftpTarget}/#{ordersFileJSON}")
+                      else
+                        logger.debug "No orders: #{JSON.stringify(orders, null, 2)} exported, no orders sync action to be set."
+                        Promise.resolve()
                 else
                   xml = _.find @orderReferences, (r) -> r.name is filename
                   if xml
