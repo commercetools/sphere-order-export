@@ -78,7 +78,7 @@ module.exports = (grunt) ->
       coverage:
         command: 'istanbul cover jasmine-node --forceExit --captureExceptions test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage'
       jasmine:
-        command: 'jasmine-node --verbose --captureExceptions test'
+        command: './node_modules/.bin/jasmine-node --verbose --captureExceptions test'
       publish:
         command: 'npm publish'
 
