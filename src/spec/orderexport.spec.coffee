@@ -10,11 +10,25 @@ unsyncedOrders = (channelId) -> [
   {id: 'ccc', syncInfo: [{channel: {typeId: 'channel', id: channelId}}]} # synced
 ]
 
+createClientMock = () ->
+  return {
+    params: []
+    where: (cond) ->
+      this.params.push(cond)
+      this
+    last: (cond) ->
+      this.params.push(cond)
+      this
+  }
+
+
 describe 'OrderExport', ->
 
   beforeEach ->
     @orderExport = new OrderExport client: Config
     expect(@orderExport._exportOptions).toEqual
+      createdFrom: null
+      createdTo: null
       fetchHours: 48
       standardShippingMethod: 'None'
       exportType: 'xml'
@@ -77,3 +91,43 @@ describe 'OrderExport', ->
           id: @orderExportChannel.id
         externalId: externalId
       ]
+
+  it '#_addDateOffset - default', ->
+    client = createClientMock()
+    client = @orderExport._addDateOffset(client)
+    expect(client.params).toEqual ['48h']
+
+  it '#_addDateOffset - time offset', ->
+    client = createClientMock()
+    _.assign @orderExport._exportOptions,
+      fetchHours: 50
+    client = @orderExport._addDateOffset(client)
+    expect(client.params).toEqual ['50h']
+
+  it '#_addDateOffset - time offset with createdTo limit', ->
+    client = createClientMock()
+    _.assign @orderExport._exportOptions,
+      fetchHours: 50
+      createdTo: '2001-09-11T14:00'
+    client = @orderExport._addDateOffset(client)
+    expect(client.params).toEqual [ 'createdAt <= "2001-09-11T14:00"' ]
+
+  it '#_addDateOffset - createdTo and createdFrom limits', ->
+    client = createClientMock()
+    _.assign @orderExport._exportOptions,
+      createdFrom: '2001-09-01T14:00'
+      createdTo: '2001-09-11T14:00'
+    client = @orderExport._addDateOffset(client)
+    expect(client.params).toEqual [
+      'createdAt <= "2001-09-11T14:00"',
+      'createdAt >= "2001-09-01T14:00"'
+    ]
+
+  it '#_addDateOffset - createdFrom limit', ->
+    client = createClientMock()
+    _.assign @orderExport._exportOptions,
+      createdFrom: '2001-09-01T14:00'
+    client = @orderExport._addDateOffset(client)
+    expect(client.params).toEqual [
+      'createdAt >= "2001-09-01T14:00"'
+    ]

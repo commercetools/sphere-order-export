@@ -21,6 +21,8 @@ argv = require('optimist')
   .describe('sphereAuthHost', 'SPHERE.IO OAuth host to connect to')
   .describe('sphereAuthProtocol', 'SPHERE.IO OAuth protocol to connect to')
   .describe('fetchHours', 'Number of hours to fetch modified orders')
+  .describe('createdFrom', 'UTC datetime from when should orders be fetched')
+  .describe('createdTo', 'UTC datetime until when should orders be fetched')
   .describe('perPage', 'Number of orders to be fetched per page')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name if order has none')
   .describe('exportUnsyncedOnly', 'whether only unsynced orders will be exported or not')
@@ -172,6 +174,8 @@ ensureCredentials(argv)
   orderExport = new OrderExport
     client: clientOptions
     export:
+      createdFrom: argv.createdFrom
+      createdTo: argv.createdTo
       fetchHours: argv.fetchHours
       perPage: argv.perPage
       standardShippingMethod: argv.standardShippingMethod

@@ -19,6 +19,44 @@ $ npm install -g sphere-order-export
 $ order-export
 ```
 
+## General usage
+```$xslt
+Usage: order-export --projectKey key
+
+Options:
+  --projectKey              your SPHERE.IO project-key                                                     [required]
+  --clientId                your OAuth client id for the SPHERE.IO API
+  --clientSecret            your OAuth client secret for the SPHERE.IO API
+  --accessToken             an OAuth access token for the SPHERE.IO API
+  --sphereHost              SPHERE.IO API host to connect to
+  --sphereProtocol          SPHERE.IO API protocol to connect to
+  --sphereAuthHost          SPHERE.IO OAuth host to connect to
+  --sphereAuthProtocol      SPHERE.IO OAuth protocol to connect to
+  --fetchHours              Number of hours to fetch modified orders                                       [default: 48]
+  --createdFrom             UTC datetime from when should orders be fetched                                    
+  --createdTo               UTC datetime until when should orders be fetched                               [default: current timestamp]
+  --perPage                 Number of orders to be fetched per page                                        [default: 100]
+  --standardShippingMethod  Allows to define the fallback shipping method name if order has none           [default: "None"]
+  --exportUnsyncedOnly      whether only unsynced orders will be exported or not                           [default: true]
+  --targetDir               the folder where exported files are saved                                      [default: "/Users/xjunajan/dev/commercetools/sphere-order-export/exports"]
+  --useExportTmpDir         whether to use a system tmp folder to store exported files                     [default: false]
+  --csvTemplate             CSV template to define the structure of the export
+  --createSyncActions       upload syncInfo update actions for orders exported (only supports sftp upload  [default: false]
+  --fileWithTimestamp       whether exported file should contain a timestamp                               [default: false]
+  --sftpCredentials         the path to a JSON file where to read the credentials from
+  --sftpHost                the SFTP host (overwrite value in sftpCredentials JSON, if given)
+  --sftpUsername            the SFTP username (overwrite value in sftpCredentials JSON, if given)
+  --sftpPassword            the SFTP password (overwrite value in sftpCredentials JSON, if given)
+  --sftpTarget              path in the SFTP server to where to move the worked files
+  --sftpContinueOnProblems  ignore errors when processing a file and continue with the next one            [default: false]
+  --logLevel                log level for file logging                                                     [default: "info"]
+  --logDir                  directory to store logs                                                        [default: "."]
+  --logSilent               use console to print messages                                                  [default: false]
+  --timeout                 Set timeout for requests                                                       [default: 60000]
+  --exportCSVAsStream       Exports CSV as stream (to use for performance reasons)                         [default: false]
+```
+
+
 ### SFTP
 Exported orders (XML or CSV) can be automatically uploaded to an SFTP server.
 
