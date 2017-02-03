@@ -55,7 +55,7 @@ Options:
   --timeout                 Set timeout for requests                                                       [default: 60000]
   --exportCSVAsStream       Exports CSV as stream (to use for performance reasons)                         [default: false]
 ```
-
+Default value for a `fetchHours` parameter is a time offset of 48 hours. Parameters `createdFrom` or `createdTo` formatted as a UTC date and time in [ISO 8601 format](https://dev.commercetools.com/http-api-types.html#datetime) can help you to export orders in a specified time range.
 
 ### SFTP
 Exported orders (XML or CSV) can be automatically uploaded to an SFTP server.
