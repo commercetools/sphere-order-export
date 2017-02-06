@@ -16,7 +16,7 @@ describe 'Integration tests', ->
     @orderExport = new OrderExport client: Config
 
     @orderExport.client.channels.ensure(CHANNEL_KEY, CHANNEL_ROLE)
-    .then (result) =>
+    .then =>
       # get a tax category required for setting up shippingInfo
       #   (simply returning first found)
       @orderExport.client.taxCategories.save SpecHelper.taxCategoryMock()
@@ -42,7 +42,7 @@ describe 'Integration tests', ->
     .then (result) =>
       @order = result.body
       @orderExport.client.customObjects.save SpecHelper.orderPaymentInfo(CONTAINER_PAYMENT, @order.id)
-    .then (result) -> done()
+    .then -> done()
     .catch (err) -> done _.prettify err
   , 20000 # 20sec
 
@@ -73,6 +73,15 @@ describe 'Integration tests', ->
         expect(parsed[1][4]).toBe ''
         done()
     .catch (err) -> done _.prettify err
+  , 10000 #10sec
+
+  it 'should not export CSV into file without template', (done) ->
+    try
+      @orderExport.runCSVAndStreamToFile 'abcd.csv'
+      done 'Should throw an error because of a missing template'
+    catch err
+      expect(err.toString()).toBe 'Error: You need to provide a csv template for exporting order information'
+      done()
   , 10000 #10sec
 
   describe 'elastic.io', ->
