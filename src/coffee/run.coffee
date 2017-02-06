@@ -137,16 +137,19 @@ createSyncOrders = (fileName) ->
   logger.debug "Creating order objects with sync Information"
   new Promise (resolve, reject) ->
     orders = []
+    orderNumberMap = {}
     fs.createReadStream(fileName)
       .pipe(csv())
       .on('data', (data) ->
-        order =
-          orderNumber: data.orderNumber
-          syncInfo: [{
-            externalId: fileName
-            channel: CHANNEL_KEY
-          }]
-        orders.push(order)
+        if data.orderNumber and not orderNumberMap[data.orderNumber]
+          order =
+            orderNumber: data.orderNumber
+            syncInfo: [{
+              externalId: fileName
+              channel: CHANNEL_KEY
+            }]
+          orders.push(order)
+          orderNumberMap[data.orderNumber] = true
       )
       .on('end', () ->
         logger.info "SyncInfo generated #{JSON.stringify(orders)}"
