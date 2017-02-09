@@ -284,7 +284,7 @@ ensureCredentials(argv)
               .catch (err) ->
                 if argv.sftpContinueOnProblems
                   filesSkipped++
-                  logger.warn err, "There was an error processing the file #{file}, skipping and continue"
+                  logger.warn err, "There was an error processing the file #{filename}, skipping and continue"
                   Promise.resolve()
                 else
                   Promise.reject err
