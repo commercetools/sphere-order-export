@@ -61,6 +61,24 @@ describe 'OrderExport', ->
     unsyncedOrders = @orderExport._unsyncedOnly(unsyncedOrders(@orderExportChannel.id), @orderExportChannel)
     expect(_.size(unsyncedOrders)).toEqual 2
 
+  it 'should set ordersExported flag to true if orders is returned', (done) ->
+    spyOn(@orderExport.client.orders, 'fetch').andCallFake => Promise.resolve
+      body:
+        results: unsyncedOrders(@orderExport.channel.id)
+    @orderExport._fetchOrders()
+      .then () =>
+        expect(@orderExport.ordersExported).toBeTruthy()
+        done()
+
+  it 'should set ordersExported flag to false if no orders is returned', (done) ->
+    spyOn(@orderExport.client.orders, 'fetch').andCallFake => Promise.resolve
+      body:
+        results: []
+    @orderExport._fetchOrders()
+      .then () =>
+        expect(@orderExport.ordersExported).toBeFalsy()
+        done()
+
   it '#_processXmlOrder', -> # TODO
 
   it '#syncOrder', ->
