@@ -255,6 +255,9 @@ ensureCredentials(argv)
             filesSkipped = 0
             Promise.map files, (filename) =>
               logger.debug "Uploading #{@outputDir}/#{filename}"
+              if not orderExport.ordersExported
+                return Promise.resolve()
+
               sftpClient.safePutFile(sftp, "#{@outputDir}/#{filename}", "#{sftpTarget}/#{filename}")
               .then =>
                 if exportType.toLowerCase() is 'csv' and argv.createSyncActions
