@@ -99,7 +99,12 @@ class OrderExport
       @channel = result.body
 
       # TODO: query also for syncInfo? -> not well supported by the API at the moment
-      @client.orders.all()
+      if @_exportOptions.where
+        @client.orders.where(@_exportOptions.where)
+      else
+        @client.orders.all()
+
+      @client.orders
       .expand('lineItems[*].state[*].state')
       .expand('lineItems[*].supplyChannel')
       .expand('discountCodes[*].discountCode')

@@ -81,6 +81,39 @@ describe 'OrderExport', ->
 
   it '#_processXmlOrder', -> # TODO
 
+  it '#_fetchOrders should accept and filter by where parameter if present', (done) ->
+    @orderExport._exportOptions.where = "customerId=\"2878df1a-ea36-4434-a473-a8adcf1fc385\""
+    spyOn(@orderExport.client.orders, 'where').andCallThrough()
+    spyOn(@orderExport.client.orders, '_get').andCallFake => Promise.resolve
+      body:
+        results: unsyncedOrders(@orderExport.channel.id)
+    @orderExport._fetchOrders()
+      .then () =>
+        expect(@orderExport.client.orders._get).toHaveBeenCalled()
+        expect(
+          @orderExport.client.orders._get.mostRecentCall.args[0]
+        ).toMatch(
+          encodeURIComponent('customerId="2878df1a-ea36-4434-a473-a8adcf1fc385"')
+        )
+        done()
+      .catch(done)
+
+  it '#_fetchOrders should not use the where parameter if not present', (done) ->
+    spyOn(@orderExport.client.orders, 'where').andCallThrough()
+    spyOn(@orderExport.client.orders, '_paged').andCallFake => Promise.resolve
+      body:
+        results: unsyncedOrders(@orderExport.channel.id)
+    @orderExport._fetchOrders()
+      .then () =>
+        expect(@orderExport.client.orders._paged).toHaveBeenCalled()
+        expect(
+          @orderExport.client.orders._paged.mostRecentCall.args[0]
+        ).not.toMatch(
+          encodeURIComponent('customerId="2878df1a-ea36-4434-a473-a8adcf1fc385"')
+        )
+        done()
+      .catch(done)
+
   it '#syncOrder', ->
     externalId = 'filename.txt'
     spyOn(@orderExport.client.orders, 'update')
