@@ -15,7 +15,6 @@ describe 'OrderExport', ->
   beforeEach ->
     @orderExport = new OrderExport client: Config
     expect(@orderExport._exportOptions).toEqual
-      fetchHours: 48
       standardShippingMethod: 'None'
       exportType: 'xml'
       exportUnsyncedOnly: true
@@ -94,6 +93,23 @@ describe 'OrderExport', ->
           @orderExport.client.orders._get.mostRecentCall.args[0]
         ).toMatch(
           encodeURIComponent('customerId="2878df1a-ea36-4434-a473-a8adcf1fc385"')
+        )
+        done()
+      .catch(done)
+
+  it '#_fetchOrders should not use the `last` option', (done) ->
+    @orderExport._exportOptions.where = "customerId=\"2878df1a-ea36-4434-a473-a8adcf1fc385\""
+    spyOn(@orderExport.client.orders, 'where').andCallThrough()
+    spyOn(@orderExport.client.orders, '_get').andCallFake => Promise.resolve
+      body:
+        results: unsyncedOrders(@orderExport.channel.id)
+    @orderExport._fetchOrders()
+      .then () =>
+        expect(@orderExport.client.orders._get).toHaveBeenCalled()
+        expect(
+          @orderExport.client.orders._get.mostRecentCall.args[0]
+        ).not.toMatch(
+          encodeURIComponent('lastModifiedAt >')
         )
         done()
       .catch(done)

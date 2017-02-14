@@ -16,7 +16,6 @@ class OrderExport
 
   constructor: (options = {}) ->
     @_exportOptions = _.defaults (options.export or {}),
-      fetchHours: 48
       standardShippingMethod: 'None'
       exportType: 'xml'
       exportUnsyncedOnly: true
@@ -75,7 +74,6 @@ class OrderExport
         .expand('discountCodes[*].discountCode')
         .expand('customerGroup')
         .perPage(@_exportOptions.perPage)
-        .last("#{@_exportOptions.fetchHours}h")
         .process (payload) =>
           orders = payload.body.results
           rows = _.map orders, (order) => @csvMapping._mapOrder(order, mappings)
@@ -109,7 +107,6 @@ class OrderExport
       .expand('lineItems[*].supplyChannel')
       .expand('discountCodes[*].discountCode')
       .expand('customerGroup')
-      .last("#{@_exportOptions.fetchHours}h")
       .fetch()
     .then (result) =>
       allOrders = result.body.results
