@@ -58,8 +58,8 @@ describe 'OrderExport', ->
     .catch (e) -> done e
 
   it '#_unsyncedOnly', ->
-    unsyncedOrders = @orderExport._unsyncedOnly(unsyncedOrders(@orderExportChannel.id), @orderExportChannel)
-    expect(_.size(unsyncedOrders)).toEqual 2
+    _unsyncedOrders = @orderExport._unsyncedOnly(unsyncedOrders(@orderExportChannel.id), @orderExportChannel)
+    expect(_.size(_unsyncedOrders)).toEqual 2
 
   it 'should set ordersExported flag to true if orders is returned', (done) ->
     spyOn(@orderExport.client.orders, 'fetch').andCallFake => Promise.resolve
