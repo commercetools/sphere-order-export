@@ -16,6 +16,8 @@ class OrderExport
 
   constructor: (options = {}) ->
     @_exportOptions = _.defaults (options.export or {}),
+      createdFrom: null
+      createdTo: null
       fetchHours: 48
       standardShippingMethod: 'None'
       exportType: 'xml'
@@ -62,6 +64,25 @@ class OrderExport
       when 'xml' then @_fetchOrders().then (orders) => @xmlExport(orders)
       else Promise.reject "Undefined export type '#{@_exportOptions.exportType}', supported 'csv' or 'xml'"
 
+  _addDateOffset: (clientService) ->
+    if @_exportOptions.createdTo
+      clientService.where("createdAt <= \"#{@_exportOptions.createdTo}\"")
+
+    if @_exportOptions.createdFrom
+      clientService.where("createdAt >= \"#{@_exportOptions.createdFrom}\"")
+
+    if not @_exportOptions.createdFrom and not @_exportOptions.createdTo
+      clientService.last("#{@_exportOptions.fetchHours}h")
+
+    clientService
+
+  _getClientService: () ->
+    @client.orders
+      .expand('lineItems[*].state[*].state')
+      .expand('lineItems[*].supplyChannel')
+      .expand('discountCodes[*].discountCode')
+      .expand('customerGroup')
+
   runCSVAndStreamToFile: (writeToFile) ->
     @_getCSVOrderTemplate()
     .then (template) => @csvMapping._analyseTemplate(template)
@@ -69,13 +90,11 @@ class OrderExport
       # write first the header
       writeToFile("#{header.join(',')}\n")
       .then () =>
-        @client.orders
-        .expand('lineItems[*].state[*].state')
-        .expand('lineItems[*].supplyChannel')
-        .expand('discountCodes[*].discountCode')
-        .expand('customerGroup')
+        clientService = @_getClientService()
+        clientService = @_addDateOffset(clientService)
+
+        clientService
         .perPage(@_exportOptions.perPage)
-        .last("#{@_exportOptions.fetchHours}h")
         .process (payload) =>
           orders = payload.body.results
           rows = _.map orders, (order) => @csvMapping._mapOrder(order, mappings)
@@ -99,12 +118,10 @@ class OrderExport
       @channel = result.body
 
       # TODO: query also for syncInfo? -> not well supported by the API at the moment
-      @client.orders.all()
-      .expand('lineItems[*].state[*].state')
-      .expand('lineItems[*].supplyChannel')
-      .expand('discountCodes[*].discountCode')
-      .expand('customerGroup')
-      .last("#{@_exportOptions.fetchHours}h")
+      clientService = @_getClientService().all()
+      clientService = @_addDateOffset(clientService)
+
+      clientService
       .fetch()
     .then (result) =>
       allOrders = result.body.results
