@@ -47,6 +47,7 @@ describe 'Integration tests', ->
   , 20000 # 20sec
 
   it 'should export as XML', (done) ->
+    @orderExport._exportOptions.where = "id = \"#{@order.id}\""
     @orderExport.run()
     .then (xmlOrders) =>
       expectedOrder = _.find xmlOrders, (o) => o.id is @order.id
@@ -57,6 +58,7 @@ describe 'Integration tests', ->
     .catch (err) -> done _.prettify err
 
   it 'should export as CSV', (done) ->
+    @orderExport._exportOptions.where = "id = \"#{@order.id}\""
     @orderExport._exportOptions.exportType = 'csv'
     @orderExport._exportOptions.csvTemplate = __dirname + '/../../data/template-order-simple.csv'
     @orderExport.run()
