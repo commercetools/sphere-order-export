@@ -12,8 +12,6 @@ before_script:
   - ./create_config.sh
 script:
   - npm test
-  - 'node test/helper-import && ./bin/order-export --projectKey ${SPHERE_PROJECT_KEY} --clientId ${SPHERE_CLIENT_ID} --clientSecret ${SPHERE_CLIENT_SECRET} --sftpHost ${SFTP_HOST} --sftpUsername ${SFTP_USERNAME} --sftpPassword ${SFTP_PASSWORD} --sftpTarget ${SFTP_TARGET} --sftpContinueOnProblems true --fileWithTimestamp true'
-  - 'node test/helper-import && ./bin/order-export --projectKey ${SPHERE_PROJECT_KEY} --clientId ${SPHERE_CLIENT_ID} --clientSecret ${SPHERE_CLIENT_SECRET} --targetDir foo --fileWithTimestamp true && ls foo | grep -qE "[[:alnum:]]+_[[:digit:]]+\.xml"'
   - './bin/order-export --projectKey ${SPHERE_PROJECT_KEY} --clientId ${SPHERE_CLIENT_ID} --clientSecret ${SPHERE_CLIENT_SECRET} --targetDir foo --fileWithTimestamp true --exportType csv --csvTemplate data/template-order-simple.csv && ls foo | grep -qE "orders_[[:digit:]]+\.csv"'
   - './bin/order-export --projectKey ${SPHERE_PROJECT_KEY} --clientId ${SPHERE_CLIENT_ID} --clientSecret ${SPHERE_CLIENT_SECRET} --targetDir foo --fileWithTimestamp true --exportType csv --csvTemplate data/template-order-addresses.csv && ls foo | grep -qE "orders_[[:digit:]]+\.csv"'
   - './bin/order-export --projectKey ${SPHERE_PROJECT_KEY} --clientId ${SPHERE_CLIENT_ID} --clientSecret ${SPHERE_CLIENT_SECRET} --targetDir foo --fileWithTimestamp true --exportType csv --csvTemplate data/template-order-lineitems.csv && ls foo | grep -qE "orders_[[:digit:]]+\.csv"'
