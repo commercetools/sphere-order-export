@@ -23,6 +23,7 @@ class OrderExport
     @client = new SphereClient options.client
     @xmlMapping = new XmlMapping @_exportOptions
     @csvMapping = new CsvMapping @_exportOptions
+    @ordersExported = false # Flag to avoid empty file being generated if no order is exported
 
   elasticio: (msg, cfg, next, snapshot) ->
     if _.isEmpty msg or _.isEmpty msg.body
@@ -108,8 +109,13 @@ class OrderExport
     .then (result) =>
       allOrders = result.body.results
       if @_exportOptions.exportUnsyncedOnly
-        Promise.resolve @_unsyncedOnly(allOrders, @channel)
+        _unSyncedOrders = @_unsyncedOnly(allOrders, @channel)
+        if _unSyncedOrders.length
+          @ordersExported = true
+        Promise.resolve _unSyncedOrders
       else
+        if allOrders.length
+          @ordersExported = true
         Promise.resolve allOrders
 
   _unsyncedOnly: (orders, channel) ->
