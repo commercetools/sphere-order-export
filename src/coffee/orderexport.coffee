@@ -16,7 +16,6 @@ class OrderExport
 
   constructor: (options = {}) ->
     @_exportOptions = _.defaults (options.export or {}),
-      fetchHours: 48
       standardShippingMethod: 'None'
       exportType: 'xml'
       exportUnsyncedOnly: true
@@ -75,7 +74,6 @@ class OrderExport
         .expand('discountCodes[*].discountCode')
         .expand('customerGroup')
         .perPage(@_exportOptions.perPage)
-        .last("#{@_exportOptions.fetchHours}h")
         .process (payload) =>
           orders = payload.body.results
           rows = _.map orders, (order) => @csvMapping._mapOrder(order, mappings)
@@ -99,12 +97,16 @@ class OrderExport
       @channel = result.body
 
       # TODO: query also for syncInfo? -> not well supported by the API at the moment
-      @client.orders.all()
+      if @_exportOptions.where
+        @client.orders.where(@_exportOptions.where)
+      else
+        @client.orders.all()
+
+      @client.orders
       .expand('lineItems[*].state[*].state')
       .expand('lineItems[*].supplyChannel')
       .expand('discountCodes[*].discountCode')
       .expand('customerGroup')
-      .last("#{@_exportOptions.fetchHours}h")
       .fetch()
     .then (result) =>
       allOrders = result.body.results

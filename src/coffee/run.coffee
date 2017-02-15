@@ -20,7 +20,6 @@ argv = require('optimist')
   .describe('sphereProtocol', 'SPHERE.IO API protocol to connect to')
   .describe('sphereAuthHost', 'SPHERE.IO OAuth host to connect to')
   .describe('sphereAuthProtocol', 'SPHERE.IO OAuth protocol to connect to')
-  .describe('fetchHours', 'Number of hours to fetch modified orders')
   .describe('perPage', 'Number of orders to be fetched per page')
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name if order has none')
   .describe('exportUnsyncedOnly', 'whether only unsynced orders will be exported or not')
@@ -35,12 +34,12 @@ argv = require('optimist')
   .describe('sftpPassword', 'the SFTP password (overwrite value in sftpCredentials JSON, if given)')
   .describe('sftpTarget', 'path in the SFTP server to where to move the worked files')
   .describe('sftpContinueOnProblems', 'ignore errors when processing a file and continue with the next one')
+  .describe('where', 'where predicate used to filter orders exported. More info here http://dev.commercetools.com/http-api.html#predicates')
   .describe('logLevel', 'log level for file logging')
   .describe('logDir', 'directory to store logs')
   .describe('logSilent', 'use console to print messages')
   .describe('timeout', 'Set timeout for requests')
   .describe('exportCSVAsStream', 'Exports CSV as stream (to use for performance reasons)')
-  .default('fetchHours', 48) # let's keep it limited to 48h
   .default('perPage', 100)
   .default('standardShippingMethod', 'None')
   .default('exportUnsyncedOnly', true)
@@ -175,12 +174,12 @@ ensureCredentials(argv)
   orderExport = new OrderExport
     client: clientOptions
     export:
-      fetchHours: argv.fetchHours
       perPage: argv.perPage
       standardShippingMethod: argv.standardShippingMethod
       exportType: exportType
       exportUnsyncedOnly: argv.exportUnsyncedOnly
       csvTemplate: argv.csvTemplate
+      where: argv.where
 
   ensureExportDir()
   .then (outputDir) =>
