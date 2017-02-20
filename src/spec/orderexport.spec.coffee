@@ -97,6 +97,47 @@ describe 'OrderExport', ->
         done()
       .catch(done)
 
+  it '#runCSVAndStreamToFile should accept and filter by where parameter if present', (done) ->
+    callback = () -> Promise.resolve()
+    @orderExport._exportOptions.where = 'customerId="2878df1a-ea36-4434-a473-a8adcf1fc385"'
+    @orderExport._getCSVOrderTemplate = () ->
+      Promise.resolve('id,customerEmail')
+    spyOn(@orderExport.client.orders, 'where').andCallThrough()
+    spyOn(@orderExport.client.orders, '_get').andCallFake => Promise.resolve
+      body:
+        results: unsyncedOrders(@orderExport.channel.id)
+
+    @orderExport.runCSVAndStreamToFile(callback)
+      .then () =>
+        expect(@orderExport.client.orders._get).toHaveBeenCalled()
+        expect(
+          @orderExport.client.orders._get.mostRecentCall.args[0]
+        ).toMatch(
+          encodeURIComponent('customerId="2878df1a-ea36-4434-a473-a8adcf1fc385"')
+        )
+        done()
+      .catch(done)
+
+  it '#runCSVAndStreamToFile should not use the where parameter if not present', (done) ->
+    callback = () -> Promise.resolve()
+    @orderExport._getCSVOrderTemplate = () ->
+      Promise.resolve('id,customerEmail')
+    spyOn(@orderExport.client.orders, 'where').andCallThrough()
+    spyOn(@orderExport.client.orders, '_get').andCallFake => Promise.resolve
+      body:
+        results: unsyncedOrders(@orderExport.channel.id)
+
+    @orderExport.runCSVAndStreamToFile(callback)
+      .then () =>
+        expect(@orderExport.client.orders._get).toHaveBeenCalled()
+        expect(
+          @orderExport.client.orders._get.mostRecentCall.args[0]
+        ).not.toMatch(
+          encodeURIComponent('customerId="2878df1a-ea36-4434-a473-a8adcf1fc385"')
+        )
+        done()
+      .catch(done)
+
   it '#_fetchOrders should not use the `last` option', (done) ->
     @orderExport._exportOptions.where = "customerId=\"2878df1a-ea36-4434-a473-a8adcf1fc385\""
     spyOn(@orderExport.client.orders, 'where').andCallThrough()

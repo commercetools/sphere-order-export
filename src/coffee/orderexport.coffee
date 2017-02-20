@@ -68,6 +68,9 @@ class OrderExport
       # write first the header
       writeToFile("#{header.join(',')}\n")
       .then () =>
+        if @_exportOptions.where
+          @client.orders.where(@_exportOptions.where)
+
         @client.orders
         .expand('lineItems[*].state[*].state')
         .expand('lineItems[*].supplyChannel')
