@@ -100,8 +100,7 @@ describe 'OrderExport', ->
   it '#runCSVAndStreamToFile should accept and filter by where parameter if present', (done) ->
     callback = () -> Promise.resolve()
     @orderExport._exportOptions.where = 'customerId="2878df1a-ea36-4434-a473-a8adcf1fc385"'
-    @orderExport._getCSVOrderTemplate = () ->
-      Promise.resolve('id,customerEmail')
+    spyOn(@orderExport, '_getCSVOrderTemplate').andCallFake => Promise.resolve('id,customerEmail')
     spyOn(@orderExport.client.orders, 'where').andCallThrough()
     spyOn(@orderExport.client.orders, '_get').andCallFake => Promise.resolve
       body:
