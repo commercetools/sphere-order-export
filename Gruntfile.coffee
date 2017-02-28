@@ -64,7 +64,7 @@ module.exports = (grunt) ->
     # watching for changes
     watch:
       default:
-        files: ["src/coffee/*.coffee"]
+        files: ["src/coffee/**/*.coffee"]
         tasks: ["build"]
       test:
         files: ["src/**/*.coffee"]

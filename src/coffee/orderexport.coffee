@@ -18,6 +18,7 @@ class OrderExport
     @_exportOptions = _.defaults (options.export or {}),
       standardShippingMethod: 'None'
       exportType: 'xml'
+      fillAllRows: false
       exportUnsyncedOnly: true
     @client = new SphereClient options.client
     @xmlMapping = new XmlMapping @_exportOptions

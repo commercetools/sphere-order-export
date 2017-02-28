@@ -4,6 +4,8 @@ Csv = require 'csv'
 access = require 'safe-access'
 
 class CsvMapping
+  constructor: (options = {}) ->
+    @options = options
 
   COLUMNS_FOR_ALL_ROWS = [
     'id'
@@ -21,6 +23,7 @@ class CsvMapping
 
   _mapOrder: (order, mappings) ->
     rows = []
+
     rows.push _.map mappings, (mapping) =>
       @_getValue order, mapping
 
@@ -30,9 +33,8 @@ class CsvMapping
           if /lineItems/.test(mapping)
             lineItemMapping = [mapping[0].replace(/lineItems/, "lineItems[#{index}]"), mapping[1]]
             @_getValue order, lineItemMapping
-          else if _.contains COLUMNS_FOR_ALL_ROWS, mapping[0]
+          else if @options.fillAllRows or _.contains COLUMNS_FOR_ALL_ROWS, mapping[0]
             @_getValue order, mapping
-
     rows
 
   _getValue: (order, mapping) ->

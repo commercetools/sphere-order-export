@@ -35,6 +35,7 @@ argv = require('optimist')
   .describe('sftpTarget', 'path in the SFTP server to where to move the worked files')
   .describe('sftpContinueOnProblems', 'ignore errors when processing a file and continue with the next one')
   .describe('where', 'where predicate used to filter orders exported. More info here http://dev.commercetools.com/http-api.html#predicates')
+  .describe('fillAllRows', 'fill all rows')
   .describe('logLevel', 'log level for file logging')
   .describe('logDir', 'directory to store logs')
   .describe('logSilent', 'use console to print messages')
@@ -53,6 +54,7 @@ argv = require('optimist')
   .default('timeout', 60000)
   .default('sftpContinueOnProblems', false)
   .default('exportCSVAsStream', false)
+  .default('fillAllRows', false)
   .demand(['projectKey'])
   .argv
 
@@ -179,6 +181,7 @@ ensureCredentials(argv)
       exportType: exportType
       exportUnsyncedOnly: argv.exportUnsyncedOnly
       csvTemplate: argv.csvTemplate
+      fillAllRows: argv.fillAllRows
       where: argv.where
 
   ensureExportDir()

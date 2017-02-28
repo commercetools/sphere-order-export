@@ -70,6 +70,21 @@ In general you can get access to any property of the order object. Find a refere
 
 > Note that when at least one `lineItems` header is given the resulting CSV contains a row per lineItem. Otherwise it only contains one row per order.
 
+When exporting order with its line items, all redundant info (eg. general order information) is removed and printed only once in the first rows:
+```csv
+id,orderNumber,price,lineItems.id,lineItems.productId,billingAddress.firstName
+123,10001,USD 5950,,,John
+123,10001,,LineItemId-1-1,ProductId-1-1,
+123,10001,,LineItemId-1-2,ProductId-1-2,
+```
+
+If needed you can specify a `--fillAllRows` parameter which will put general info also to line items rows:
+```csv
+id,orderNumber,price,lineItems.id,lineItems.productId,billingAddress.firstName
+123,10001,USD 5950,,,John
+123,10001,USD 5950,LineItemId-1-1,ProductId-1-1,John
+123,10001,USD 5950,LineItemId-1-2,ProductId-1-2,John
+```
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
