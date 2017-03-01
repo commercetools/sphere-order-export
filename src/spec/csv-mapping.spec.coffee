@@ -8,7 +8,7 @@ template = 'id,orderNumber,totalPrice,lineItems.id,lineItems.productId,billingAd
 describe 'CsvMapping', ->
   it '#_mapOrder should remove redundant info', (done) ->
     mapping = new Mapping
-    mapping ._analyseTemplate template
+    mapping._analyseTemplate template
     .then ([header, mappings]) ->
       rows = mapping._mapOrder(testOrders[0], mappings)
       expect(rows.length).toBe 3
@@ -31,7 +31,7 @@ describe 'CsvMapping', ->
 
   it '#_mapOrder should fill all rows', (done) ->
     mapping = new Mapping fillAllRows: true
-    mapping ._analyseTemplate template
+    mapping._analyseTemplate template
     .then ([header, mappings]) ->
       rows = mapping._mapOrder(testOrders[0], mappings)
       expect(rows.length).toBe 3
@@ -54,7 +54,7 @@ describe 'CsvMapping', ->
 
   it '#_mapOrder should return order even when lineItems are missing', (done) ->
     mapping = new Mapping fillAllRows: true
-    mapping ._analyseTemplate template
+    mapping._analyseTemplate template
     .then ([header, mappings]) ->
       order = _.deepClone(testOrders[0])
       order.lineItems = []
