@@ -18,6 +18,7 @@ describe 'OrderExport', ->
       standardShippingMethod: 'None'
       exportType: 'xml'
       exportUnsyncedOnly: true
+      fillAllRows : false
     @orderExport.channel = @orderExportChannel =
       id: 'channel-export'
       type: 'channel'

@@ -12,3 +12,4 @@ create_config.sh
 release-as-zip.sh
 package
 foo
+.idea

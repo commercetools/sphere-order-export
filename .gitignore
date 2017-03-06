@@ -9,3 +9,5 @@ config.js
 exports
 sftp-credentials.json
 foo
+.idea
+tmp
