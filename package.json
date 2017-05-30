@@ -44,7 +44,9 @@
     "node": ">= 0.10.0"
   },
   "scripts": {
-    "test": "grunt coverage"
+    "test": "grunt coverage",
+    "lint": "grunt coffeelint",
+    "watch": "grunt watch"
   },
   "dependencies": {
     "bluebird": "2.9.33",
