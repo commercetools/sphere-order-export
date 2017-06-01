@@ -112,7 +112,7 @@ exportCSVAsStream = (csvFile, orderExport) ->
     output.on 'finish', -> resolve()
     orderExport.runCSVAndStreamToFile (data) =>
       process.stdout.write('.')
-      output.write data
+      output.write "#{data}\n"
       Promise.resolve()
     .then () ->
       process.stdout.write('\n')

@@ -67,7 +67,7 @@ class OrderExport
     .then (template) => @csvMapping._analyseTemplate(template)
     .then ([header, mappings]) =>
       # write first the header
-      writeToFile("#{header.join(',')}\n")
+      writeToFile(header.join(','))
       .then () =>
         if @_exportOptions.where
           @client.orders.where(@_exportOptions.where)
