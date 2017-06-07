@@ -65,6 +65,7 @@ The following headers can be used in the CSV template
 - `lineItems.variant.*` - eg. `sku` or `images`
 - `shippingAddress.*` - eg. `lastName` or `postalCode`
 - `billingAddress.*`
+- `custom.fields.*` - eg `custom.fields.fieldName` will export custom field
 
 In general you can get access to any property of the order object. Find a reference in our [API documentation](http://dev.sphere.io/http-api-projects-orders.html#order).
 
@@ -85,6 +86,15 @@ id,orderNumber,price,lineItems.id,lineItems.productId,billingAddress.firstName
 123,10001,USD 5950,LineItemId-1-1,ProductId-1-1,John
 123,10001,USD 5950,LineItemId-1-2,ProductId-1-2,John
 ```
+
+Example with custom fields:
+```csv
+id,orderNumber,custom.fields.stringField,custom.fields.booleanField
+1,10001,abcd,1
+2,10002,efgh,
+```
+Booleans with a `false` value are mapped as an empty strings.
+
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).

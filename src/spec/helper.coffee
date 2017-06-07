@@ -47,6 +47,31 @@ module.exports =
     name: uniqueId 'PT'
     description: 'bla'
 
+  typeMock: ->
+    key: uniqueId 'order-custom-fields'
+    name:
+      en: 'Custom order fields'
+    resourceTypeIds: [
+      'order'
+    ],
+    fieldDefinitions: [{
+      name: 'field1',
+      label:
+        en: 'Custom field'
+      required: false,
+      type:
+        name: 'Boolean'
+      inputHint: 'SingleLine'
+    },{
+      name: 'field2',
+      label:
+        en: 'Second custom field'
+      required: false,
+      type:
+        name: 'String'
+      inputHint: 'SingleLine'
+    }]
+
   productMock: (productType) ->
     productType:
       typeId: 'product-type'
@@ -58,7 +83,7 @@ module.exports =
     masterVariant:
       sku: uniqueId 'sku'
 
-  orderMock: (shippingMethod, product, taxCategory, customer) ->
+  orderMock: (shippingMethod, product, taxCategory, customer, type) ->
     id: uniqueId 'o'
     orderState: 'Open'
     paymentState: 'Pending'
@@ -104,6 +129,13 @@ module.exports =
       shippingMethod:
         typeId: 'shipping-method'
         id: shippingMethod.id
+    custom:
+      type:
+        typeId: 'type'
+        id: type.id
+      fields:
+        field1: true
+        field2: 'abcd'
 
   customerMock: ->
     firstName = uniqueId 'Heinz'
