@@ -3,27 +3,17 @@ _ = require 'underscore'
 Promise = require 'bluebird'
 fs = Promise.promisifyAll require('fs')
 tmp = Promise.promisifyAll require('tmp')
-{ExtendedLogger, ProjectCredentialsConfig, Sftp} = require 'sphere-node-utils'
+{ProjectCredentialsConfig, Sftp} = require 'sphere-node-utils'
 package_json = require '../package.json'
 OrderExport = require './orderexport'
+utils = require './utils'
 csv = require 'csv-parser'
 
 CHANNEL_KEY = 'OrderXmlFileExport'
 
-argv = require('optimist')
-  .usage('Usage: $0 --projectKey key --clientId id --clientSecret secret')
-  .describe('projectKey', 'your SPHERE.IO project-key')
-  .describe('clientId', 'your OAuth client id for the SPHERE.IO API')
-  .describe('clientSecret', 'your OAuth client secret for the SPHERE.IO API')
-  .describe('accessToken', 'an OAuth access token for the SPHERE.IO API')
-  .describe('sphereHost', 'SPHERE.IO API host to connect to')
-  .describe('sphereProtocol', 'SPHERE.IO API protocol to connect to')
-  .describe('sphereAuthHost', 'SPHERE.IO OAuth host to connect to')
-  .describe('sphereAuthProtocol', 'SPHERE.IO OAuth protocol to connect to')
-  .describe('perPage', 'Number of orders to be fetched per page')
+argv = utils.getDefaultOptions()
   .describe('standardShippingMethod', 'Allows to define the fallback shipping method name if order has none')
   .describe('exportUnsyncedOnly', 'whether only unsynced orders will be exported or not')
-  .describe('targetDir', 'the folder where exported files are saved')
   .describe('useExportTmpDir', 'whether to use a system tmp folder to store exported files')
   .describe('csvTemplate', 'CSV template to define the structure of the export')
   .describe('createSyncActions', 'upload syncInfo update actions for orders exported (only supports sftp upload')
@@ -36,42 +26,16 @@ argv = require('optimist')
   .describe('sftpContinueOnProblems', 'ignore errors when processing a file and continue with the next one')
   .describe('where', 'where predicate used to filter orders exported. More info here http://dev.commercetools.com/http-api.html#predicates')
   .describe('fillAllRows', 'fill all rows')
-  .describe('logLevel', 'log level for file logging')
-  .describe('logDir', 'directory to store logs')
-  .describe('logSilent', 'use console to print messages')
-  .describe('timeout', 'Set timeout for requests')
   .describe('exportCSVAsStream', 'Exports CSV as stream (to use for performance reasons)')
-  .default('perPage', 100)
   .default('standardShippingMethod', 'None')
   .default('exportUnsyncedOnly', true)
-  .default('targetDir', path.join(__dirname,'../exports'))
   .default('useExportTmpDir', false)
-  .default('fileWithTimestamp', false)
-  .default('logLevel', 'info')
-  .default('logDir', '.')
   .default('createSyncActions', false)
-  .default('logSilent', false)
-  .default('timeout', 60000)
   .default('sftpContinueOnProblems', false)
-  .default('exportCSVAsStream', false)
   .default('fillAllRows', false)
-  .demand(['projectKey'])
   .argv
 
-logOptions =
-  name: "#{package_json.name}-#{package_json.version}"
-  streams: [
-    { level: 'error', stream: process.stderr }
-    { level: argv.logLevel, path: "#{argv.logDir}/#{package_json.name}.log" }
-  ]
-logOptions.silent = argv.logSilent if argv.logSilent
-logger = new ExtendedLogger
-  additionalFields:
-    project_key: argv.projectKey
-  logConfig: logOptions
-if argv.logSilent
-  logger.bunyanLogger.trace = -> # noop
-  logger.bunyanLogger.debug = -> # noop
+logger = utils.getLogger(argv)
 
 process.on 'SIGUSR2', -> logger.reopenFileStreams()
 process.on 'exit', => process.exit(@exitCode)
@@ -119,21 +83,6 @@ exportCSVAsStream = (csvFile, orderExport) ->
       output.end()
     .catch (e) -> reject(e)
 
-ensureCredentials = (argv) ->
-  if argv.accessToken
-    Promise.resolve
-      config:
-        project_key: argv.projectKey
-      access_token: argv.accessToken
-  else
-    ProjectCredentialsConfig.create()
-    .then (credentials) ->
-      Promise.resolve
-        config: credentials.enrichCredentials
-          project_key: argv.projectKey
-          client_id: argv.clientId
-          client_secret: argv.clientSecret
-
 createSyncOrders = (fileName) ->
   logger.debug "Creating order objects with sync Information"
   new Promise (resolve, reject) ->
@@ -159,22 +108,12 @@ createSyncOrders = (fileName) ->
       .on 'error', (err) ->
         reject(err)
 
-ensureCredentials(argv)
+utils.ensureCredentials(argv)
 .then (credentials) =>
-  clientOptions = _.extend credentials,
-    timeout: argv.timeout
-    user_agent: "#{package_json.name} - #{package_json.version}"
-  clientOptions.host = argv.sphereHost if argv.sphereHost
-  clientOptions.protocol = argv.sphereProtocol if argv.sphereProtocol
-  if argv.sphereAuthHost
-    clientOptions.oauth_host = argv.sphereAuthHost
-    clientOptions.rejectUnauthorized = false
-  clientOptions.oauth_protocol = argv.sphereAuthProtocol if argv.sphereAuthProtocol
-
   exportType = if argv.csvTemplate then 'csv' else 'xml'
 
   orderExport = new OrderExport
-    client: clientOptions
+    client: utils.getClientOptions(credentials, argv)
     export:
       perPage: argv.perPage
       standardShippingMethod: argv.standardShippingMethod
@@ -190,11 +129,7 @@ ensureCredentials(argv)
     @outputDir = outputDir
     if argv.exportCSVAsStream
       logger.info "Exporting orders as stream."
-      if argv.fileWithTimestamp
-        ts = (new Date()).getTime()
-        fileName = "orders_#{ts}.csv"
-      else
-        fileName = 'orders.csv'
+      fileName = exports.getFileName argv.fileWithTimestamp, 'orders'
       csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
       exportCSVAsStream(csvFile, orderExport)
 
@@ -205,18 +140,15 @@ ensureCredentials(argv)
         # - one file for all (default)
         # - one file for each order
         @orderReferences = []
-        ts = (new Date()).getTime()
         if exportType.toLowerCase() is 'csv'
-          if argv.fileWithTimestamp
-            fileName = "orders_#{ts}.csv"
-          else
-            fileName = 'orders.csv'
+          fileName = exports.getFileName argv.fileWithTimestamp, 'orders'
           csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
           logger.info "Storing CSV export to '#{csvFile}'."
           @orderReferences.push fileName: csvFile, entry: data
           fs.writeFileAsync csvFile, data
         else
           logger.info "Storing #{_.size data} file(s) to '#{@outputDir}'."
+          ts = (new Date()).getTime()
           Promise.map data, (entry) =>
             content = entry.xml.end(pretty: true, indent: '  ', newline: '\n')
             if argv.fileWithTimestamp
