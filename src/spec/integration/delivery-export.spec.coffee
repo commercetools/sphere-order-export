@@ -29,7 +29,7 @@ deleteOrders = (client) ->
       Promise.resolve()
 
 createOrderMock = (apiObjects, index) ->
-  order = SpecHelper.orderMock(apiObjects.shippingMethod, apiObjects.product, apiObjects.taxCategory, apiObjects.customer)
+  order = SpecHelper.orderMock(apiObjects.shippingMethod, apiObjects.product, apiObjects.taxCategory, apiObjects.customer, apiObjects.type)
 
   delete order.id
   order.orderNumber = "order_#{index}"
@@ -63,6 +63,7 @@ describe 'DeliveryExport - Integration tests', ->
         taxCategory: @deliveriesExport.client.taxCategories.save(SpecHelper.taxCategoryMock())
         customer: @deliveriesExport.client.customers.save(SpecHelper.customerMock())
         zone: @deliveriesExport.client.zones.save(SpecHelper.zoneMock())
+        type: @deliveriesExport.client.types.save(SpecHelper.typeMock())
     .then (res) =>
       @apiObjects = getApiObjectsFromResponses res
       @apiObjects.customer = @apiObjects.customer.customer
@@ -147,10 +148,9 @@ describe 'DeliveryExport - Integration tests', ->
           exportedRows: 0
 
     it '#streamCsvDeliveries should work when there are orders without deliveries', (done) ->
-      @deliveriesExport.options.export.where = 'orderNumber = "orderWithoutDelivery"'
-
-      order = SpecHelper.orderMock(@apiObjects.shippingMethod, @apiObjects.product, @apiObjects.taxCategory, @apiObjects.customer)
-      order.orderNumber = 'orderWithoutDelivery'
+      @deliveriesExport.options.export.where = 'orderNumber = "order_withoutDelivery"'
+      order = createOrderMock(@apiObjects, 'withoutDelivery')
+      order.shippingInfo.deliveries = []
 
       outputStream = streamtest['v2'].toText (error, output) =>
         expect(error).toBe(null)
