@@ -1,7 +1,7 @@
 _ = require 'underscore'
 path = require 'path'
 fs = require('fs-extra')
-DeliveriesExport = require './deliveriesexport'
+DeliveryExport = require './delivery-export'
 utils = require './utils'
 
 # get CLI params
@@ -19,7 +19,7 @@ utils.ensureCredentials(argv)
     client: utils.getClientOptions(credentials, argv)
     export: _.pick(argv, 'perPage', 'where')
 
-  deliveriesExport = new DeliveriesExport options, logger
+  deliveryExport = new DeliveryExport options, logger
 
   fs.ensureDir(argv.targetDir)
   .then ->
@@ -29,7 +29,7 @@ utils.ensureCredentials(argv)
     fileStream = fs.createWriteStream(path.join(argv.targetDir, fileName))
 
     logger.info "Streaming deliveries to #{fileStream.path}"
-    deliveriesExport.streamCsvDeliveries(fileStream)
+    deliveryExport.streamCsvDeliveries(fileStream)
   .then (stats) ->
     logger.info "Loaded #{stats.loadedOrders} order(s) and exported #{stats.exportedDeliveries} deliveries."
 .catch (error) ->

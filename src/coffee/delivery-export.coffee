@@ -4,10 +4,14 @@ _ = require 'underscore'
 Csv = require 'csv'
 objectPath = require 'object-path'
 
-class DeliveriesExport
+class DeliveryExport
   constructor: (@options, @logger) ->
     @client = new SphereClient @options.client
     @stats = @_getDefaultStats()
+
+    @options.export = _.defaults @options.export or {},
+      where: ''
+      perPage: 500
 
   _getDefaultStats: ->
     _.clone
@@ -64,10 +68,12 @@ class DeliveriesExport
 
       # if there are more parcels then items, duplicate last CSV row
       # and push it again with the rest of parcels
-      for index in [rows.length...delivery.items.length]
-        rows.push(@_connectItemWithParcel(
-          _.copy(rows[rows.length - 1]), delivery.parcels[index]
-        ))
+      if delivery.parcels.length > rows.length
+        indexFrom = rows.length
+        for index in [indexFrom...delivery.parcels.length]
+          rows.push(@_connectItemWithParcel(
+            _.clone(rows[rows.length - 1]), delivery.parcels[index]
+          ))
       rows
 
   _connectItemWithParcel: (item, parcel) ->
@@ -94,7 +100,7 @@ class DeliveriesExport
       'parcel.length': 'measurements.lengthInMillimeter'
       'parcel.height': 'measurements.heightInMillimeter'
       'parcel.width': 'measurements.widthInMillimeter'
-      'parcel.weight': 'measurements.lengthInMillimeter'
+      'parcel.weight': 'measurements.weightInGram'
       'parcel.trackingId': 'trackingData.trackingId'
       'parcel.carrier': 'trackingData.carrier'
       'parcel.provider': 'trackingData.provider'
@@ -110,10 +116,10 @@ class DeliveriesExport
     item
 
   # load deliveries, serialize them as CSVs and save them to stream
-  streamCsvDeliveries: (stream) ->
-    stream.write("#{@_getCsvHeader()}\n")
+  streamCsvDeliveries: (outputStream) ->
+    outputStream.write("#{@_getCsvHeader()}\n")
 
-    @streamDeliveries (orders) =>
+    @streamOrders (orders) =>
       @stats.loadedOrders += orders.length
       @logger.debug("Processing #{orders.length} order(s)")
 
@@ -123,21 +129,20 @@ class DeliveriesExport
 
       Promise.map orders, (order) =>
         rows = @_mapDeliveriesToRows(order.orderNumber, order.shippingInfo.deliveries)
-        if rows.length
-          @stats.exportedRows += rows.length
-          @_castRowsToCsv(rows)
-            .then (csv) -> stream.write("#{csv}\n")
+        @stats.exportedRows += rows.length
+        @_castRowsToCsv(rows)
+          .then (csv) -> outputStream.write("#{csv}\n")
     .then =>
-      stream.end()
+      outputStream.end()
       @stats
 
   # load deliveries in chunks and pass them to processFn function
-  streamDeliveries: (processFn) ->
+  streamOrders: (processFn) ->
     @client.orders
-      .where(@options.export.where or '')
-      .perPage(@options.export.perPage or 500)
+      .where(@options.export.where)
+      .perPage(@options.export.perPage)
       .process (res) ->
         Promise.resolve processFn(res.body.results)
     , { accumulate: false }
 
-module.exports = DeliveriesExport
+module.exports = DeliveryExport

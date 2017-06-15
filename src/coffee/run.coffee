@@ -129,7 +129,7 @@ utils.ensureCredentials(argv)
     @outputDir = outputDir
     if argv.exportCSVAsStream
       logger.info "Exporting orders as stream."
-      fileName = exports.getFileName argv.fileWithTimestamp, 'orders'
+      fileName = utils.getFileName argv.fileWithTimestamp, 'orders'
       csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
       exportCSVAsStream(csvFile, orderExport)
 
@@ -141,7 +141,7 @@ utils.ensureCredentials(argv)
         # - one file for each order
         @orderReferences = []
         if exportType.toLowerCase() is 'csv'
-          fileName = exports.getFileName argv.fileWithTimestamp, 'orders'
+          fileName = utils.getFileName argv.fileWithTimestamp, 'orders'
           csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
           logger.info "Storing CSV export to '#{csvFile}'."
           @orderReferences.push fileName: csvFile, entry: data

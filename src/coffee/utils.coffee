@@ -21,14 +21,12 @@ exports.getDefaultOptions = ->
     .describe('where', 'where predicate used to filter orders exported. More info here http://dev.commercetools.com/http-api.html#predicates')
     .describe('logLevel', 'log level for file logging')
     .describe('logDir', 'directory to store logs')
-    .describe('logSilent', 'use console to print messages')
     .describe('timeout', 'Set timeout for requests')
     .default('perPage', 100)
     .default('targetDir', path.join(__dirname,'../exports'))
     .default('fileWithTimestamp', false)
     .default('logLevel', 'info')
     .default('logDir', '.')
-    .default('logSilent', false)
     .default('timeout', 60000)
     .default('exportCSVAsStream', false)
     .demand(['projectKey'])
@@ -45,10 +43,6 @@ exports.getLogger = (argv, name = package_json.name) ->
         { level: argv.logLevel, path: "#{argv.logDir}/#{name}.log" }
       ]
       silent: Boolean argv.logSilent
-
-  if argv.logSilent
-    logger.bunyanLogger.trace = -> # noop
-    logger.bunyanLogger.debug = -> # noop
   logger
 
 exports.ensureCredentials = (argv) ->
@@ -78,8 +72,7 @@ exports.getClientOptions = (credentials, argv) ->
   clientOptions.oauth_protocol = argv.sphereAuthProtocol if argv.sphereAuthProtocol
   clientOptions
 
-exports.getFileName = (withTimestamp, prefix) ->
-  ts = (new Date()).getTime()
+exports.getFileName = (withTimestamp, prefix, ts = (new Date()).getTime()) ->
   if withTimestamp
     "#{prefix}_#{ts}.csv"
   else

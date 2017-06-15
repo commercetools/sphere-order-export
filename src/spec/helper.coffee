@@ -58,7 +58,7 @@ module.exports =
     masterVariant:
       sku: uniqueId 'sku'
 
-  orderMock: (shippingMethod, product, taxCategory, customer) ->
+  orderMock: (shippingMethod, product, taxCategory, customer, index) ->
     id: uniqueId 'o'
     orderState: 'Open'
     paymentState: 'Pending'
