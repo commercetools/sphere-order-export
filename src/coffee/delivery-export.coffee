@@ -44,14 +44,13 @@ class DeliveryExport
         .on 'error', reject
         .to.string resolve
 
-  # take delivery objects and map to CSV rows (objects indexed by column names)
+  # take delivery objects and map them to CSV rows
   _mapDeliveriesToRows: (orderNumber, deliveries) ->
     @stats.exportedDeliveries += deliveries.length
 
     # run through all deliveries
     _.flatten deliveries.map (delivery) =>
-
-      # create CSV rows from delivery items and orderNumber and deliveryId
+      # create CSV rows from delivery items, orderNumber and deliveryId
       # Note that every delivery has at least one item
       rows = delivery.items.map (_item, index) =>
         item =
