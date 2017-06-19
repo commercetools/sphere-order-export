@@ -6,7 +6,7 @@
 
 [![Build Status](https://secure.travis-ci.org/sphereio/sphere-order-export.png?branch=master)](http://travis-ci.org/sphereio/sphere-order-export) [![NPM version](https://badge.fury.io/js/sphere-order-export.png)](http://badge.fury.io/js/sphere-order-export) [![Coverage Status](https://coveralls.io/repos/sphereio/sphere-order-export/badge.png)](https://coveralls.io/r/sphereio/sphere-order-export) [![Dependency Status](https://david-dm.org/sphereio/sphere-order-export.png?theme=shields.io)](https://david-dm.org/sphereio/sphere-order-export) [![devDependency Status](https://david-dm.org/sphereio/sphere-order-export/dev-status.png?theme=shields.io)](https://david-dm.org/sphereio/sphere-order-export#info=devDependencies)
 
-This module allows to export orders to XML or CSV, with SFTP support.
+This module allows to export orders to XML or CSV, with SFTP support and order deliveries to CSV file.
 
 > By default XML export will result in each file pro order
 
@@ -15,8 +15,10 @@ This module allows to export orders to XML or CSV, with SFTP support.
 ```bash
 $ npm install -g sphere-order-export
 
-# output help screen
+# output help screen for order export
 $ order-export
+# output help screen for delivery export
+$ delivery-export
 ```
 
 ### SFTP
@@ -95,10 +97,22 @@ id,orderNumber,custom.fields.stringField,custom.fields.booleanField
 ```
 Booleans with a `false` value are mapped as an empty strings.
 
+## Delivery export
+It is possible to export order deliveries into CSV with the following command.
+```bash
+$ delivery-export --projectKey <project-key> --targetDir exportedDeliveries
+```
+This will create an `exportedDeliveries` folder with a `deliveries.csv` file where all deliveries are stored.
+
+Exported CSV file has these fields:
+```csv
+orderNumber,delivery.id,_itemGroupId,item.id,item.quantity,parcel.id,parcel.length,parcel.height,parcel.width,parcel.weight,parcel.trackingId,parcel.carrier,parcel.provider,parcel.providerTransaction,parcel.isReturn
+```
+And the structure is more described in the csv-parser-order package [here](https://commercetools.github.io/nodejs/cli/csv-parser-order.html#deliveries).
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
-More info [here](CONTRIBUTING.md)
+More info [here](CONTRIBUTING.md).
 
 ## Releasing
 Releasing a new version is completely automated using the Grunt task `grunt release`.

@@ -28,7 +28,6 @@ exports.getDefaultOptions = ->
     .default('logLevel', 'info')
     .default('logDir', '.')
     .default('timeout', 60000)
-    .default('exportCSVAsStream', false)
     .demand(['projectKey'])
 
 # Will return a logger

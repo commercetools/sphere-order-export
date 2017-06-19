@@ -33,6 +33,7 @@ argv = utils.getDefaultOptions()
   .default('createSyncActions', false)
   .default('sftpContinueOnProblems', false)
   .default('fillAllRows', false)
+  .default('exportCSVAsStream', false)
   .argv
 
 logger = utils.getLogger(argv)

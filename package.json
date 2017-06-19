@@ -38,7 +38,7 @@
   ],
   "bin": {
     "order-export": "bin/order-export",
-    "deliveries-export": "bin/deliveries-export"
+    "deliveries-export": "bin/delivery-export"
   },
   "main": "lib/run",
   "engines": {
