@@ -108,7 +108,7 @@ Exported CSV file has these fields:
 ```csv
 orderNumber,delivery.id,_itemGroupId,item.id,item.quantity,parcel.id,parcel.length,parcel.height,parcel.width,parcel.weight,parcel.trackingId,parcel.carrier,parcel.provider,parcel.providerTransaction,parcel.isReturn
 ```
-And the structure is more described in the csv-parser-order package [here](https://commercetools.github.io/nodejs/cli/csv-parser-order.html#deliveries).
+And the structure is more described in the csv-parser-order package [here](https://commercetools.github.io/nodejs/cli/csv-parser-orders.html#deliveries).
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
