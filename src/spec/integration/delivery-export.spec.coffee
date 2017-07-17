@@ -24,7 +24,6 @@ deleteOrders = (client) ->
     if res.body.count
       Promise.map res.body.results, (order) ->
         client.orders.byId(order.id).delete(order.version)
-      , { concurrency: 10 }
     else
       Promise.resolve()
 

@@ -46,10 +46,7 @@ class DeliveryExport
 
   # take delivery objects and map them to CSV rows
   _mapDeliveriesToRows: (orderNumber, deliveries) ->
-    @stats.exportedDeliveries += deliveries.length
-
-    # run through all deliveries
-    _.flatten deliveries.map (delivery) =>
+    rows = _.flatten deliveries.map (delivery) =>
       # create CSV rows from delivery items, orderNumber and deliveryId
       # Note that every delivery has at least one item
       rows = delivery.items.map (_item, index) =>
@@ -74,6 +71,9 @@ class DeliveryExport
             _.clone(rows[rows.length - 1]), delivery.parcels[index]
           ))
       rows
+
+    @stats.exportedDeliveries += deliveries.length
+    rows
 
   _connectItemWithParcel: (item, parcel) ->
     # Example parcel object:
