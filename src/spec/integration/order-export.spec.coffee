@@ -7,7 +7,7 @@ OrderExport = require '../../lib/orderexport'
 Config = require '../../config'
 SpecHelper = require '../helper'
 
-describe 'Integration tests', ->
+describe 'OrderExport - Integration tests', ->
 
   CHANNEL_KEY = 'OrderXmlFileExport'
   CHANNEL_ROLE = 'OrderExport'
