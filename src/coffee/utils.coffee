@@ -37,11 +37,12 @@ exports.getLogger = (argv, name = package_json.name) ->
       project_key: argv.projectKey
     logConfig:
       name: "#{name}-#{package_json.version}"
-      streams: [
-        { level: 'error', stream: process.stderr }
-        { level: argv.logLevel, path: "#{argv.logDir}/#{name}.log" }
-      ]
       silent: Boolean argv.logSilent
+
+  logger.bunyanLogger.addStream({
+    level: argv.logLevel,
+    path: "#{argv.logDir}/#{name}.log"
+  })
   logger
 
 exports.ensureCredentials = (argv) ->
