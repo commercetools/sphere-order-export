@@ -28,7 +28,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
     it 'should export prices', (done) ->
       template =
@@ -48,7 +47,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
     it 'should export discount codes', (done) ->
       template =
@@ -86,7 +84,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
     it 'export lineItems', (done) ->
       template =
@@ -109,7 +106,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
     it 'export lineItems and prices', (done) ->
       template =
@@ -132,7 +128,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
     xit 'export lineItems and deliveries without parcels', (done) ->
       template =
@@ -160,7 +155,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
     it 'export lineItems with states', (done) ->
       template =
@@ -183,7 +177,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
     it 'export lineItems with images', (done) ->
       template =
@@ -206,7 +199,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
     it 'export lineItems with channel', (done) ->
       template =
@@ -229,7 +221,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
     it 'export orders with customerGroup', (done) ->
       template =
@@ -249,7 +240,6 @@ describe 'Mapping utils - XML', ->
         expect(result).toBe expectedCSV
         done()
       .catch (err) -> done(_.prettify err)
-      .done()
 
   xdescribe '#format*', -> # TODO
 
