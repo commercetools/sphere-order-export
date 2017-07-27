@@ -128,12 +128,11 @@ utils.ensureCredentials(argv)
   .then (outputDir) =>
     logger.debug "Created output dir at #{outputDir}"
     @outputDir = outputDir
+    fileName = utils.getFileName argv.fileWithTimestamp, 'orders'
+    csvFile = "#{@outputDir}/#{fileName}"
     if argv.exportCSVAsStream
       logger.info "Exporting orders as stream."
-      fileName = utils.getFileName argv.fileWithTimestamp, 'orders'
-      csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
       exportCSVAsStream(csvFile, orderExport)
-
     else
       orderExport.run()
       .then (data) =>
@@ -142,8 +141,6 @@ utils.ensureCredentials(argv)
         # - one file for each order
         @orderReferences = []
         if exportType.toLowerCase() is 'csv'
-          fileName = utils.getFileName argv.fileWithTimestamp, 'orders'
-          csvFile = argv.csvFile or "#{@outputDir}/#{fileName}"
           logger.info "Storing CSV export to '#{csvFile}'."
           @orderReferences.push fileName: csvFile, entry: data
           fs.writeFileAsync csvFile, data
@@ -249,8 +246,6 @@ utils.ensureCredentials(argv)
   .catch (error) =>
     logger.error error, 'Oops, something went wrong!'
     @exitCode = 1
-  .done()
 .catch (err) =>
   logger.error err, 'Problems on getting client credentials from config files.'
   @exitCode = 1
-.done()
