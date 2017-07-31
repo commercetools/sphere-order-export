@@ -33,6 +33,9 @@ exports.getDefaultOptions = ->
 
 # Will return a logger
 exports.getLogger = (argv, name = package_json.name) ->
+  if argv.logDir is true
+    argv.logDir = '.'
+    
   if argv.logDir isnt '.'
     fs.ensureDirSync(argv.logDir)
 
