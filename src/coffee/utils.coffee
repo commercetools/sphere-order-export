@@ -30,12 +30,14 @@ exports.getDefaultOptions = ->
     .default('logDir', '.')
     .default('timeout', 60000)
     .demand(['projectKey'])
+    .string(['logDir'])
 
 # Will return a logger
 exports.getLogger = (argv, name = package_json.name) ->
-  if argv.logDir is true
-    argv.logDir = '.'
-    
+  # if a logDir is provided but without any value
+  if argv.logDir is ''
+    throw new Error('LogDir parameter has to have a value with folder path where to save a log file.')
+
   if argv.logDir isnt '.'
     fs.ensureDirSync(argv.logDir)
 
