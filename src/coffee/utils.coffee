@@ -1,3 +1,4 @@
+fs = require 'fs-extra'
 path = require 'path'
 _ = require 'underscore'
 {ExtendedLogger, ProjectCredentialsConfig} = require 'sphere-node-utils'
@@ -32,17 +33,26 @@ exports.getDefaultOptions = ->
 
 # Will return a logger
 exports.getLogger = (argv, name = package_json.name) ->
+  if argv.logDir isnt '.'
+    fs.ensureDirSync(argv.logDir)
+
   logger = new ExtendedLogger
     additionalFields:
       project_key: argv.projectKey
     logConfig:
       name: "#{name}-#{package_json.version}"
       silent: Boolean argv.logSilent
+      streams: [
+        {
+          level: argv.logLevel
+          stream: process.stdout
+        },
+        {
+          level: 'debug',
+          path: "#{argv.logDir}/#{name}.log"
+        }
+      ]
 
-  logger.bunyanLogger.addStream({
-    level: argv.logLevel,
-    path: "#{argv.logDir}/#{name}.log"
-  })
   logger
 
 exports.ensureCredentials = (argv) ->
