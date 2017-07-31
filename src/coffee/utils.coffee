@@ -1,3 +1,4 @@
+fs = require 'fs-extra'
 path = require 'path'
 _ = require 'underscore'
 {ExtendedLogger, ProjectCredentialsConfig} = require 'sphere-node-utils'
@@ -29,19 +30,34 @@ exports.getDefaultOptions = ->
     .default('logDir', '.')
     .default('timeout', 60000)
     .demand(['projectKey'])
+    .string(['logDir'])
 
 # Will return a logger
 exports.getLogger = (argv, name = package_json.name) ->
+  # if a logDir is provided but without any value
+  if argv.logDir is ''
+    throw new Error('LogDir parameter has to have a value with folder path where to save a log file.')
+
+  if argv.logDir isnt '.'
+    fs.ensureDirSync(argv.logDir)
+
   logger = new ExtendedLogger
     additionalFields:
       project_key: argv.projectKey
     logConfig:
       name: "#{name}-#{package_json.version}"
-      streams: [
-        { level: 'error', stream: process.stderr }
-        { level: argv.logLevel, path: "#{argv.logDir}/#{name}.log" }
-      ]
       silent: Boolean argv.logSilent
+      streams: [
+        {
+          level: argv.logLevel
+          stream: process.stdout
+        },
+        {
+          level: 'debug',
+          path: "#{argv.logDir}/#{name}.log"
+        }
+      ]
+
   logger
 
 exports.ensureCredentials = (argv) ->
