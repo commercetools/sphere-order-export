@@ -8,7 +8,7 @@ class XmlMapping
 
   mapOrders: -> # TODO: allow to map all orders into one xml
 
-  mapOrder: (order, paymentInfo, customer) ->
+  mapOrder: (order, customer) ->
     xml = builder.create('order',
       { 'version': '1.0', 'encoding': 'UTF-8', 'standalone': true })
     xml.e('xsdVersion').t('0.9')
@@ -20,8 +20,9 @@ class XmlMapping
     for attr in attribs
       @_add(xml, order, attr)
 
-    xml.e('customerNumber')
-      .t(customer.customerNumber) if customer?.customerNumber
+    if customer?.customerNumber
+      xml.e('customerNumber')
+        .t(customer.customerNumber)
 
     if customer?.externalId
       xml.e('externalCustomerId')
@@ -49,11 +50,6 @@ class XmlMapping
       @_address(xml.e('billingAddress'), order.billingAddress)
 
     @_customerGroup(xml, order)
-
-    if paymentInfo?
-      xPi = xml.e('paymentInfo')
-      @_add(xPi, paymentInfo.value, 'paymentMethod') if paymentInfo.value.paymentMethod
-      xPi.e('paymentID').t(paymentInfo.value.paymentTransaction).up() if paymentInfo.value.paymentTransaction
 
     si = order.shippingInfo
     xSi = xml.e('shippingInfo')

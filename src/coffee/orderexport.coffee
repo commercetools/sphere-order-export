@@ -134,29 +134,20 @@ class OrderExport
           syncInfo.channel.id is channel?.id
 
   _processXmlOrder: (order) ->
-    # TODO: what if customObject is not found?
-    # TODO: why not doing it also for CSV export?
-    customObjectId = if order.cart
-      order.cart.id
-    else
-      order.id
-    @client.customObjects.byId("#{CONTAINER_PAYMENT}/#{customObjectId}").fetch()
-    .then (result) =>
-      paymentInfo = result.body
-      if order.customerId?
-        @client.customers.byId(order.customerId).fetch()
-        .then (result) =>
-          entry =
-            id: order.id
-            xml: @xmlMapping.mapOrder order, paymentInfo, result.body
-            version: order.version
-          Promise.resolve entry
-      else
+    if order.customerId?
+      @client.customers.byId(order.customerId).fetch()
+      .then (result) =>
         entry =
           id: order.id
-          xml: @xmlMapping.mapOrder order, paymentInfo
+          xml: @xmlMapping.mapOrder order, result.body
           version: order.version
         Promise.resolve entry
+    else
+      entry =
+        id: order.id
+        xml: @xmlMapping.mapOrder order
+        version: order.version
+      Promise.resolve entry
 
   syncOrder: (xmlOrder, filename) ->
     data =
