@@ -68,6 +68,10 @@ class CsvMapping
       else [entry]
 
   formatDiscountCodes = (discountCodes) ->
+    discountCodes = _.filter(discountCodes, ({ discountCode }) ->
+      if discountCode.obj
+        return discountCode
+    )
     return _.map(discountCodes, ({ discountCode: { obj: { code } } }) ->
       return code
     ).join(';')
