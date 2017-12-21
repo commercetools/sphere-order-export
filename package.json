@@ -59,7 +59,7 @@
     "safe-access": "0.1.0",
     "sphere-node-sdk": "^1.22.0",
     "sphere-node-utils": "^0.9.1",
-    "tmp": "0.0.31",
+    "tmp": "0.0.33",
     "underscore": "1.8.3",
     "underscore-mixins": "*",
     "xmlbuilder": "2.2.1"

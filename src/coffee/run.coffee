@@ -55,6 +55,10 @@ ensureExportDir = ->
   if "#{argv.useExportTmpDir}" is 'true'
     # unsafeCleanup: recursively removes the created temporary directory, even when it's not empty
     tmp.dirAsync {unsafeCleanup: true}
+    .then (tmpDir) ->
+      # tmp module returns an array with path to tmpDir and a cleanup function
+      # here we return only the path to tmpDir
+      tmpDir[0]
   else
     exportsPath = argv.targetDir
     fsExistsAsync(exportsPath)
@@ -131,7 +135,7 @@ utils.ensureCredentials(argv)
     fileName = utils.getFileName argv.fileWithTimestamp, 'orders'
     csvFile = "#{@outputDir}/#{fileName}"
     if argv.exportCSVAsStream
-      logger.info "Exporting orders as stream."
+      logger.info "Exporting orders as a stream."
       exportCSVAsStream(csvFile, orderExport)
     else
       orderExport.run()
