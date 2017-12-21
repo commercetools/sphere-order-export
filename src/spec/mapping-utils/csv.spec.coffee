@@ -30,16 +30,27 @@ describe 'Mapping utils - XML', ->
       .catch (err) -> done(_.prettify err)
 
     it 'should export prices', (done) ->
-      template =
-        """
-        id,orderNumber,totalPrice,totalNet,totalGross
-        """
+      fields = [
+        'id',
+        'orderNumber',
+        'totalPrice',
+        'totalNet',
+        'totalGross',
+        'taxedPrice.totalNet',
+        'taxedPrice.totalGross',
+        'shippingInfo.price',
+        'shippingInfo.taxedPrice.totalNet',
+        'shippingInfo.taxedPrice.totalGross',
+        'shippingInfo.shippingRate.freeAbove',
+        'shippingInfo.taxedPrice.totalNet.centAmount'
+      ]
+      template = fields.join(',')
 
       expectedCSV =
         """
-        id,orderNumber,totalPrice,totalNet,totalGross
-        abc,10001,USD 5950,USD 5000,USD 5950
-        xyz,10002,USD 2380,USD 2000,USD 2380
+        #{fields.join(',')}
+        abc,10001,USD 5950,USD 5000,USD 5950,USD 5000,USD 5950,USD 499,USD 0,USD 495,USD 20000,0
+        xyz,10002,USD 2380,USD 2000,USD 2380,USD 2000,USD 2380,USD 499,,,USD 20000,
         """
 
       @csvMapping.mapOrders(template, ordersJson)

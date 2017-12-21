@@ -39,9 +39,15 @@ class CsvMapping
 
   _getValue: (order, mapping) ->
     value = access order, mapping[0]
-    return '' unless value
+    if not value and value != 0
+      return ''
+
     if _.size(mapping) is 2 and _.isFunction mapping[1]
       mapping[1].call undefined, value
+    else if isMoneyFormat value
+      formatMoney value
+    else if _.isNumber value
+      value
     else
       value or ''
 
@@ -84,6 +90,11 @@ class CsvMapping
       if price.channel?
         channelKeyPart = "##{price.channel.id}"
       "#{countryPart}#{price.value.currencyCode} #{price.value.centAmount}#{customerGroupPart}#{channelKeyPart}"
+
+  # check if given value is an object with money fields
+  isMoneyFormat = (value) ->
+    moneyFields = ['centAmount', 'currencyCode']
+    return _.isObject(value) and _.isEqual(moneyFields, Object.keys(value).sort())
 
   formatMoney = (money) ->
     "#{money.currencyCode} #{money.centAmount}"
