@@ -46,10 +46,8 @@ class CsvMapping
       mapping[1].call undefined, value
     else if isMoneyFormat value
       formatMoney value
-    else if _.isNumber value
-      value
     else
-      value or ''
+      value
 
   _analyseTemplate: (template) ->
     @parse(template)
