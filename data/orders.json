@@ -186,6 +186,16 @@
         "currencyCode": "USD"
       }
     },
+    "taxedPrice": {
+      "totalNet": {
+        "currencyCode": "USD",
+        "centAmount": 0
+      },
+      "totalGross": {
+        "currencyCode": "USD",
+        "centAmount": 495
+      }
+    },
     "taxRate": {
       "name": "Standard Tax Rate",
       "amount": 0.19,
