@@ -177,46 +177,6 @@ describe 'Mapping utils - XML', ->
         expect(cg.name[0]).toBe 'B2B'
         done()
 
-    it 'should export paymentMethod and paymentId', (done) ->
-      order = {}
-      paymentInfo =
-        value:
-          paymentMethod: 'Cash'
-          paymentTransaction: '7'
-
-      doc = @xmlMapping.mapOrder order, paymentInfo, null
-      parseString doc, (err, result) ->
-        expect(result.order.paymentInfo).not.toBeUndefined()
-        expect(result.order.paymentInfo[0].paymentID[0]).toBe '7'
-        expect(result.order.paymentInfo[0].paymentMethod[0]).toBe 'Cash'
-        done()
-
-    it 'should export only paymentMethod', (done) ->
-      order = {}
-      paymentInfo =
-        value:
-          paymentMethod: 'Cash'
-
-      doc = @xmlMapping.mapOrder order, paymentInfo, null
-      parseString doc, (err, result) ->
-        expect(result.order.paymentInfo).not.toBeUndefined()
-        expect(result.order.paymentInfo[0].paymentID).toBeUndefined()
-        expect(result.order.paymentInfo[0].paymentMethod[0]).toBe 'Cash'
-        done()
-
-    it 'should export only paymentId', (done) ->
-      order = {}
-      paymentInfo =
-        value:
-          paymentTransaction: '7'
-
-      doc = @xmlMapping.mapOrder order, paymentInfo, null
-      parseString doc, (err, result) ->
-        expect(result.order.paymentInfo).not.toBeUndefined()
-        expect(result.order.paymentInfo[0].paymentID[0]).toBe '7'
-        expect(result.order.paymentInfo[0].paymentMethod).toBeUndefined()
-        done()
-
     it 'shippingInfo', (done) ->
       order =
         shippingInfo:
@@ -246,7 +206,7 @@ describe 'Mapping utils - XML', ->
       order = {}
       customer =
         externalId: '111-222-333'
-      doc = @xmlMapping.mapOrder order, null, customer
+      doc = @xmlMapping.mapOrder order, customer
       parseString doc, (err, result) ->
         expect(result.order.customerNumber).toBeUndefined()
         expect(result.order.externalCustomerId[0]).toBe customer.externalId
@@ -256,7 +216,7 @@ describe 'Mapping utils - XML', ->
       order = {}
       customer =
         customerNumber: '111-222'
-      doc = @xmlMapping.mapOrder order, null, customer
+      doc = @xmlMapping.mapOrder order, customer
       parseString doc, (err, result) ->
         expect(result.order.customerNumber[0]).toBe customer.customerNumber
         expect(result.order.externalCustomerId).toBeUndefined()
@@ -267,7 +227,7 @@ describe 'Mapping utils - XML', ->
       customer =
         customerNumber: '111-222'
         externalId: '111-222-333'
-      doc = @xmlMapping.mapOrder order, null, customer
+      doc = @xmlMapping.mapOrder order, customer
       parseString doc, (err, result) ->
         expect(result.order.customerNumber[0]).toBe customer.customerNumber
         expect(result.order.externalCustomerId[0]).toBe customer.externalId
