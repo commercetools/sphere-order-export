@@ -3,7 +3,7 @@ _.mixin require('underscore-mixins')
 CsvMapping = require '../../lib/mapping-utils/csv'
 ordersJson = require '../../data/orders.json'
 
-describe 'Mapping utils - XML', ->
+describe 'Mapping utils - CSV', ->
 
   beforeEach ->
     @csvMapping = new CsvMapping()
@@ -199,10 +199,10 @@ describe 'Mapping utils - XML', ->
         """
         id,orderNumber,lineItems.id,lineItems.variant.images
         abc,10001,,
-        abc,10001,LineItemId-1-1,http://www.example.org/image-1-1-3.jpg;http://www.example.org/image-1-1-2.jpg;http://www.example.org/image-1-1-1.jpg;
-        abc,10001,LineItemId-1-2,
+        abc,10001,LineItemId-1-1,http://www.example.org/image-1-1-1.jpg;http://www.example.org/image-1-1-2.jpg;http://www.example.org/image-1-1-3.jpg
+        abc,10001,LineItemId-1-2,http://www.example.org/image-2-1-1.jpg;http://www.example.org/image-2-1-2.jpg;http://www.example.org/image-2-1-3.jpg
         xyz,10002,,
-        xyz,10002,LineItemId-2-1,http://www.example.org/image-2-1-1.jpg;
+        xyz,10002,LineItemId-2-1,http://www.example.org/image-2-1-1.jpg
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -247,6 +247,159 @@ describe 'Mapping utils - XML', ->
         """
 
       @csvMapping.mapOrders(template, ordersJson)
+      .then (result) ->
+        expect(result).toBe expectedCSV
+        done()
+      .catch (err) -> done(_.prettify err)
+
+  describe '#map variant attributes in order', ->
+    it 'should map variant images', (done) ->
+      template =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.sku,lineItems.variant.images
+        """
+      expectedCSV =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.sku,lineItems.variant.images
+        abc,10001,,,
+        abc,10001,1,SKU-1-1,http://www.example.org/image-1-1-1.jpg;http://www.example.org/image-1-1-2.jpg;http://www.example.org/image-1-1-3.jpg
+        abc,10001,2,SKU-1-2,http://www.example.org/image-2-1-1.jpg;http://www.example.org/image-2-1-2.jpg;http://www.example.org/image-2-1-3.jpg
+        """
+
+      @csvMapping.mapOrders(template, [ordersJson[0]])
+      .then (result) ->
+        expect(result).toBe expectedCSV
+        done()
+      .catch (err) -> done(_.prettify err)
+
+    it 'should map variant prices', (done) ->
+      template =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.sku,lineItems.variant.prices
+        """
+      expectedCSV =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.sku,lineItems.variant.prices
+        abc,10001,,,
+        abc,10001,1,SKU-1-1,DE-EUR 12900;GB-GBP 11900
+        abc,10001,2,SKU-1-2,
+        """
+
+      @csvMapping.mapOrders(template, [ordersJson[0]])
+      .then (result) ->
+        expect(result).toBe expectedCSV
+        done()
+      .catch (err) -> done(_.prettify err)
+
+    it 'should map variant availability', (done) ->
+      template =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.sku,lineItems.variant.availability,lineItems.quantity
+        """
+      expectedCSV =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.sku,lineItems.variant.availability,lineItems.quantity
+        abc,10001,,,,
+        abc,10001,1,SKU-1-1,1,2
+        abc,10001,2,SKU-1-2,,3
+        """
+
+      @csvMapping.mapOrders(template, [ordersJson[0]])
+      .then (result) ->
+        expect(result).toBe expectedCSV
+        done()
+      .catch (err) -> done(_.prettify err)
+
+    it 'should map basic variant attributes', (done) ->
+      template =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.text,lineItems.variant.attributes,lineItems.variant.attributes.,lineItems.variant.attributes.ltext.en
+        """
+      expectedCSV =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.text,lineItems.variant.attributes,lineItems.variant.attributes.,lineItems.variant.attributes.ltext.en
+        abc,10001,,,,,
+        abc,10001,1,StringValue,,,LtextEN
+        abc,10001,2,,,,
+        """
+
+      @csvMapping.mapOrders(template, [ordersJson[0]])
+      .then (result) ->
+        expect(result).toBe expectedCSV
+        done()
+      .catch (err) -> done(_.prettify err)
+
+    it 'should map text/ltext variant attributes', (done) ->
+      template =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.text,lineItems.variant.attributes.ltext,lineItems.variant.attributes.ltext.en,lineItems.variant.attributes.ltext.de
+        """
+      expectedCSV =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.text,lineItems.variant.attributes.ltext,lineItems.variant.attributes.ltext.en,lineItems.variant.attributes.ltext.de
+        abc,10001,,,,,
+        abc,10001,1,StringValue,LtextEN,LtextEN,LtextDE
+        abc,10001,2,,,,
+        """
+
+      @csvMapping.mapOrders(template, [ordersJson[0]])
+      .then (result) ->
+        expect(result).toBe expectedCSV
+        done()
+      .catch (err) -> done(_.prettify err)
+
+    it 'should map boolean variant attributes', (done) ->
+      template =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.booleanTrue,lineItems.variant.attributes.booleanFalse
+        """
+      expectedCSV =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.booleanTrue,lineItems.variant.attributes.booleanFalse
+        abc,10001,,,
+        abc,10001,1,1,
+        abc,10001,2,,
+        """
+
+      @csvMapping.mapOrders(template, [ordersJson[0]])
+      .then (result) ->
+        expect(result).toBe expectedCSV
+        done()
+      .catch (err) -> done(_.prettify err)
+
+    it 'should map enum/lenum variant attributes', (done) ->
+      template =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.enum,lineItems.variant.attributes.lenum,lineItems.variant.attributes.lenum.en,lineItems.variant.attributes.lenum.de
+        """
+      expectedCSV =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.enum,lineItems.variant.attributes.lenum,lineItems.variant.attributes.lenum.en,lineItems.variant.attributes.lenum.de
+        abc,10001,,,,,
+        abc,10001,1,EnumKey,lenumKey,LabelEn,LabelDe
+        abc,10001,2,,,,
+        """
+
+      @csvMapping.mapOrders(template, [ordersJson[0]])
+        .then (result) ->
+          expect(result).toBe expectedCSV
+          done()
+        .catch (err) -> done(_.prettify err)
+
+    it 'should map set variant attributes', (done) ->
+      template =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.setOfLtext,lineItems.variant.attributes.setOfEnum
+        """
+      expectedCSV =
+        """
+        id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.setOfLtext,lineItems.variant.attributes.setOfEnum
+        abc,10001,,,
+        abc,10001,1,textEn1;textEn2,key1;key2
+        abc,10001,2,,
+        """
+
+      @csvMapping.mapOrders(template, [ordersJson[0]])
       .then (result) ->
         expect(result).toBe expectedCSV
         done()

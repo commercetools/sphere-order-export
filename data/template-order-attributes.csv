@@ -1,0 +1,1 @@
+id,orderNumber,lineItems.variant.attributes.color,lineItems.variant.attributes.size_code,lineItems.variant.attributes.product_length,lineItems.variant.attributes.ean_codes,lineItems.variant.attributes.filter_colors,lineItems.variant.attributes.pinned,lineItems.variant.attributes.delivery_time

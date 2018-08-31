@@ -63,8 +63,10 @@ The following headers can be used in the CSV template
 - `totalNet`
 - `totalGross`
 - `customerGroup`
-- `lineItems.*` - eg. `id`, `state` or `supplyChannel`
-- `lineItems.variant.*` - eg. `sku` or `images`
+- `lineItems.*` - eg. `id`, `state`, `quantity` or `supplyChannel`
+- `lineItems.variant.*` - eg. `sku`, `variantId`, `availability`, `prices` or `images`
+- `lineItems.variant.attributes.*` - eg. `lineItems.variant.attributes.color` will export attribute with name `color` 
+- `custom.fields.*` - eg. `custom.fields.fieldName` will export custom field
 - `shippingAddress.*` - eg. `lastName` or `postalCode`
 - `billingAddress.*`
 - `custom.fields.*` - eg. `custom.fields.fieldName` will export custom field
@@ -95,7 +97,12 @@ id,orderNumber,custom.fields.stringField,custom.fields.booleanField
 1,10001,abcd,1
 2,10002,efgh,
 ```
-Booleans with a `false` value are mapped as an empty strings.
+Booleans with a `false` value are mapped as an empty strings and `true` value is mapped as `1`.
+
+Example template for exporting lineItem attributes:
+```csv
+id,orderNumber,lineItems.variant.attributes.color,lineItems.variant.attributes.size_code,lineItems.variant.attributes.product_length,lineItems.variant.attributes.ean_codes,lineItems.variant.attributes.filter_colors,lineItems.variant.attributes.pinned,lineItems.variant.attributes.delivery_time
+```
 
 ## Delivery export
 It is possible to export order deliveries into CSV with the following command.
