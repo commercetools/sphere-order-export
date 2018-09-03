@@ -2,10 +2,18 @@ _ = require 'underscore'
 Promise = require 'bluebird'
 Csv = require 'csv'
 access = require 'safe-access'
+productJsonToCsv = require '@commercetools/product-json-to-csv'
 
 class CsvMapping
-  constructor: (options = {}) ->
-    @options = options
+  constructor: (@options = {}) ->
+    productMapperConfig = {
+      fillAllRows: true,
+      categoryBy: 'slug',
+      lang: 'en',
+      multiValDel: ';'
+    }
+
+    @productMapper = new productJsonToCsv.MapProductData(productMapperConfig)
 
   COLUMNS_FOR_ALL_ROWS = [
     'id'
@@ -38,16 +46,31 @@ class CsvMapping
     rows
 
   _getValue: (order, mapping) ->
+    # test if we want to map an attribute and parse attributeName
+    attributeRegexp = /(lineItems\[.*]\.variant\.attributes)\.(.+)$/i
+    # get a path to attributes array - eg: lineItems[1].variant.attributes
+    # and the name of requested attribute
+    attributeNames = attributeRegexp.exec(mapping[0])
+
+    if (attributeNames isnt null)
+      attributes = access order, attributeNames[1]
+      return @formatProductAttributes(attributeNames[2], attributes)
+
     value = access order, mapping[0]
     if not value and value != 0
       return ''
 
     if _.size(mapping) is 2 and _.isFunction mapping[1]
-      mapping[1].call undefined, value
+      mapping[1].call this, value, mapping[0]
     else if isMoneyFormat value
       formatMoney value
     else
-      value
+      # return an empty string for "lineItems.variant.attributes" for any lineItem
+      # otherwise we would return an array with objects (attributes)
+      if mapping[0].match(/^lineItems\[.*]\.variant\.attributes\.?$/gi)
+        ''
+      else
+        value
 
   _analyseTemplate: (template) ->
     @parse(template)
@@ -66,6 +89,8 @@ class CsvMapping
       when 'lineItems.price' then [entry, formatPrice]
       when 'lineItems.state' then [entry, formatStates]
       when 'lineItems.variant.images' then [entry, formatImages]
+      when 'lineItems.variant.prices' then [entry, formatVariantPrices]
+      when 'lineItems.variant.availability' then [entry, formatVariantAvailability]
       when 'lineItems.supplyChannel' then [entry, formatChannel]
       when 'customerGroup' then [entry, formatCustomerGroup]
       when 'discountCodes' then [entry, formatDiscountCodes]
@@ -76,18 +101,24 @@ class CsvMapping
       return code
     ).join(';')
   # TODO: Move method below to sphere-node-utils
+
+  formatProductAttributes: (attributeName, attributes) ->
+    mappedAttributes = @productMapper._mapAttributes(attributes)
+    value = mappedAttributes[attributeName]
+
+    # value can be a zero so we should check strictly if it is undefined
+    if value is undefined
+      value = ''
+    value
+
   formatPrice = (price) ->
-    if price?.value?
-      countryPart = ''
-      if price.country?
-        countryPart = "#{price.country}-"
-      customerGroupPart = ''
-      if price.customerGroup?
-        customerGroupPart = " #{price.customerGroup.id}"
-      channelKeyPart = ''
-      if price.channel?
-        channelKeyPart = "##{price.channel.id}"
-      "#{countryPart}#{price.value.currencyCode} #{price.value.centAmount}#{customerGroupPart}#{channelKeyPart}"
+    productJsonToCsv.MapProductData._mapPriceToString(price)
+
+  formatVariantAvailability = (availability) ->
+    availability.availableQuantity
+
+  formatVariantPrices = (prices) ->
+    @productMapper._mapPricesToString(prices)
 
   # check if given value is an object with money fields
   isMoneyFormat = (value) ->
@@ -108,9 +139,7 @@ class CsvMapping
   # TODO: Catch case that only item is present and don't show delimiter
   # TODO: Make delimiter configurable
   formatImages = (images) ->
-    _.reduce images, (cell, image) ->
-      "#{image.url};#{cell}"
-    , ''
+    @productMapper._mapImagesToString images
 
   formatChannel = (channel) ->
     if channel?

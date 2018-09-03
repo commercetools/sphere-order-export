@@ -50,6 +50,7 @@
     "watch": "grunt watch"
   },
   "dependencies": {
+    "@commercetools/product-json-to-csv": "^2.1.2",
     "bluebird": "2.9.33",
     "csv": "0.3.x",
     "csv-parser": "^1.11.0",
@@ -78,7 +79,7 @@
     "grunt-shell": "0.6.4",
     "istanbul": "^0.4.5",
     "jasmine-node": "1.14.5",
-    "sphere-coffeelint": "sphereio/sphere-coffeelint#master",
+    "sphere-coffeelint": "github:sphereio/sphere-coffeelint#master",
     "streamtest": "^1.2.2",
     "xml2js": "0.4.2"
   }
