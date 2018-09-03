@@ -97,7 +97,7 @@ id,orderNumber,custom.fields.stringField,custom.fields.booleanField
 1,10001,abcd,1
 2,10002,efgh,
 ```
-Booleans with a `false` value are mapped as an empty strings and `true` value is mapped as `1`.
+Booleans with a `false` value are mapped as an empty string and `true` value is mapped as `1`.
 
 Example template for exporting lineItem attributes:
 ```csv

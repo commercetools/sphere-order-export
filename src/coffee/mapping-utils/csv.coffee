@@ -46,7 +46,10 @@ class CsvMapping
     rows
 
   _getValue: (order, mapping) ->
+    # test if we want to map an attribute and parse attributeName
     attributeRegexp = /(lineItems\[.*]\.variant\.attributes)\.(.+)$/i
+    # get a path to attributes array - eg: lineItems[1].variant.attributes
+    # and the name of requested attribute
     attributeNames = attributeRegexp.exec(mapping[0])
 
     if (attributeNames isnt null)
@@ -62,6 +65,8 @@ class CsvMapping
     else if isMoneyFormat value
       formatMoney value
     else
+      # return an empty string for "lineItems.variant.attributes" for any lineItem
+      # otherwise we would return an array with objects (attributes)
       if mapping[0].match(/^lineItems\[.*]\.variant\.attributes\.?$/gi)
         ''
       else
@@ -101,25 +106,12 @@ class CsvMapping
     mappedAttributes = @productMapper._mapAttributes(attributes)
     value = mappedAttributes[attributeName]
 
+    # value can be a zero so we should check strictly if it is undefined
     if value is undefined
       value = ''
     value
 
   formatPrice = (price) ->
-#    if price?.value?
-#      countryPart = ''
-#      if price.country?
-#        countryPart = "#{price.country}-"
-#      customerGroupPart = ''
-#      if price.customerGroup?
-#        customerGroupPart = " #{price.customerGroup.id}"
-#      channelKeyPart = ''
-#      if price.channel?
-#        channelKeyPart = "##{price.channel.id}"
-#      "#{countryPart}#{price.value.currencyCode} #{price.value.centAmount}#{customerGroupPart}#{channelKeyPart}"
-
-    # TODO Original code has a different mapping for mapping channels and customerGroup
-    # than here https://github.com/commercetools/nodejs/blob/master/packages/product-json-to-csv/src/map-product-data.js#L174
     productJsonToCsv.MapProductData._mapPriceToString(price)
 
   formatVariantAvailability = (availability) ->
