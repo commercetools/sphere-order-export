@@ -94,7 +94,13 @@ class CsvMapping
       when 'lineItems.supplyChannel' then [entry, formatChannel]
       when 'customerGroup' then [entry, formatCustomerGroup]
       when 'discountCodes' then [entry, formatDiscountCodes]
+      when 'paymentInfo' then [entry, formatPayments]
       else [entry]
+
+  formatPayments = (payments) ->
+    return _.map(payments.payments, ({ id }) ->
+      return id
+    ).join(';')
 
   formatDiscountCodes = (discountCodes) ->
     return _.map(discountCodes, ({ discountCode: { obj: { code } } }) ->
