@@ -342,7 +342,13 @@
       }
     },
     "state": "MatchesCart"
-  }]
+  }],
+  "paymentInfo": {
+    "payments": [
+    { "typeId": "payment", "id": "payment1" },
+    { "typeId": "payment", "id": "payment2" }
+    ]
+  }
 }, {
   "id": "xyz",
   "orderNumber": "10002",
@@ -490,5 +496,10 @@
       }
     },
     "state": "MatchesCart"
-  }]
+  }],
+  "paymentInfo": {
+    "payments": [
+    { "typeId": "payment", "id": "payment3" }
+    ]
+  }
 }]
