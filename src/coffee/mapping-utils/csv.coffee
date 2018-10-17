@@ -99,14 +99,10 @@ class CsvMapping
       else [entry]
 
   formatPayments = (payments) ->
-    return _.map(payments.payments, ({ id }) ->
-      return id
-    ).join(';')
+    return _.map(payments.payments, ({ id }) -> id).join(';')
 
   formatDiscountCodes = (discountCodes) ->
-    return _.map(discountCodes, ({ discountCode: { obj: { code } } }) ->
-      return code
-    ).join(';')
+    return _.map(discountCodes, ({ discountCode: { obj: { code } } }) -> code).join(';')
   # TODO: Move method below to sphere-node-utils
 
   formatProductAttributes: (attributeName, attributes) ->
