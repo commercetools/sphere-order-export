@@ -10,7 +10,8 @@ class CsvMapping
       fillAllRows: true,
       categoryBy: 'slug',
       lang: 'en',
-      multiValDel: ';'
+      multiValDel: ';',
+      createShortcuts: true
     }
 
     @productMapper = new productJsonToCsv.MapProductData(productMapperConfig)
