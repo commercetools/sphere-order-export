@@ -10,7 +10,8 @@ class CsvMapping
       fillAllRows: true,
       categoryBy: 'slug',
       lang: 'en',
-      multiValDel: ';'
+      multiValDel: ';',
+      createShortcuts: true
     }
 
     @productMapper = new productJsonToCsv.MapProductData(productMapperConfig)
@@ -94,12 +95,14 @@ class CsvMapping
       when 'lineItems.supplyChannel' then [entry, formatChannel]
       when 'customerGroup' then [entry, formatCustomerGroup]
       when 'discountCodes' then [entry, formatDiscountCodes]
+      when 'paymentInfo' then [entry, formatPayments]
       else [entry]
 
+  formatPayments = (payments) ->
+    return _.map(payments.payments, ({ id }) -> id).join(';')
+
   formatDiscountCodes = (discountCodes) ->
-    return _.map(discountCodes, ({ discountCode: { obj: { code } } }) ->
-      return code
-    ).join(';')
+    return _.map(discountCodes, ({ discountCode: { obj: { code } } }) -> code).join(';')
   # TODO: Move method below to sphere-node-utils
 
   formatProductAttributes: (attributeName, attributes) ->

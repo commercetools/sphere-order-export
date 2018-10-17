@@ -70,6 +70,7 @@ The following headers can be used in the CSV template
 - `shippingAddress.*` - eg. `lastName` or `postalCode`
 - `billingAddress.*`
 - `custom.fields.*` - eg. `custom.fields.fieldName` will export custom field
+- `paymentInfo` - will export all associated payment IDs
 
 In general you can get access to any property of the order object. Find a reference in our [API documentation](http://dev.sphere.io/http-api-projects-orders.html#order).
 

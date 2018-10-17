@@ -77,6 +77,24 @@ describe 'Mapping utils - CSV', ->
         done()
       .catch (err) -> done(_.prettify err)
 
+    it 'should export paymentinfo IDs ', (done) ->
+      template =
+        """
+        id,orderNumber,totalPrice,totalNet,totalGross,paymentInfo
+        """
+      expectedCSV =
+        """
+        id,orderNumber,totalPrice,totalNet,totalGross,paymentInfo
+        abc,10001,USD 5950,USD 5000,USD 5950,payment1;payment2
+        xyz,10002,USD 2380,USD 2000,USD 2380,payment3
+        """
+
+      @csvMapping.mapOrders(template, ordersJson)
+      .then (result) ->
+        expect(result).toBe expectedCSV
+        done()
+      .catch (err) -> done(_.prettify err)
+
     it 'export addresses', (done) ->
       template =
         """
