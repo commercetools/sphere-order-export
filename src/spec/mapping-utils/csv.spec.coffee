@@ -356,7 +356,7 @@ describe 'Mapping utils - CSV', ->
         """
         id,orderNumber,lineItems.variant.variantId,lineItems.variant.attributes.text,lineItems.variant.attributes.ltext,lineItems.variant.attributes.ltext.en,lineItems.variant.attributes.ltext.de
         abc,10001,,,,,
-        abc,10001,1,StringValue,LtextEN,LtextEN,LtextDE
+        abc,10001,1,StringValue,,LtextEN,LtextDE
         abc,10001,2,,,,
         """
 
