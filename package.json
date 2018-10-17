@@ -50,7 +50,7 @@
     "watch": "grunt watch"
   },
   "dependencies": {
-    "@commercetools/product-json-to-csv": "^2.1.2",
+    "@commercetools/product-json-to-csv": "2.2.5",
     "bluebird": "2.9.33",
     "csv": "0.3.x",
     "csv-parser": "^1.11.0",
