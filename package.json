@@ -1,7 +1,7 @@
 {
   "name": "sphere-order-export",
   "description": "Quick and easy way to export your orders from SPHERE.IO into files, with SFTP support!",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "homepage": "https://github.com/sphereio/sphere-order-export",
   "private": false,
   "keywords": [
