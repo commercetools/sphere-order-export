@@ -699,8 +699,7 @@
     "discountCodes": [
       {
         "discountCode": {
-          "typeId": "discount-code",
-          "obj": {}
+          "typeId": "discount-code"
         },
         "state": "MatchesCart"
       }
