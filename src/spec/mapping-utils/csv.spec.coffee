@@ -21,6 +21,7 @@ describe 'Mapping utils - CSV', ->
         id,orderNumber
         abc,10001
         xyz,10002
+        ijk,10003
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -51,6 +52,7 @@ describe 'Mapping utils - CSV', ->
         #{fields.join(',')}
         abc,10001,USD 5950,USD 5000,USD 5950,USD 5000,USD 5950,USD 499,USD 0,USD 495,USD 20000,0
         xyz,10002,USD 2380,USD 2000,USD 2380,USD 2000,USD 2380,USD 499,,,USD 20000,
+        ijk,10003,EUR 3000,EUR 2250,EUR 3000,EUR 2250,EUR 3000,EUR 500,,,EUR 20000,
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -69,6 +71,7 @@ describe 'Mapping utils - CSV', ->
         id,orderNumber,totalPrice,totalNet,totalGross,discountCodes
         abc,10001,USD 5950,USD 5000,USD 5950,code1;code2
         xyz,10002,USD 2380,USD 2000,USD 2380,code3
+        ijk,10003,EUR 3000,EUR 2250,EUR 3000,
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -87,6 +90,7 @@ describe 'Mapping utils - CSV', ->
         id,orderNumber,totalPrice,totalNet,totalGross,paymentInfo
         abc,10001,USD 5950,USD 5000,USD 5950,payment1;payment2
         xyz,10002,USD 2380,USD 2000,USD 2380,payment3
+        ijk,10003,EUR 3000,EUR 2250,EUR 3000,payment4
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -106,6 +110,7 @@ describe 'Mapping utils - CSV', ->
         id,orderNumber,billingAddress.firstName,billingAddress.lastName,billingAddress.streetName,billingAddress.streetNumber,billingAddress.postalCode,billingAddress.city,billingAddress.country,shippingAddress.firstName,shippingAddress.lastName,shippingAddress.streetName,shippingAddress.streetNumber,shippingAddress.postalCode,shippingAddress.city,shippingAddress.country
         abc,10001,John,Doe,Some Street,11,11111,Some City,US,John,Doe,Some Street,11,11111,Some City,US
         xyz,10002,Jane,Doe,Some Other Street ,22,22222,Some Other City,US,Jane,Doe,Some Other Street ,22,22222,Some Other City,US
+        ijk,10003,John,Bull,One Way Street,3,3333,Star City,DE,John,Bull,One Way Street,3,3333,Star City,DE
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -128,6 +133,8 @@ describe 'Mapping utils - CSV', ->
         abc,10001,LineItemId-1-2,ProductId-1-2,Product-1-2,2,SKU-1-2,3,US-USD 1190
         xyz,10002,,,,,,,
         xyz,10002,LineItemId-2-1,ProductId-2-1,Product-2-1,1,SKU-2-1,1,US-USD 2380
+        ijk,10003,,,,,,,
+        ijk,10003,LineItemId-3-1,ProductId-3-1,Product-3-1,1,SKU-3-1,1,DE-EUR 3000
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -150,6 +157,8 @@ describe 'Mapping utils - CSV', ->
         abc,10001,LineItemId-1-2,ProductId-1-2,Product-1-2,2,SKU-1-2,3,US-USD 1190,,,
         xyz,10002,,,,,,,,USD 2380,USD 2000,USD 2380
         xyz,10002,LineItemId-2-1,ProductId-2-1,Product-2-1,1,SKU-2-1,1,US-USD 2380,,,
+        ijk,10003,,,,,,,,EUR 3000,EUR 2250,EUR 3000
+        ijk,10003,LineItemId-3-1,ProductId-3-1,Product-3-1,1,SKU-3-1,1,DE-EUR 3000,,,
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -199,6 +208,8 @@ describe 'Mapping utils - CSV', ->
         abc,10001,LineItemId-1-2,thirdState:1;secondState:1;firstState:1;
         xyz,10002,,
         xyz,10002,LineItemId-2-1,firstState:1;
+        ijk,10003,,
+        ijk,10003,LineItemId-3-1,firstState:1;
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -221,6 +232,8 @@ describe 'Mapping utils - CSV', ->
         abc,10001,LineItemId-1-2,http://www.example.org/image-2-1-1.jpg;http://www.example.org/image-2-1-2.jpg;http://www.example.org/image-2-1-3.jpg
         xyz,10002,,
         xyz,10002,LineItemId-2-1,http://www.example.org/image-2-1-1.jpg
+        ijk,10003,,
+        ijk,10003,LineItemId-3-1,http://www.example.org/image-3-1-1.jpg
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -243,6 +256,8 @@ describe 'Mapping utils - CSV', ->
         abc,10001,LineItemId-1-2,secondChannel
         xyz,10002,,
         xyz,10002,LineItemId-2-1,secondChannel
+        ijk,10003,,
+        ijk,10003,LineItemId-3-1,thirdChannel
         """
 
       @csvMapping.mapOrders(template, ordersJson)
@@ -262,6 +277,7 @@ describe 'Mapping utils - CSV', ->
         id,orderNumber,customerGroup
         abc,10001,
         xyz,10002,cool customers
+        ijk,10003,tech customers
         """
 
       @csvMapping.mapOrders(template, ordersJson)
