@@ -502,4 +502,154 @@
     { "typeId": "payment", "id": "payment3" }
     ]
   }
+}, {
+  "id": "ijk",
+  "orderNumber": "10003",
+  "createdAt": "1970-01-01T00:00:00.004Z",
+  "lastModifiedAt": "1970-01-01T00:00:00.005Z",
+  "version": 1,
+  "lineItems": [{
+    "id": "LineItemId-3-1",
+    "productId": "ProductId-3-1",
+    "name": {
+      "en": "Product-3-1"
+    },
+    "variant": {
+      "variantId": 1,
+      "sku": "SKU-3-1",
+      "images": [{
+        "url": "http://www.example.org/image-3-1-1.jpg",
+        "dimensions": {
+          "w": 0,
+          "h": 0
+        }
+      }],
+      "attributes": []
+    },
+    "quantity": 1,
+    "price": {
+      "country": "DE",
+      "value": {
+        "currencyCode": "EUR",
+        "centAmount": 3000
+      }
+    },
+    "state": [{
+      "quantity": 1,
+      "state": {
+        "typeId": "state",
+        "id": "state-1",
+        "obj": {
+          "key": "firstState"
+        }
+      }
+    }],
+    "taxRate": {
+      "name": "Standard Tax Rate",
+      "amount": 0.25,
+      "includedInPrice": true,
+      "id": "taxRateId",
+      "country": "DE"
+    },
+    "supplyChannel": {
+      "typeId": "channel",
+      "id": "channel-3",
+      "obj": {
+        "key": "thirdChannel"
+      }
+    }
+  }],
+  "customLineItems": [],
+  "totalPrice": {
+    "currencyCode": "EUR",
+    "centAmount": 3000
+  },
+  "taxedPrice": {
+    "totalNet": {
+      "currencyCode": "EUR",
+      "centAmount": 2250
+    },
+    "totalGross": {
+      "currencyCode": "EUR",
+      "centAmount": 3000
+    },
+    "taxPortions": [{
+      "amount": {
+        "currencyCode": "EUR",
+        "centAmount": 750
+      },
+      "rate": 0.25
+    }]
+  },
+  "customerGroup": {
+    "typeId": "customer-group",
+    "id": "customer-group-3",
+    "obj": {
+      "name": "tech customers"
+    }
+  },
+  "shippingAddress": {
+    "firstName": "John",
+    "lastName": "Bull",
+    "streetName": "One Way Street",
+    "streetNumber": "3",
+    "postalCode": "3333",
+    "city": "Star City",
+    "country": "DE"
+  },
+  "billingAddress": {
+    "firstName": "John",
+    "lastName": "Bull",
+    "streetName": "One Way Street",
+    "streetNumber": "3",
+    "postalCode": "3333",
+    "city": "Star City",
+    "country": "DE"
+  },
+  "shippingInfo": {
+    "price": {
+      "centAmount": 500,
+      "currencyCode": "EUR"
+    },
+    "shippingRate": {
+      "price": {
+        "centAmount": 500,
+        "currencyCode": "EUR"
+      },
+      "freeAbove": {
+        "centAmount": 20000,
+        "currencyCode": "EUR"
+      }
+    },
+    "taxRate": {
+      "name": "Standard Tax Rate",
+      "amount": 0.25,
+      "includedInPrice": true,
+      "id": "taxRateId",
+      "country": "DE"
+    },
+    "taxCategory": {
+      "typeId": "tax-category",
+      "id": "taxCategoryId"
+    },
+    "deliveries": [{
+      "id": "deliveryId-3-1",
+      "createdAt": "1970-01-01T00:00:00.006Z",
+      "items": [{
+        "id": "LineItemId-3-1",
+        "quantity": 1
+      }]
+    }]
+  },
+  "discountCodes": [{
+    "discountCode": {
+      "typeId": "discount-code"
+    },
+    "state": "MatchesCart"
+  }],
+  "paymentInfo": {
+    "payments": [
+    { "typeId": "payment", "id": "payment4" }
+    ]
+  }
 }]
