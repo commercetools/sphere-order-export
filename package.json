@@ -77,7 +77,7 @@
     "grunt-contrib-coffee": "github:daern91/grunt-contrib-coffee",
     "grunt-contrib-concat": "0.5.1",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-shell": "0.6.4",
+    "grunt-shell": "3.0.1",
     "istanbul": "^0.4.5",
     "jasmine-node": "github:daern91/jasmine-node",
     "sphere-coffeelint": "github:sphereio/sphere-coffeelint#master",
