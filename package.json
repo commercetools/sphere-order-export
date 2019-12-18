@@ -43,7 +43,7 @@
   },
   "main": "lib/run",
   "engines": {
-    "node": ">= 6.0.0"
+    "node": ">= 10.0.0"
   },
   "scripts": {
     "test": "grunt coverage",
