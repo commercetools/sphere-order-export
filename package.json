@@ -59,7 +59,7 @@
     "object-path": "^0.11.4",
     "optimist": "0.6.1",
     "safe-access": "0.1.0",
-    "sphere-node-sdk": "^2.1.2",
+    "sphere-node-sdk": "^3.0.0",
     "sphere-node-utils": "^1.0.0",
     "tmp": "0.0.33",
     "underscore": "1.8.3",
