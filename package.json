@@ -54,7 +54,7 @@
   "dependencies": {
     "@commercetools/product-json-to-csv": "2.2.5",
     "bluebird": "2.9.33",
-    "csv": "0.3.x",
+    "csv": "5.3.x",
     "csv-parser": "^1.11.0",
     "fs-extra": "^3.0.1",
     "object-path": "^0.11.4",
