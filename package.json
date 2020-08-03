@@ -83,7 +83,7 @@
     "istanbul": "^0.4.5",
     "jasmine-node": "github:daern91/jasmine-node",
     "sphere-coffeelint": "github:sphereio/sphere-coffeelint#master",
-    "streamtest": "^1.2.2",
+    "streamtest": "^2.0.0",
     "xml2js": "0.4.2"
   },
   "resolutions": {
