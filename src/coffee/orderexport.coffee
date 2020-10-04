@@ -73,6 +73,7 @@ class OrderExport
           @client.orders.where(@_exportOptions.where)
 
         @client.orders
+        .expand('customLineItems[*].state[*].state')
         .expand('lineItems[*].state[*].state')
         .expand('lineItems[*].supplyChannel')
         .expand('discountCodes[*].discountCode')
@@ -107,6 +108,7 @@ class OrderExport
         @client.orders.all()
 
       @client.orders
+      .expand('customLineItems[*].state[*].state')
       .expand('lineItems[*].state[*].state')
       .expand('lineItems[*].supplyChannel')
       .expand('discountCodes[*].discountCode')

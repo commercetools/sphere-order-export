@@ -63,6 +63,7 @@ The following headers can be used in the CSV template
 - `totalNet`
 - `totalGross`
 - `customerGroup`
+- `customLineItems.*` - eg. `id`, `state`, `quantity` or `slug`
 - `lineItems.*` - eg. `id`, `state`, `quantity` or `supplyChannel`
 - `lineItems.variant.*` - eg. `sku`, `variantId`, `availability`, `prices` or `images`
 - `lineItems.variant.attributes.*` - eg. `lineItems.variant.attributes.color` will export attribute with name `color` 

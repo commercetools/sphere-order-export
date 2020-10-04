@@ -44,6 +44,15 @@ class CsvMapping
             @_getValue order, lineItemMapping
           else if @options.fillAllRows or _.contains COLUMNS_FOR_ALL_ROWS, mapping[0]
             @_getValue order, mapping
+
+    if order.customLineItems? and @hasCustomLineItemHeader?
+      _.each order.customLineItems, (customLineItem, index) =>
+        rows.push _.map mappings, (mapping) =>
+          if /customLineItems/.test(mapping)
+            customLineItemsMapping = [mapping[0].replace(/customLineItems/, "customLineItems[#{index}]"), mapping[1]]
+            @_getValue order, customLineItemsMapping
+          else if @options.fillAllRows or _.contains COLUMNS_FOR_ALL_ROWS, mapping[0]
+            @_getValue order, mapping
     rows
 
   _getValue: (order, mapping) ->
@@ -80,6 +89,8 @@ class CsvMapping
       mappings = _.map header, (entry) =>
         if /lineItems/.test entry
           @hasLineItemHeader = true
+        else if /customLineItem/.test entry
+          @hasCustomLineItemHeader = true
         @_mapHeader(entry)
       Promise.resolve [header, mappings]
 
@@ -87,6 +98,8 @@ class CsvMapping
     switch entry
       when 'totalNet', 'totalGross' then ["taxedPrice.#{entry}", formatMoney]
       when 'totalPrice' then [entry, formatMoney]
+      when 'customLineItems.state' then [entry, formatStates]
+      when 'customLineItems.price' then [entry, formatPrice]
       when 'lineItems.price' then [entry, formatPrice]
       when 'lineItems.state' then [entry, formatStates]
       when 'lineItems.variant.images' then [entry, formatImages]
