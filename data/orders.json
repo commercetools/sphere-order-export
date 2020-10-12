@@ -238,7 +238,22 @@
       }
     }
   }],
-  "customLineItems": [],
+  "customLineItems": [
+    {
+        "id": "64d8843b-3b53-497c-8d31-fcca82bee6f3",
+        "name": {
+            "de": "test"
+        },
+        "slug": "slug",
+        "quantity": 1,
+        "price": {
+            "value": {
+                "centAmount": 999,
+                "currencyCode": "EUR"
+            }
+        }
+      }
+  ],
   "totalPrice": {
     "currencyCode": "USD",
     "centAmount": 5950
