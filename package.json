@@ -1,7 +1,7 @@
 {
   "name": "sphere-order-export",
   "description": "Quick and easy way to export your orders from commercetools into files, with SFTP support!",
-  "version": "3.1.0",
+  "version": "3.1.2",
   "homepage": "https://github.com/sphereio/sphere-order-export",
   "private": false,
   "keywords": [
