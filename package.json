@@ -65,7 +65,7 @@
     "tmp": "0.0.33",
     "underscore": "1.8.3",
     "underscore-mixins": "*",
-    "xmlbuilder": "2.2.1"
+    "xmlbuilder": "15.1.1"
   },
   "devDependencies": {
     "npm-force-resolutions": "0.0.3",
