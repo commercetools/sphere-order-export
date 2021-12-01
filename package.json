@@ -46,7 +46,6 @@
     "node": ">= 10.0.0"
   },
   "scripts": {
-    "preinstall": "node safe-resolution-check.js",
     "test": "grunt coverage",
     "lint": "grunt coffeelint",
     "watch": "grunt watch"
