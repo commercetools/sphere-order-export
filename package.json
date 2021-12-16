@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@commercetools/product-json-to-csv": "2.2.5",
-    "bluebird": "2.9.33",
+    "bluebird": "3.7.2",
     "csv": "0.3.x",
     "csv-parser": "^1.11.0",
     "fs-extra": "^3.0.1",
