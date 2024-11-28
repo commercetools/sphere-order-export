@@ -54,7 +54,7 @@
     "@commercetools/product-json-to-csv": "2.2.5",
     "bluebird": "2.9.33",
     "csv": "0.3.x",
-    "csv-parser": "^1.11.0",
+    "csv-parser": "^3.0.0",
     "fs-extra": "^3.0.1",
     "object-path": "^0.11.4",
     "optimist": "0.6.1",
